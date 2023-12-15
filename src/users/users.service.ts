@@ -45,7 +45,6 @@ export class UsersService {
         try {
             const user = await this.userModel.create<User>(createUserDto);
 
-            console.log("user created", user)
             return user["dataValues"]
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {

@@ -14,7 +14,11 @@ export class AuthController {
     @Post('login')
     @HttpCode(HttpStatus.OK)
     async login(@Request() req: Req) {
-        return this.authService.login(req.user);
+        try {
+            return this.authService.login(req.user);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     @Public()

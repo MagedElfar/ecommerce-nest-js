@@ -34,6 +34,7 @@
     "dotenv": "^16.3.1",
     "helmet": "^7.1.0",
     "mysql2": "^3.6.5",
+    "nest-winston": "^1.9.4",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -41,7 +42,11 @@
     "rxjs": "^7.8.1",
     "sequelize": "^6.35.1",
     "sequelize-typescript": "^2.1.6",
-    "un": "^0.0.0"
+    "un": "^0.0.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1",
+    "winston-slack-webhook-transport": "^2.3.3",
+    "winston-transport": "^4.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
