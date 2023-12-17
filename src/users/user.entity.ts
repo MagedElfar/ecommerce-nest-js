@@ -1,8 +1,9 @@
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
 import { UserRole } from 'src/core/constants';
+import { UserImages } from 'src/users-images/users-images.entity';
 
-@Table
-export class User extends Model<User> {
+@Table({ tableName: "users" })
+export class UserEntity extends Model<UserEntity> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -29,4 +30,7 @@ export class User extends Model<User> {
         defaultValue: UserRole.USER
     })
     role: UserRole
+
+    @HasMany(() => UserImages)
+    images: UserImages[];
 }

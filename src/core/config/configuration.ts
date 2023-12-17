@@ -11,5 +11,10 @@ export default () => ({
     jwt: {
         secret: process.env.JWTKEY,
         exp: process.env.TOKEN_EXPIRATION
+    },
+    cloudStorage: {
+        apiKey: process.env.CLOUD_API_KEY!,
+        apiSecret: process.env.CLOUD_API_SECRET!,
+        cloudName: process.env.CLOUD_NAME!
     }
 });

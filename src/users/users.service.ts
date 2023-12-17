@@ -1,8 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto.dto';
-import { User } from './user.entity';
+import { UserEntity } from './user.entity';
 import { IUser } from './users.interface';
 import { InjectModel } from '@nestjs/sequelize';
+import { UserImages } from 'src/users-images/users-images.entity';
 
 
 @Injectable()
@@ -10,14 +11,14 @@ export class UsersService {
 
 
     constructor(
-        @InjectModel(User)
-        private userModel: typeof User,
+        @InjectModel(UserEntity)
+        private userModel: typeof UserEntity,
     ) { }
 
     // findAll() {
     // }
 
-    async findOne(data: Partial<IUser>): Promise<User | null> {
+    async findOne(data: Partial<IUser>): Promise<UserEntity | null> {
         try {
             const user = await this.userModel.findOne({ where: data });
 
@@ -29,7 +30,25 @@ export class UsersService {
         }
     }
 
-    async findById(id: number): Promise<User | null> {
+    async findOneFullData(data: Partial<IUser>): Promise<UserEntity | null> {
+        try {
+            const user = await this.userModel.findOne({
+                where: data,
+                include: [{
+                    model: UserImages
+                }]
+            });
+
+            if (!user) return null
+
+            return user["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+
+    async findById(id: number): Promise<UserEntity | null> {
         try {
             const user = await this.userModel.findByPk(id);
 
@@ -41,14 +60,14 @@ export class UsersService {
         }
     }
 
-    async create(createUserDto: CreateUserDto): Promise<User> {
+    async create(createUserDto: CreateUserDto): Promise<UserEntity> {
         try {
-            const user = await this.userModel.create<User>(createUserDto);
+            const user = await this.userModel.create<UserEntity>(createUserDto);
 
             return user["dataValues"]
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new HttpException('Email address is already in use', HttpStatus.BAD_REQUEST);
+                throw new BadRequestException('Email address is already in use');
             }
             throw error
         }

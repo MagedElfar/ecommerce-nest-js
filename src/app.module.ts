@@ -8,13 +8,23 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import configuration from './core/config/configuration';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from './users/user.entity';
+import { UserEntity } from './users/user.entity';
 import { LoggerModule } from './logger/logger.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
+import { RolesGuard } from './core/guards/roles.guard';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { UsersImagesModule } from './users-images/users-images.module';
+import { UserImages } from './users-images/users-images.entity';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 3,
+
+    }]),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration]
@@ -30,18 +40,26 @@ import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        models: [User], // Add your models here
+        models: [UserEntity, UserImages], // Add your models here
+        logging: false,
         sync: {
           alter: true
         }
       }),
     }),
-    UsersModule,
     AuthModule,
-    LoggerModule
+    LoggerModule,
+    UsersModule,
+    UsersImagesModule,
+    CloudinaryModule,
+
   ],
   controllers: [AppController],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },
     {
       provide: APP_FILTER,
       useClass: GlobalExceptionFilter,
@@ -50,6 +68,11 @@ import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+
     AppService
   ],
 })
