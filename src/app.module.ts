@@ -17,6 +17,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { UsersImagesModule } from './users-images/users-images.module';
 import { UserImages } from './users-images/users-images.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     UsersModule,
     UsersImagesModule,
     CloudinaryModule,
+    AdminModule,
 
   ],
   controllers: [AppController],

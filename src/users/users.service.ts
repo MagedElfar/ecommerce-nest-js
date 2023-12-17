@@ -1,9 +1,10 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto.dto';
 import { UserEntity } from './user.entity';
 import { IUser } from './users.interface';
 import { InjectModel } from '@nestjs/sequelize';
 import { UserImages } from 'src/users-images/users-images.entity';
+import { UpdateUserDto } from './dto/updateUserDto.dto';
 
 
 @Injectable()
@@ -30,7 +31,7 @@ export class UsersService {
         }
     }
 
-    async findOneFullData(data: Partial<IUser>): Promise<UserEntity | null> {
+    async findOneFullData(data: Partial<IUser>): Promise<Partial<UserEntity> | null> {
         try {
             const user = await this.userModel.findOne({
                 where: data,
@@ -41,7 +42,9 @@ export class UsersService {
 
             if (!user) return null
 
-            return user["dataValues"]
+            const { password, ...result } = user["dataValues"];
+
+            return result
         } catch (error) {
             throw error
         }
@@ -68,6 +71,28 @@ export class UsersService {
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 throw new BadRequestException('Email address is already in use');
+            }
+            throw error
+        }
+    }
+
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<Partial<UserEntity>> {
+        try {
+            let user = await this.findById(id);
+
+            if (!user) throw new NotFoundException()
+
+            await this.userModel.update(updateUserDto, { where: { id } });
+
+            const { password, ...result } = user
+
+            return {
+                ...result,
+                ...updateUserDto
+            }
+        } catch (error) {
+            if (error.name === 'SequelizeUniqueConstraintError') {
+                throw new BadRequestException('user email or name address is already in use');
             }
             throw error
         }

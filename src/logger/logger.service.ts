@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { join, dirname } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
+import { LoggerDto } from './dto/logger.dto';
 
 const logsDir = join(dirname(__dirname), '..', 'logs');
 
@@ -74,12 +75,14 @@ export class LoggerService {
         });
     }
 
-    public info(message: string, req: Request | null = null, statusCode = null, logData?: any) {
+    public info(loggerDto: LoggerDto) {
+        const { req = null, statusCode = "", logData, message } = loggerDto;
         const data = req ? { endpoint: req.originalUrl, logData, statusCode } : { logData };
         this.logger.info(message, { data });
     }
 
-    public error(message: string, req: Request | null = null, statusCode: any = "", errorData?: any) {
+    public error(loggerDto: LoggerDto) {
+        const { req = null, statusCode = "", logData: errorData, message } = loggerDto;
         const data = req ? {
             endpoint: req.originalUrl,
             logData: errorData ? errorData : "",

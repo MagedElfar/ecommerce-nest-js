@@ -6,6 +6,7 @@ import { UserEntity } from './user.entity';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { User } from 'src/core/decorators/user.decorator';
+import { UpdateUserDto } from './dto/updateUserDto.dto';
 
 @Controller('users')
 export class UsersController {
@@ -17,23 +18,6 @@ export class UsersController {
     //     return this.usersService.findAll()
     // }
 
-    @Post()
-    @Roles([UserRole.ADMIN, UserRole.USER])
-    async create(
-        @Body(ToLowerCasePipe) createUserDto: CreateUserDto,
-        @User() user: UserEntity
-    ): Promise<UserEntity> {
-
-        try {
-            console.log("user = ", user)
-            return await this.usersService.create(createUserDto)
-        } catch (error) {
-            throw error
-        }
-
-
-    }
-
     @Get(":id")
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
@@ -41,20 +25,21 @@ export class UsersController {
 
             if (!user) throw new NotFoundException();
 
-            return user
+            return { user }
         } catch (error) {
             throw error
         }
     }
 
-    @Put(":id")
-    updated(@Param("id", new ParseIntPipe({
-        // errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
-        exceptionFactory: () => {
-            throw new NotAcceptableException("Invalid user ID. Please provide a valid integer ID.");
-        },
-    })) id: number) {
-        console.log(id)
-        return "done"
+    @Put()
+    async updated(@User("id") id: number, @Body() updateUserDto: UpdateUserDto) {
+        try {
+            const user = await this.usersService.update(id, updateUserDto);
+
+            return { user }
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
     }
 }

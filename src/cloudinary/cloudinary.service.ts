@@ -19,7 +19,10 @@ export class CloudinaryService {
                 public_id: `${folder}/${newFileName}`
             }, (error, result) => {
                 if (error) {
-                    this.loggerService.error("cloudinary error:", null, "", { error })
+                    this.loggerService.error({
+                        message: "cloudinary error",
+                        logData: { error }
+                    })
                     reject(error)
                     return;
                 }

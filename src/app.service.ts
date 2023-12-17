@@ -13,12 +13,12 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async onApplicationBootstrap() {
-    // Add models and automatically create tables
-    this.sequelize.addModels([
-      UserEntity,
-      UserImages
-    ]);
-    await this.sequelize.sync({ alter: true });
-  }
+  // async onApplicationBootstrap() {
+  //   // Add models and automatically create tables
+  //   this.sequelize.addModels([
+  //     UserEntity,
+  //     UserImages
+  //   ]);
+  //   await this.sequelize.sync({ alter: true });
+  // }
 }
