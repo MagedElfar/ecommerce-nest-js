@@ -6,12 +6,16 @@ import { UserImages } from 'src/users-images/users-images.entity';
     indexes: [
         {
             unique: true,
-            fields: ['email'],
+            fields: ['name'],
         },
-        // Add other indexes as needed
+
+        {
+            unique: true,
+            fields: ['slug'],
+        },
     ],
 })
-export class User extends Model<User> {
+export class Category extends Model<Category> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -22,22 +26,6 @@ export class User extends Model<User> {
         type: DataType.STRING,
         allowNull: false,
     })
-    email: string;
+    slug: string;
 
-
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    password: string;
-
-    @Column({
-        type: DataType.ENUM(...Object.values(UserRole)),
-        allowNull: false,
-        defaultValue: UserRole.USER
-    })
-    role: UserRole
-
-    @HasMany(() => UserImages)
-    images: UserImages[];
 }

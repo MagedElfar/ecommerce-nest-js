@@ -4,8 +4,8 @@ import { SignUpDto } from './dto/signup.dto';
 import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
-import { UserEntity } from 'src/users/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { IUser } from 'src/users/users.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
         private readonly jwtService: JwtService,
     ) { };
 
-    public async login(user: Partial<UserEntity>) {
+    public async login(user: Partial<IUser>) {
         try {
 
             const token = await this.generateToken({ id: user.id })
@@ -74,7 +74,7 @@ export class AuthService {
         }
     }
 
-    private async generateToken(user: Partial<UserEntity>) {
+    private async generateToken(user: Partial<IUser>) {
         const token = await this.jwtService.signAsync(user);
         return token;
     }

@@ -2,9 +2,8 @@ import { UsersImagesService } from './users-images.service';
 import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from "express"
-import { diskStorage, memoryStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { User } from 'src/core/decorators/user.decorator';
-import { UserEntity } from 'src/users/user.entity';
 
 @Controller('users-images')
 export class UsersImagesController {

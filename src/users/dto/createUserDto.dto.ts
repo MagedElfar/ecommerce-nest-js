@@ -1,6 +1,9 @@
+import { Transform } from "class-transformer";
 import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
 
 export class CreateUserDto {
+    @Transform((param) => transformLowerCase(param))
     @IsString()
     @IsNotEmpty()
     readonly name: string;

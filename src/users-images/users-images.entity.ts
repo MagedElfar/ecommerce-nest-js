@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { UserEntity as User } from 'src/users/user.entity';
+import { User } from 'src/users/user.entity';
 
 @Table({ tableName: "user_images" })
 export class UserImages extends Model<UserImages> {
@@ -19,7 +19,7 @@ export class UserImages extends Model<UserImages> {
     @Column
     userId: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, { onDelete: 'CASCADE' }) // Specify onDelete option here
     user: User;
 
 }

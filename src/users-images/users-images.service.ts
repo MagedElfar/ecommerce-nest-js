@@ -1,8 +1,9 @@
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
-import { UploadImageDto } from './dro/uploadImage.dto';
+import { UploadImageDto } from './dto/uploadImage.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { UserImages } from './users-images.entity';
+import { IUserImage } from './users-images.interface';
 
 
 @Injectable()
@@ -13,7 +14,7 @@ export class UsersImagesService {
         private readonly cloudinaryService: CloudinaryService
     ) { }
 
-    async create(uploadImageDto: UploadImageDto) {
+    async create(uploadImageDto: UploadImageDto): Promise<IUserImage> {
         try {
             const cloudinary = await this.cloudinaryService.upload({
                 file: uploadImageDto.file,

@@ -1,10 +1,12 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { UserQueryDto } from './dto/userQuery.dto';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUserDto.dto';
-import { UserEntity } from './user.entity';
+import { User } from './user.entity';
 import { IUser } from './users.interface';
 import { InjectModel } from '@nestjs/sequelize';
 import { UserImages } from 'src/users-images/users-images.entity';
 import { UpdateUserDto } from './dto/updateUserDto.dto';
+import { Op } from 'sequelize';
 
 
 @Injectable()
@@ -12,14 +14,51 @@ export class UsersService {
 
 
     constructor(
-        @InjectModel(UserEntity)
-        private userModel: typeof UserEntity,
+        @InjectModel(User)
+        private userModel: typeof User,
     ) { }
 
-    // findAll() {
-    // }
+    async findAll(userQueryDto: UserQueryDto) {
+        try {
+            const { limit, page, name } = userQueryDto;
 
-    async findOne(data: Partial<IUser>): Promise<UserEntity | null> {
+            const result = await this.userModel.findAll({
+                where: {
+                    name: { [Op.like]: `%${name}%` }
+                },
+                include: [
+                    { model: UserImages, limit: 10, attributes: ["id", "url"] }
+                ],
+                attributes: { exclude: ["password"] },
+                limit,
+                offset: (page - 1) * limit
+            });
+
+            const users = result.map(item => item["dataValues"])
+
+            return users
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getCount(userQueryDto: UserQueryDto): Promise<number> {
+        try {
+
+            const { name } = userQueryDto;
+            const count = await this.userModel.count({
+                where: {
+                    name: { [Op.like]: `%${name}%` }
+                },
+            });
+
+            return count
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOne(data: Partial<Omit<IUser, "images">>): Promise<IUser | null> {
         try {
             const user = await this.userModel.findOne({ where: data });
 
@@ -31,27 +70,29 @@ export class UsersService {
         }
     }
 
-    async findOneFullData(data: Partial<IUser>): Promise<Partial<UserEntity> | null> {
+    async findOneFullData(data: Partial<Omit<IUser, "images">>): Promise<Partial<IUser> | null> {
         try {
             const user = await this.userModel.findOne({
                 where: data,
+                attributes: { exclude: ["password"] },
                 include: [{
-                    model: UserImages
+                    model: UserImages,
+                    limit: 10,
+                    attributes: ["id", "url"]
                 }]
             });
 
             if (!user) return null
 
-            const { password, ...result } = user["dataValues"];
 
-            return result
+            return user
         } catch (error) {
             throw error
         }
     }
 
 
-    async findById(id: number): Promise<UserEntity | null> {
+    async findById(id: number): Promise<IUser | null> {
         try {
             const user = await this.userModel.findByPk(id);
 
@@ -63,9 +104,9 @@ export class UsersService {
         }
     }
 
-    async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+    async create(createUserDto: CreateUserDto): Promise<IUser> {
         try {
-            const user = await this.userModel.create<UserEntity>(createUserDto);
+            const user = await this.userModel.create<User>(createUserDto);
 
             return user["dataValues"]
         } catch (error) {
@@ -76,7 +117,7 @@ export class UsersService {
         }
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto): Promise<Partial<UserEntity>> {
+    async update(id: number, updateUserDto: UpdateUserDto | Partial<Omit<IUser, "images">>): Promise<Partial<IUser>> {
         try {
             let user = await this.findById(id);
 
@@ -97,5 +138,6 @@ export class UsersService {
             throw error
         }
     }
+
 
 }

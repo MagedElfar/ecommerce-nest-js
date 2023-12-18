@@ -8,7 +8,7 @@ import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import configuration from './core/config/configuration';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { UserEntity } from './users/user.entity';
+import { User } from './users/user.entity';
 import { LoggerModule } from './logger/logger.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
@@ -18,6 +18,8 @@ import { UsersImagesModule } from './users-images/users-images.module';
 import { UserImages } from './users-images/users-images.entity';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { AdminModule } from './admin/admin.module';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/category.entity';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { AdminModule } from './admin/admin.module';
 
     // DatabaseModule,
     SequelizeModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         dialect: 'mysql',
@@ -41,11 +44,13 @@ import { AdminModule } from './admin/admin.module';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        models: [UserEntity, UserImages], // Add your models here
+        models: [User, UserImages, Category], // Add your models here
         logging: false,
         sync: {
-          alter: true
-        }
+          alter: true,
+          // force: true
+        },
+        autoLoadModels: true
       }),
     }),
     AuthModule,
@@ -54,6 +59,7 @@ import { AdminModule } from './admin/admin.module';
     UsersImagesModule,
     CloudinaryModule,
     AdminModule,
+    CategoriesModule,
 
   ],
   controllers: [AppController],
