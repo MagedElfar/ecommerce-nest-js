@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
-import { User } from './users/user.entity';
-import { UserImages } from './users-images/users-images.entity';
+import { User } from './feachers/users/user.entity';
+import { UserImages } from './feachers/users-images/users-images.entity';
 
 
 @Injectable()

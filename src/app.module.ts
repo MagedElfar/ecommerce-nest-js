@@ -1,30 +1,29 @@
 import { Module, Inject, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './feachers/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './feachers/auth/auth.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { JwtAuthGuard } from './feachers/auth/jwt-auth.guard';
 import configuration from './core/config/configuration';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { User } from './users/user.entity';
-import { LoggerModule } from './logger/logger.module';
-import { LoggerMiddleware } from './logger/logger.middleware';
+import { LoggerModule } from './core/logger/logger.module';
+import { LoggerMiddleware } from './core/logger/logger.middleware';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
 import { RolesGuard } from './core/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { UsersImagesModule } from './users-images/users-images.module';
-import { UserImages } from './users-images/users-images.entity';
-import { CloudinaryModule } from './cloudinary/cloudinary.module';
-import { AdminModule } from './admin/admin.module';
-import { CategoriesModule } from './categories/categories.module';
-import { Category } from './categories/category.entity';
+import { UsersImagesModule } from './feachers/users-images/users-images.module';
+import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
+import { AdminModule } from './feachers/admin/admin.module';
+import { CategoriesModule } from './feachers/categories/categories.module';
+import { CategoryImageModule } from './feachers/category-image/category-image.module';
+import { models } from './core/database/models';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([{
-      ttl: 60000,
+      ttl: 1000,
       limit: 3,
 
     }]),
@@ -44,7 +43,7 @@ import { Category } from './categories/category.entity';
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        models: [User, UserImages, Category], // Add your models here
+        models, // Add your models here
         logging: false,
         sync: {
           alter: true,
@@ -60,6 +59,7 @@ import { Category } from './categories/category.entity';
     CloudinaryModule,
     AdminModule,
     CategoriesModule,
+    CategoryImageModule,
 
   ],
   controllers: [AppController],
