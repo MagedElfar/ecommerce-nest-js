@@ -27,7 +27,7 @@ export class UsersService {
                     name: { [Op.like]: `%${name}%` }
                 },
                 include: [
-                    { model: UserImages, limit: 10, attributes: ["id", "url"] }
+                    { model: UserImages, attributes: ["id", "url"] }
                 ],
                 attributes: { exclude: ["password"] },
                 limit,
@@ -58,7 +58,7 @@ export class UsersService {
         }
     }
 
-    async findOne(data: Partial<Omit<IUser, "images">>): Promise<IUser | null> {
+    async findOne(data: Partial<Omit<IUser, "image">>): Promise<IUser | null> {
         try {
             const user = await this.userModel.findOne({ where: data });
 
@@ -70,15 +70,15 @@ export class UsersService {
         }
     }
 
-    async findOneFullData(data: Partial<Omit<IUser, "images">>): Promise<Partial<IUser> | null> {
+    async findOneFullData(data: Partial<Omit<IUser, "image">>): Promise<Partial<IUser> | null> {
         try {
             const user = await this.userModel.findOne({
                 where: data,
                 attributes: { exclude: ["password"] },
                 include: [{
                     model: UserImages,
-                    limit: 10,
-                    attributes: ["id", "url"]
+                    attributes: ["id", "url"],
+
                 }]
             });
 
@@ -87,6 +87,7 @@ export class UsersService {
 
             return user
         } catch (error) {
+            console.log(error)
             throw error
         }
     }
@@ -117,7 +118,7 @@ export class UsersService {
         }
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto | Partial<Omit<IUser, "images">>): Promise<Partial<IUser>> {
+    async update(id: number, updateUserDto: UpdateUserDto | Partial<Omit<IUser, "image">>): Promise<Partial<IUser>> {
         try {
             let user = await this.findById(id);
 

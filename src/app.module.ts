@@ -19,6 +19,12 @@ import { AdminModule } from './feachers/admin/admin.module';
 import { CategoriesModule } from './feachers/categories/categories.module';
 import { CategoryImageModule } from './feachers/category-image/category-image.module';
 import { models } from './core/database/models';
+import { ProfilesModule } from './feachers/profiles/profiles.module';
+import { BrandsModule } from './feachers/brands/brands.module';
+import { BrandsImageModule } from './feachers/brands-image/brands-image.module';
+import { ProductsModule } from './feachers/products/products.module';
+import { AttributesModule } from './feachers/attributes/attributes.module';
+import { AttributeValuesModule } from './feachers/attribute-values/attribute-values.module';
 
 @Module({
   imports: [
@@ -52,15 +58,20 @@ import { models } from './core/database/models';
         autoLoadModels: true
       }),
     }),
-    AuthModule,
     LoggerModule,
+    CloudinaryModule,
+    AuthModule,
     UsersModule,
     UsersImagesModule,
-    CloudinaryModule,
     AdminModule,
     CategoriesModule,
     CategoryImageModule,
-
+    ProfilesModule,
+    BrandsModule,
+    BrandsImageModule,
+    ProductsModule,
+    AttributesModule,
+    AttributeValuesModule
   ],
   controllers: [AppController],
   providers: [

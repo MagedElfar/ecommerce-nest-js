@@ -1,5 +1,5 @@
 import { UsersImagesService } from './users-images.service';
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from "express"
 import { memoryStorage } from 'multer';
@@ -25,6 +25,17 @@ export class UsersImagesController {
 
             return { image }
 
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @Delete(":id")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(@Param("id", ParseIntPipe) id: number, @User("id") userId: number) {
+        try {
+            await this.usersImagesService.delete(id, userId);
+            return
         } catch (error) {
             throw error
         }

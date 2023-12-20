@@ -33,7 +33,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
         this.loggerService.error({
             message: error,
-            logData: { error: message }
+            logData: { error: JSON.stringify(exception.stack || exception.message) }
         })
         response.status(statusCode).json({
             message: message,

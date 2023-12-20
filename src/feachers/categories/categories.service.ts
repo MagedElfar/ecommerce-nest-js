@@ -27,12 +27,18 @@ export class CategoriesService {
 
             const result = await this.categoryModel.findAll({
                 where: {
-                    name: { [Op.like]: `%${name}%` }
+                    name: { [Op.like]: `%${name}%` },
+                    parentId: null
                 },
                 include: [
                     {
                         model: CategoryImage,
                         attributes: ["id", "url"]
+                    },
+                    {
+                        model: Category,
+                        as: "subCategories",
+                        attributes: ["id", "name", "slug"]
                     }
                 ],
                 limit,
@@ -53,7 +59,9 @@ export class CategoriesService {
             const { name } = categoryQueryDto;
             const count = await this.categoryModel.count({
                 where: {
-                    name: { [Op.like]: `%${name}%` }
+                    name: { [Op.like]: `%${name}%` },
+                    parentId: null
+
                 },
             });
 
@@ -82,7 +90,7 @@ export class CategoriesService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICategory, "image">>): Promise<ICategory | null> {
+    async findOne(data: Partial<Omit<ICategory, "image" | "subCategories" | "parent">>): Promise<ICategory | null> {
         try {
             const category = await this.categoryModel.findOne({
                 where: data,
@@ -90,6 +98,15 @@ export class CategoriesService {
                     {
                         model: CategoryImage,
                         attributes: ["id", "url"]
+                    },
+                    {
+                        model: Category,
+                        as: "subCategories",
+                        attributes: ["id", "name", "slug"]
+                    },
+                    {
+                        model: Category,
+                        as: "parent"
                     }
                 ],
             })
@@ -117,6 +134,10 @@ export class CategoriesService {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 throw new BadRequestException('Category is already in exist');
             }
+
+            if (error.name === "SequelizeForeignKeyConstraintError") {
+                throw new NotFoundException('Parent category not found');
+            }
             throw error
         }
     }
@@ -143,6 +164,10 @@ export class CategoriesService {
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 throw new BadRequestException('Category is already in exist');
+            }
+
+            if (error.name === "SequelizeForeignKeyConstraintError") {
+                throw new NotFoundException('Parent category not found');
             }
             throw error
         }

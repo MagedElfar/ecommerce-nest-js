@@ -12,3 +12,4 @@ export const IS_PUBLIC_KEY = 'isPublic';
 export const CLOUDINARY = "CLOUDINARY"
 export const USERFolder = "users"
 export const CategoryFolder = "categories"
+export const BrandsFolder = "brands"

@@ -1,44 +1,44 @@
-import { CategoriesService } from './../categories/categories.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { CategoryImage } from './category-image.entity';
-import { UploadCategoryImageDto } from './dto/uploadCategoryImage.dto';
+import { BrandImage } from './brands-image.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
-import { ICategoryImage } from './category-image.interface';
-import { CategoryFolder } from 'src/core/constants';
+import { IBrandImage } from './brands-image.interface';
+import { BrandsFolder } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
+import { BrandsService } from '../brands/brands.service';
+import { UploadBrandImageDto } from './dto/uploadBrandImage.dto';
 
 @Injectable()
-export class CategoryImageService {
+export class BrandImageService {
     constructor(
-        @InjectModel(CategoryImage)
-        private readonly categoryImageModel: typeof CategoryImage,
-        private readonly categoriesService: CategoriesService,
+        @InjectModel(BrandImage)
+        private readonly branImageModel: typeof BrandImage,
+        private readonly brandsService: BrandsService,
         private sequelize: Sequelize,
         private readonly cloudinaryService: CloudinaryService,
 
     ) { }
 
-    async create(uploadCategoryImageDto: UploadCategoryImageDto): Promise<ICategoryImage> {
+    async create(uploadBrandImageDto: UploadBrandImageDto): Promise<IBrandImage> {
 
         let storageKey: string = "";
         let url: string = ""
 
         try {
 
-            const category = await this.categoriesService.findOneById(uploadCategoryImageDto.categoryId);
+            const category = await this.brandsService.findOneById(uploadBrandImageDto.brandId);
 
             if (!category) throw new NotFoundException()
 
             const cloudinary = await this.cloudinaryService.upload({
-                file: uploadCategoryImageDto.file,
-                folder: CategoryFolder
+                file: uploadBrandImageDto.file,
+                folder: BrandsFolder
             });
 
             storageKey = cloudinary.public_id
             url = cloudinary.url
 
-            let image = await this.findOne({ categoryId: uploadCategoryImageDto.categoryId });
+            let image = await this.findOne({ brandId: uploadBrandImageDto.brandId });
 
             if (image) {
 
@@ -53,8 +53,9 @@ export class CategoryImageService {
                 }
 
             } else {
-                image = await this.categoryImageModel.create({
-                    categoryId: uploadCategoryImageDto.categoryId,
+                console.log("ooo")
+                image = await this.branImageModel.create({
+                    brandId: uploadBrandImageDto.brandId,
                     url: cloudinary.url,
                     storageKey
                 })
@@ -70,9 +71,9 @@ export class CategoryImageService {
 
     }
 
-    async findById(id: number): Promise<ICategoryImage | null> {
+    async findById(id: number): Promise<IBrandImage | null> {
         try {
-            const image = await this.categoryImageModel.findByPk(id)
+            const image = await this.branImageModel.findByPk(id)
 
             if (!image) return null;
 
@@ -82,9 +83,9 @@ export class CategoryImageService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICategoryImage, "category">>): Promise<ICategoryImage | null> {
+    async findOne(data: Partial<Omit<IBrandImage, "category">>): Promise<IBrandImage | null> {
         try {
-            const image = await this.categoryImageModel.findOne({ where: data })
+            const image = await this.branImageModel.findOne({ where: data })
 
             if (!image) return null;
 
@@ -94,10 +95,10 @@ export class CategoryImageService {
         }
     }
 
-    async update(id: number, data: Partial<Omit<ICategoryImage, "category">>): Promise<ICategoryImage | null> {
+    async update(id: number, data: Partial<Omit<IBrandImage, "category">>): Promise<IBrandImage | null> {
         try {
 
-            await this.categoryImageModel.update(data, { where: { id } })
+            await this.branImageModel.update(data, { where: { id } })
 
             return
         } catch (error) {
@@ -115,7 +116,7 @@ export class CategoryImageService {
 
             if (!image) throw new NotFoundException();
 
-            const isDelete = await this.categoryImageModel.destroy({
+            const isDelete = await this.branImageModel.destroy({
                 where: { id },
                 transaction: t
             },)

@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
 import { UserRole } from 'src/core/constants';
 import { UserImages } from 'src/feachers/users-images/users-images.entity';
 
@@ -38,6 +38,6 @@ export class User extends Model<User> {
     })
     role: UserRole
 
-    @HasMany(() => UserImages)
-    images: UserImages[];
+    @HasOne(() => UserImages)
+    image: UserImages;
 }

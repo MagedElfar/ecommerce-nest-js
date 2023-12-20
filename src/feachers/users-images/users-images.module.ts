@@ -4,11 +4,13 @@ import { UsersImagesController } from './users-images.controller';
 import { UsersImagesService } from './users-images.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserImages } from './users-images.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([UserImages]),
-    CloudinaryModule
+    CloudinaryModule,
+    UsersModule
   ],
   controllers: [UsersImagesController],
   providers: [UsersImagesService]

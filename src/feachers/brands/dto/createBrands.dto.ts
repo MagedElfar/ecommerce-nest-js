@@ -2,15 +2,10 @@ import { Transform } from "class-transformer";
 import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
 
-export class CreateCategoryDto {
+export class CreateBrandDto {
 
     @IsString()
     @IsNotEmpty()
     @Transform((param) => transformLowerCase(param))
     name: string
-
-    @IsOptional()
-    @IsInt()
-    @Min(1)
-    parentId: number
 }

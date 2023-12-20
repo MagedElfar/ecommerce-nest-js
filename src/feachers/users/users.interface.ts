@@ -7,5 +7,5 @@ export interface IUser extends IModel {
     email?: string
     password?: string,
     role: UserRole,
-    images?: IUserImage[]
+    image?: IUserImage
 }

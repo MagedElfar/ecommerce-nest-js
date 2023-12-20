@@ -5,7 +5,9 @@ import { existsSync, mkdirSync } from 'fs';
 import * as DailyRotateFile from 'winston-daily-rotate-file';
 import { LoggerDto } from './dto/logger.dto';
 
-const logsDir = join(dirname(__dirname), '..', 'logs');
+const logsDir = join(dirname(__dirname), '..', "..", 'logs');
+
+console.log(logsDir)
 
 if (!existsSync(logsDir)) {
     mkdirSync(logsDir);

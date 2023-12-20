@@ -1,16 +1,10 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { User } from 'src/feachers/users/user.entity';
+import { Category } from '../categories/category.entity';
+import { Brand } from '../brands/brands.entity';
 
-@Table({
-    tableName: "user_images",
-    indexes: [
-        {
-            unique: true,
-            fields: ["userId"]
-        }
-    ]
-})
-export class UserImages extends Model<UserImages> {
+@Table({ tableName: "brands_image" })
+export class BrandImage extends Model<BrandImage> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -23,11 +17,11 @@ export class UserImages extends Model<UserImages> {
     })
     storageKey: string
 
-    @ForeignKey(() => User)
+    @ForeignKey(() => Brand)
     @Column
-    userId: number;
+    brandId: number;
 
-    @BelongsTo(() => User, { onDelete: 'CASCADE' }) // Specify onDelete option here
-    user: User;
+    @BelongsTo(() => Brand, { onDelete: "CASCADE" }) // Specify onDelete option here
+    brand: Brand;
 
 }
