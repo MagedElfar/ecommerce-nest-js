@@ -7,6 +7,7 @@ import { AttributeValues } from './attribute-values.entity';
 @Module({
   imports: [SequelizeModule.forFeature([AttributeValues])],
   providers: [AttributeValuesService],
-  controllers: [AttributeValuesController]
+  controllers: [AttributeValuesController],
+  exports: [AttributeValuesService]
 })
 export class AttributeValuesModule { }

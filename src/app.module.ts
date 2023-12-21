@@ -25,6 +25,8 @@ import { BrandsImageModule } from './feachers/brands-image/brands-image.module';
 import { ProductsModule } from './feachers/products/products.module';
 import { AttributesModule } from './feachers/attributes/attributes.module';
 import { AttributeValuesModule } from './feachers/attribute-values/attribute-values.module';
+import { ProductVariationsModule } from './feachers/product-variations/product-variations.module';
+import { ProductVariationAttributesModule } from './feachers/product_variation_attributes/product_variation_attributes.module';
 
 @Module({
   imports: [
@@ -49,11 +51,11 @@ import { AttributeValuesModule } from './feachers/attribute-values/attribute-val
         username: configService.get<string>('database.username'),
         password: configService.get<string>('database.password'),
         database: configService.get<string>('database.database'),
-        models, // Add your models here
+        models,
+        retryAttempts: 1,
         logging: false,
         sync: {
           alter: true,
-          // force: true
         },
         autoLoadModels: true
       }),
@@ -71,7 +73,9 @@ import { AttributeValuesModule } from './feachers/attribute-values/attribute-val
     BrandsImageModule,
     ProductsModule,
     AttributesModule,
-    AttributeValuesModule
+    AttributeValuesModule,
+    ProductVariationsModule,
+    ProductVariationAttributesModule
   ],
   controllers: [AppController],
   providers: [

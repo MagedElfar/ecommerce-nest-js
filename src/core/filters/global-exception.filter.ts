@@ -27,6 +27,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             error = exp.getResponse().error
         }
 
+        console.log(exception)
+
         // // Log the error using your logger service
         // this.logger.error(`[${request.method}] ${request.url}`, exception.stack, 'ExceptionFilter');
 

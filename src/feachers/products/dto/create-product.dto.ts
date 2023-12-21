@@ -1,7 +1,8 @@
-import { Transform } from "class-transformer";
-import { IsDecimal, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from "class-validator";
+import { PartialType, OmitType } from "@nestjs/mapped-types";
+import { Transform, Type } from "class-transformer";
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator";
 import { transformFloat } from "src/core/pipes/parseFloat.pipe";
-import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
+import { CreateProductVariationDto } from "src/feachers/product-variations/dto/create-product-variations.dto";
 
 export class CreateProductDto {
     @IsNotEmpty()
@@ -19,4 +20,8 @@ export class CreateProductDto {
     price: number
 
     userId?: number
+
+    @ValidateNested({ each: true })
+    @Type(() => PartialType(OmitType(CreateProductVariationDto, ['productId'])))
+    variant: CreateProductVariationDto
 }

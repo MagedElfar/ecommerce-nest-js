@@ -45,9 +45,9 @@ export class CategoriesService {
                 offset: (page - 1) * limit
             });
 
-            const users = result.map(item => item["dataValues"])
+            const categories = result.map(item => item["dataValues"])
 
-            return users
+            return categories
         } catch (error) {
             throw error
         }

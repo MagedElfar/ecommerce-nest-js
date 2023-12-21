@@ -11,6 +11,7 @@ export class AttributeValuesService {
         private readonly attributeValueModel: typeof AttributeValues
     ) { }
 
+
     async create(createAttributeValueDto: CreateAttributeValueDto): Promise<IAttributeValue> {
         try {
             let value = await this.findOne({ ...createAttributeValueDto });
@@ -33,6 +34,18 @@ export class AttributeValuesService {
     async findOne(data: Partial<Omit<IAttributeValue, "attribute">>): Promise<IAttributeValue | null> {
         try {
             const value = await this.attributeValueModel.findOne({ where: data });
+
+            if (!value) return null;
+
+            return value["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOneById(id: number): Promise<IAttributeValue | null> {
+        try {
+            const value = await this.attributeValueModel.findByPk(id);
 
             if (!value) return null;
 
