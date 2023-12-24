@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ProductVariationAttributesController } from './product_variation_attributes.controller';
 import { ProductVariationAttributesService } from './product_variation_attributes.service';
 import { SequelizeModule } from '@nestjs/sequelize';
@@ -9,10 +9,11 @@ import { AttributeValuesModule } from '../attribute-values/attribute-values.modu
 @Module({
   imports: [
     SequelizeModule.forFeature([ProductVariationAttribute]),
-    ProductVariationsModule,
+    forwardRef(() => ProductVariationsModule),
     AttributeValuesModule
   ],
   controllers: [ProductVariationAttributesController],
-  providers: [ProductVariationAttributesService]
+  providers: [ProductVariationAttributesService],
+  exports: [ProductVariationAttributesService]
 })
 export class ProductVariationAttributesModule { }

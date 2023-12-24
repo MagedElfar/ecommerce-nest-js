@@ -9,5 +9,6 @@ export interface IProduct extends IModel {
     price?: number
     userId?: number
     user?: User
-    variations?: ProductVariations[]
+    variations?: ProductVariations[],
+    attributes?: { [key: string]: string[] }[]
 }

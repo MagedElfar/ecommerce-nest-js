@@ -3,6 +3,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { AttributeValues } from './attribute-values.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAttributeValue } from './attribute-values.interface';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class AttributeValuesService {
@@ -43,9 +44,10 @@ export class AttributeValuesService {
         }
     }
 
-    async findOneById(id: number): Promise<IAttributeValue | null> {
+    async findOneById(id: number, t?: Transaction
+    ): Promise<IAttributeValue | null> {
         try {
-            const value = await this.attributeValueModel.findByPk(id);
+            const value = await this.attributeValueModel.findByPk(id, { transaction: t });
 
             if (!value) return null;
 

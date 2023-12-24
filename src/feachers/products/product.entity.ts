@@ -1,6 +1,7 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
 import { User } from "../users/user.entity";
 import { ProductVariations } from "../product-variations/product-variations.entity";
+import { Category } from "../categories/category.entity";
 
 @Table({
     indexes: [
@@ -43,4 +44,10 @@ export class Product extends Model<Product> {
 
     @HasMany(() => ProductVariations, { as: "variations" })
     variations: ProductVariations[]
+
+    @ForeignKey(() => Category)
+    categoryId: number
+
+    @BelongsTo(() => Category, { onDelete: "SET NULL" })
+    category: Category
 }

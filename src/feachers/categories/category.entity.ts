@@ -1,7 +1,7 @@
 import { Table, Column, Model, DataType, HasMany, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { UserRole } from 'src/core/constants';
-import { UserImages } from 'src/feachers/users-images/users-images.entity';
 import { CategoryImage } from '../category-image/category-image.entity';
+import { Product } from '../products/product.entity';
+import { SubCategory } from '../sub-categories/sub-category.entity';
 
 @Table({
     indexes: [
@@ -24,17 +24,12 @@ export class Category extends Model<Category> {
     })
     slug: string;
 
-    @ForeignKey(() => Category)
-    @Column
-    parentId: number
-
-    @BelongsTo(() => Category, { onDelete: "SET NULL", as: "parent" })
-    parent: Category
-
-    @HasMany(() => Category, { as: "subCategories" })
-    subCategories: Category[]
+    @HasMany(() => SubCategory)
+    subCategories: SubCategory[]
 
     @HasOne(() => CategoryImage)
     image: CategoryImage
 
+    @HasMany(() => Product)
+    product: Product
 }

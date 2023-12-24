@@ -85,9 +85,29 @@ export class ProductsService {
 
             })
 
-            if (!product) throw new NotFoundException()
+            if (!product) throw new NotFoundException();
 
-            return product["dataValues"]
+            const attributes = product["variations"]
+                .flatMap((variation: any) => variation['attributes'])
+                .filter((attribute: any) => attribute['value'])
+                .reduce((acc: Record<string, string[]>, attribute: any) => {
+                    const attributeName = attribute['attribute']['name'];
+                    const attributeValue = attribute['value'];
+
+                    if (!acc[attributeName]) {
+                        acc[attributeName] = [];
+                    }
+
+                    if (!acc[attributeName].includes(attributeValue)) {
+                        acc[attributeName].push(attributeValue);
+                    }
+
+                    return acc;
+                }, {});
+
+            console.log(attributes)
+
+            return { ...product["dataValues"], attributes }
         } catch (error) {
             throw error
         }

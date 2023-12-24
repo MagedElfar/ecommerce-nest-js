@@ -1,64 +1,61 @@
-import { CreateCategoryDto } from './dto/createCategory.dto';
+import { CreateSubCategoryDto } from './dto/create-sub-category.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Category } from './category.entity';
+import { SubCategory } from './sub-category.entity';
 import * as slugify from "slugify"
-import { ICategory } from './category.interface';
-import { UpdateCategoryDto } from './dto/updateCategory.dto';
-import { CategoryQueryDto } from './dto/categoryQuery.dto';
+import { ISubCategory } from './sub-category.interface';
+import { UpdateSubCategoryDto } from './dto/update-sub-category.dto';
+import { SubCategoryQueryDto } from './dto/sub-categoryQuery.dto';
 import { Op } from 'sequelize';
 import { CategoryImage } from '../category-image/category-image.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Sequelize } from 'sequelize-typescript';
-import { SubCategory } from '../sub-categories/sub-category.entity';
+import { SubCategoryImage } from '../sub-category-image/sub-category-image.entity';
 
 @Injectable()
-export class CategoriesService {
+export class SubCategoriesService {
     constructor(
-        @InjectModel(Category)
-        private categoryModel: typeof Category,
+        @InjectModel(SubCategory)
+        private subCategoryModel: typeof SubCategory,
         private readonly cloudinaryService: CloudinaryService,
         private sequelize: Sequelize,
 
     ) { }
 
-    async findAll(categoryQueryDto: CategoryQueryDto): Promise<ICategory[]> {
+    async findAll(subCategoryQueryDto: SubCategoryQueryDto): Promise<ISubCategory[]> {
         try {
-            const { limit, page, name } = categoryQueryDto;
+            const { limit, page, name } = subCategoryQueryDto;
 
-            const result = await this.categoryModel.findAll({
+            const result = await this.subCategoryModel.findAll({
                 where: {
                     name: { [Op.like]: `%${name}%` },
                 },
                 include: [
                     {
-                        model: CategoryImage,
+                        model: SubCategoryImage,
                         attributes: ["id", "url"]
-                    },
-                    {
-                        model: SubCategory,
-                        attributes: ["id", "name", "slug"]
                     }
                 ],
                 limit,
                 offset: (page - 1) * limit
             });
 
-            const categories = result.map(item => item["dataValues"])
+            const subCategories = result.map(item => item["dataValues"])
 
-            return categories
+            return subCategories
         } catch (error) {
             throw error
         }
     }
 
-    async getCount(categoryQueryDto: CategoryQueryDto): Promise<number> {
+    async getCount(subCategoryQueryDto: SubCategoryQueryDto): Promise<number> {
         try {
 
-            const { name } = categoryQueryDto;
-            const count = await this.categoryModel.count({
+            const { name } = subCategoryQueryDto;
+            const count = await this.subCategoryModel.count({
                 where: {
                     name: { [Op.like]: `%${name}%` },
+
                 },
             });
 
@@ -68,85 +65,85 @@ export class CategoriesService {
         }
     }
 
-    async findOneById(id: number): Promise<ICategory | null> {
+    async findOneById(id: number): Promise<ISubCategory | null> {
         try {
-            const category = await this.categoryModel.findByPk(id, {
+            const subCategory = await this.subCategoryModel.findByPk(id, {
                 include: [
                     {
-                        model: CategoryImage,
+                        model: SubCategoryImage,
                         attributes: ["storageKey"]
                     }
                 ],
             })
 
-            if (!category) return null;
+            if (!subCategory) return null;
 
-            return category["dataValues"]
+            return subCategory["dataValues"]
         } catch (error) {
             throw error
         }
     }
 
-    async findOne(data: Partial<Omit<ICategory, "image" | "subCategories" | "parent">>): Promise<ICategory | null> {
+    async findOne(data: Partial<Omit<ISubCategory, "image" | "subCategories" | "parent">>): Promise<ISubCategory | null> {
         try {
-            const category = await this.categoryModel.findOne({
+            const subCategory = await this.subCategoryModel.findOne({
                 where: data,
                 include: [
                     {
-                        model: CategoryImage,
+                        model: SubCategoryImage,
                         attributes: ["id", "url"]
                     },
-                    {
-                        model: SubCategory,
-                        attributes: ["id", "name", "slug"]
-                    }
                 ],
             })
 
-            if (!category) return null;
+            if (!subCategory) return null;
 
-            return category["dataValues"]
+            return subCategory["dataValues"]
         } catch (error) {
             throw error
         }
     }
 
-    async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
+    async create(createSubCategoryDto: CreateSubCategoryDto): Promise<ISubCategory> {
         try {
 
-            const slug: string = slugify.default(createCategoryDto.name);
+            const slug: string = slugify.default(createSubCategoryDto.name);
 
-            const category = await this.categoryModel.create<Category>({
-                ...createCategoryDto,
+            const subCategory = await this.subCategoryModel.create<SubCategory>({
+                ...createSubCategoryDto,
                 slug
             })
 
-            return category["dataValues"]
+            return subCategory["dataValues"]
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 throw new BadRequestException('Category is already in exist');
+            }
+
+            if (error.name === "SequelizeForeignKeyConstraintError") {
+                throw new NotFoundException('Parent category not found');
             }
             throw error
         }
     }
 
-    async update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<ICategory> {
+    async update(id: number, updateSubCategoryDto: UpdateSubCategoryDto): Promise<ISubCategory> {
         try {
 
-            let category = await this.findOneById(id);
+            let subCategory = await this.findOneById(id);
 
-            if (!category) throw new NotFoundException();
+            if (!subCategory) throw new NotFoundException();
 
-            const slug: string = slugify.default(updateCategoryDto.name);
+            const slug: string = slugify.default(updateSubCategoryDto.name);
 
-            await this.categoryModel.update<Category>({
-                ...updateCategoryDto,
+            await this.subCategoryModel.update<SubCategory>({
+                ...updateSubCategoryDto,
                 slug
             }, { where: { id } })
 
             return {
-                ...category,
-                ...updateCategoryDto,
+                ...subCategory,
+                ...updateSubCategoryDto,
                 slug
             }
         } catch (error) {
@@ -171,7 +168,7 @@ export class CategoriesService {
 
             if (!category) throw new NotFoundException();
 
-            const isDeleted = await this.categoryModel.destroy({
+            const isDeleted = await this.subCategoryModel.destroy({
                 where: { id },
                 transaction: t
             });

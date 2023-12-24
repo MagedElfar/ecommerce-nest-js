@@ -27,6 +27,8 @@ import { AttributesModule } from './feachers/attributes/attributes.module';
 import { AttributeValuesModule } from './feachers/attribute-values/attribute-values.module';
 import { ProductVariationsModule } from './feachers/product-variations/product-variations.module';
 import { ProductVariationAttributesModule } from './feachers/product_variation_attributes/product_variation_attributes.module';
+import { SubCategoriesModule } from './feachers/sub-categories/sub-categories.module';
+import { SubCategoryImageModule } from './feachers/sub-category-image/sub-category-image.module';
 
 @Module({
   imports: [
@@ -68,6 +70,8 @@ import { ProductVariationAttributesModule } from './feachers/product_variation_a
     AdminModule,
     CategoriesModule,
     CategoryImageModule,
+    SubCategoriesModule,
+    SubCategoryImageModule,
     ProfilesModule,
     BrandsModule,
     BrandsImageModule,
