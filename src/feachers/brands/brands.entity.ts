@@ -3,6 +3,7 @@ import { UserRole } from 'src/core/constants';
 import { UserImages } from 'src/feachers/users-images/users-images.entity';
 import { CategoryImage } from '../category-image/category-image.entity';
 import { BrandImage } from '../brands-image/brands-image.entity';
+import { Product } from '../products/product.entity';
 
 @Table({
     indexes: [
@@ -24,6 +25,9 @@ export class Brand extends Model<Brand> {
         allowNull: false,
     })
     slug: string;
+
+    @HasMany(() => Product)
+    products: Product[]
 
     @HasOne(() => BrandImage)
     image: BrandImage

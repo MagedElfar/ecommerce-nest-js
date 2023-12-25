@@ -1,6 +1,8 @@
-import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo, BelongsToMany, HasMany } from 'sequelize-typescript';
 import { Category } from '../categories/category.entity';
 import { SubCategoryImage } from '../sub-category-image/sub-category-image.entity';
+import { ProductSubCategory } from '../products-sub-categories/products-sub-category.entity';
+import { Product } from '../products/product.entity';
 
 
 @Table({
@@ -34,5 +36,9 @@ export class SubCategory extends Model<SubCategory> {
 
     @HasOne(() => SubCategoryImage)
     image: SubCategoryImage
+
+    @BelongsToMany(() => Product, () => ProductSubCategory)
+    products?: Product[];
+
 
 }

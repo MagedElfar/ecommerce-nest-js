@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductVariationAttribute } from './product_variation_attributes.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductVariationsService } from '../product-variations/product-variations.service';
@@ -6,6 +6,7 @@ import { IProductVariationAttributes } from './product_variation_attributes.inte
 import { CreateProductAttributesDto } from './dto/create-product_variation_attributes.dto';
 import { AttributeValuesService } from '../attribute-values/attribute-values.service';
 import { Transaction } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 
 @Injectable()
@@ -15,7 +16,8 @@ export class ProductVariationAttributesService {
         private readonly productAttributeModel: typeof ProductVariationAttribute,
         @Inject(forwardRef(() => ProductVariationsService))
         private readonly productVariationsService: ProductVariationsService,
-        private readonly attributeValuesService: AttributeValuesService
+        private readonly attributeValuesService: AttributeValuesService,
+        private sequelize: Sequelize,
     ) { }
 
     async findOne(
@@ -23,18 +25,24 @@ export class ProductVariationAttributesService {
         t?: Transaction
 
     ): Promise<IProductVariationAttributes | null> {
+
+        const transaction = t || await this.sequelize.transaction();
+
         try {
 
             const productAttribute = await this.productAttributeModel.findOne({
                 where: data,
-                transaction: t
+                transaction
             });
 
-            if (!productAttribute) return null
+            if (!productAttribute) return null;
 
-            return productAttribute["dataValues"]
+            if (!t) await transaction.commit()
+
+            return t ? productAttribute : productAttribute["dataValues"];
+
         } catch (error) {
-
+            if (!t) await transaction.rollback()
             throw error
         }
     }
@@ -44,43 +52,66 @@ export class ProductVariationAttributesService {
         createProductAttributesDto: CreateProductAttributesDto,
         t?: Transaction
     ): Promise<IProductVariationAttributes> {
+
+        const transaction = t || await this.sequelize.transaction();
+
         try {
 
             const { attrId, productVariationId } = createProductAttributesDto;
 
+            //check if the variant exist if request come from the module controller
             if (!t) {
-                const variant = await this.productVariationsService.findOneById(productVariationId);
-
+                const variant = await this.productVariationsService.findOneById(
+                    productVariationId,
+                    transaction
+                );
                 if (!variant) throw new NotFoundException("variant not found");
             }
 
-            const attribute = await this.attributeValuesService.findOneById(attrId, t);
+            //check if attribute exist
+            const attribute = await this.attributeValuesService.findOneById(
+                attrId,
+                transaction
+            );
+
 
             if (!attribute) throw new NotFoundException("attribute not found");
 
-            const productAttribute = await this.findOne({
-                attrId,
-                productVariationId
-            }, t)
+            //check if attribute already assign to that variant
+            const productAttribute = await this.findOne(
+                {
+                    attrId,
+                    productVariationId
+                }
+                ,
+                transaction
+            )
+
+            if (productAttribute) throw new BadRequestException("product shouldn't has duplicate attributes")
 
 
-            if (productAttribute) throw new BadRequestException("value already assign to this attribute")
-
+            //create new record
             const productVariant = await this.productAttributeModel.create<ProductVariationAttribute>(
                 {
                     productVariationId,
                     attrId
                 },
                 {
-                    transaction: t
+                    transaction
                 }
             )
 
-            return productVariant["dataValues"]
+            if (!t) await transaction.commit()
+
+            return t ? productVariant : productVariant["dataValues"];
+
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException("value already assign to this attribute")
-            }
+
+            if (!t) await transaction.rollback()
+
+            if (error instanceof BadRequestException || error instanceof NotFoundException) throw error
+            if (error.parent)
+                throw new InternalServerErrorException(error.parent);
             throw error
         }
     }

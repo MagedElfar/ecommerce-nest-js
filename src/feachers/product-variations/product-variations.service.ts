@@ -23,79 +23,98 @@ export class ProductVariationsService {
 
     ) { }
 
-    async _create(createProductVariationDto: CreateProductVariationDto, t: Transaction): Promise<ProductVariations> {
-        try {
-            const { attributes: attrs = [], ...createDto } = createProductVariationDto
-
-            const variant = await this.productVariationModel.create<ProductVariations>(
-                createDto,
-                { transaction: t }
-            )
-
-            const attributes: any = [];
-
-            await Promise.all(attrs.map(async (attr) => {
-                const attribute = await this.productVariationAttributesService.create(
-                    { ...attr, productVariationId: variant["dataValues"].id },
-                    t
-                )
-
-                attributes.push(attribute)
-            }))
-
-
-            return await this.findOneFullData({ id: variant["dataValues"].id }, t)
-        } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('SKU should be unique');
-            }
-            throw error
-        }
-    }
-
     async create(
         createProductVariationDto: CreateProductVariationDto,
+        t?: Transaction
     ): Promise<ProductVariations> {
-        const t = await this.sequelize.transaction()
+
+        const transaction = t || await this.sequelize.transaction();
+
         try {
 
-            const { attributes, ...createDto } = createProductVariationDto
+            const { attributes = [], ...createDto } = createProductVariationDto;
 
-            const product = await this.productsService.findOneById(createProductVariationDto.productId);
+            //check if the product exist if request come from the module controller
+            if (!t) {
+                const product = await this.productsService.findOneById(createProductVariationDto.productId);
 
-            if (!product) throw new NotFoundException("product not found");
+                if (!product) throw new NotFoundException("product not found");
+            }
 
-            const productVariant = await this._create(createProductVariationDto, t)
+            //create new product variant record in databases
+            const variant = await this.productVariationModel.create<ProductVariations>(
+                createDto,
+                {
+                    transaction,
+                    include: [{
+                        model: AttributeValues,
+                        attributes: ["value", "id"],
+                        through: { attributes: [] },
+                        include: [
+                            {
+                                model: Attribute,
+                                attributes: ["id", "name"],
+                            }
+                        ]
+                    }],
+                }
+            )
 
-            t.commit()
+            // add attributes in case the attribute founds
+            if (attributes && attributes.length > 0) {
 
-            return productVariant
+                const attrs = await Promise.all(attributes.map(async (attr) => {
+                    return await this.productVariationAttributesService.create(
+                        {
+                            ...attr,
+                            productVariationId: variant["dataValues"].id
+                        },
+                        transaction
+                    )
+                }))
+            }
+
+
+            if (!t) {
+                await transaction.commit();
+                return await this.findOneFullData({ id: variant["dataValues"].id })
+            }
+
+            return variant;
+
         } catch (error) {
-            t.rollback()
+            if (!t) await transaction.rollback()
             throw error
         }
     }
 
-    async findOneById(id: number): Promise<ProductVariations | null> {
+    async findOneById(
+        id: number,
+        t: Transaction
+    ): Promise<ProductVariations | null> {
+
+        const transaction = t || await this.sequelize.transaction();
+
         try {
 
-            const productVariant = await this.productVariationModel.findByPk(id);
+            const productVariant = await this.productVariationModel.findByPk(
+                id,
+                { transaction }
+            );
 
             if (!productVariant) return null
 
-            return productVariant["dataValues"]
+            if (!t) await transaction.commit();
+
+            return productVariant["dataValues"];
+
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('SKU should be unique');
-            }
+            await transaction.rollback();
             throw error
         }
     }
 
-    async findOneFullData(
-        data: Partial<Omit<ProductVariations, "attributes">>,
-        t?: Transaction
-    ): Promise<ProductVariations | null> {
+    async findOneFullData(data: Partial<Omit<ProductVariations, "attributes">>): Promise<ProductVariations | null> {
         try {
 
             const productVariant = await this.productVariationModel.findOne({
@@ -108,20 +127,15 @@ export class ProductVariationsService {
                         {
                             model: Attribute,
                             attributes: ["id", "name"],
-
                         }
                     ]
                 }],
-                transaction: t
             });
 
             if (!productVariant) throw new NotFoundException()
 
             return productVariant["dataValues"]
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('SKU should be unique');
-            }
             throw error
         }
     }

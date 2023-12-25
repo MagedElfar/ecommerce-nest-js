@@ -1,4 +1,4 @@
-import { BelongsTo, Column, ForeignKey, Model, Table, HasMany, DataType, BelongsToMany } from "sequelize-typescript";
+import { BelongsTo, Column, ForeignKey, Model, Table, DataType, BelongsToMany } from "sequelize-typescript";
 import { Product } from "../products/product.entity";
 import { ProductVariationAttribute } from "../product_variation_attributes/product_variation_attributes.entity";
 import { Attribute } from "../attributes/attribute.entity";
@@ -29,9 +29,9 @@ export class ProductVariations extends Model<ProductVariations>{
     productId: number
 
     @BelongsTo(() => Product, { onDelete: "CASCADE" })
-    product: Product
+    product?: Product
 
     @BelongsToMany(() => AttributeValues, () => ProductVariationAttribute)
-    attributes: AttributeValues[];
+    attributes?: AttributeValues[];
 
 }    

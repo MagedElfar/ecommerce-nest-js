@@ -1,8 +1,19 @@
 import { PartialType, OmitType } from "@nestjs/mapped-types";
 import { Transform, Type } from "class-transformer";
-import { IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator";
+import {
+    ArrayMinSize,
+    IsInt,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    Min,
+    ValidateNested,
+    IsArray
+} from "class-validator";
 import { transformFloat } from "src/core/pipes/parseFloat.pipe";
 import { CreateProductVariationDto } from "src/feachers/product-variations/dto/create-product-variations.dto";
+import { CreateProductSubCategoryDto } from "src/feachers/products-sub-categories/dto/create-product-sub-category.dto";
 
 export class CreateProductDto {
     @IsNotEmpty()
@@ -21,7 +32,22 @@ export class CreateProductDto {
 
     userId?: number
 
+    @IsOptional()
+    @IsInt()
+    categoryId: number
+
+    @IsOptional()
+    @IsInt()
+    brandId: number
+
+    @ArrayMinSize(1)
     @ValidateNested({ each: true })
     @Type(() => PartialType(OmitType(CreateProductVariationDto, ['productId'])))
-    variant: CreateProductVariationDto
+    variations: CreateProductVariationDto[]
+
+    @IsOptional()
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => PartialType(OmitType(CreateProductSubCategoryDto, ['productId'])))
+    subCategories?: CreateProductSubCategoryDto[]
 }

@@ -29,6 +29,7 @@ import { ProductVariationsModule } from './feachers/product-variations/product-v
 import { ProductVariationAttributesModule } from './feachers/product_variation_attributes/product_variation_attributes.module';
 import { SubCategoriesModule } from './feachers/sub-categories/sub-categories.module';
 import { SubCategoryImageModule } from './feachers/sub-category-image/sub-category-image.module';
+import { ProductsSubCategoriesModule } from './feachers/products-sub-categories/products-sub-categories.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { SubCategoryImageModule } from './feachers/sub-category-image/sub-catego
         logging: false,
         sync: {
           alter: true,
+          // force: true
         },
         autoLoadModels: true
       }),
@@ -79,7 +81,8 @@ import { SubCategoryImageModule } from './feachers/sub-category-image/sub-catego
     AttributesModule,
     AttributeValuesModule,
     ProductVariationsModule,
-    ProductVariationAttributesModule
+    ProductVariationAttributesModule,
+    ProductsSubCategoriesModule
   ],
   controllers: [AppController],
   providers: [

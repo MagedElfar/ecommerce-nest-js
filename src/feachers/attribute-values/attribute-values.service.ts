@@ -4,12 +4,14 @@ import { AttributeValues } from './attribute-values.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAttributeValue } from './attribute-values.interface';
 import { Transaction } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class AttributeValuesService {
     constructor(
         @InjectModel(AttributeValues)
-        private readonly attributeValueModel: typeof AttributeValues
+        private readonly attributeValueModel: typeof AttributeValues,
+        private sequelize: Sequelize,
     ) { }
 
 
@@ -44,16 +46,22 @@ export class AttributeValuesService {
         }
     }
 
-    async findOneById(id: number, t?: Transaction
+    async findOneById(
+        id: number,
+        t?: Transaction
     ): Promise<IAttributeValue | null> {
+        const transaction = t || await this.sequelize.transaction()
         try {
             const value = await this.attributeValueModel.findByPk(id, { transaction: t });
 
             if (!value) return null;
 
-            return value["dataValues"]
+            return t ? value : value["dataValues"];
         } catch (error) {
+            await transaction.rollback()
             throw error
+        } finally {
+            if (!t) await transaction.commit()
         }
     }
 }

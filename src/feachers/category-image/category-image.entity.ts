@@ -20,7 +20,7 @@ export class CategoryImage extends Model<CategoryImage> {
     @Column
     categoryId: number;
 
-    @BelongsTo(() => Category, { onDelete: "CASCADE" }) // Specify onDelete option here
+    @BelongsTo(() => Category, { onDelete: "CASCADE" })
     category: Category;
 
 }
