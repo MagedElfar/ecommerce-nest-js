@@ -1,5 +1,5 @@
 import { CreateProductDto } from './dto/create-product.dto';
-import { BadRequestException, HttpException, Inject, Injectable, InternalServerErrorException, NotFoundException, forwardRef } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, Inject, Injectable, InternalServerErrorException, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './product.entity';
 import { IProduct } from './product.interface';
@@ -89,7 +89,18 @@ export class ProductsService {
 
             if (error instanceof HttpException) throw error
 
-            if (error.parent) throw new InternalServerErrorException(error.parent)
+            // if (error.parent && error.parent.code === 'ER_DUP_ENTRY') {
+            //     // This is an example for handling duplicate entry errors
+            //     throw new ConflictException('Duplicate entry error: This record already exists.');
+            // } else if (error.parent && error.parent.code === 'ER_NO_REFERENCED_ROW_2') {
+            //     // throw new BadRequestException('Foreign key constraint error: Referenced record not found.');
+            //     throw new BadRequestException(error);
+            // } else if (error.parent) {
+
+            //     throw new InternalServerErrorException(error);
+            // }
+
+            // if (error.parent) throw new InternalServerErrorException(error.parent)
 
 
             throw error

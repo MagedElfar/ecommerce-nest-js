@@ -1,6 +1,7 @@
 import { LoggerService } from '../logger/logger.service';
 import { Catch, ArgumentsHost, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { Sequelize } from 'sequelize';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -14,24 +15,39 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
         let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
         let message = 'Internal Server Error';
-        let error = 'Internal Server Error';
+        let error: any = 'Internal Server Error';
 
 
 
         if (exception instanceof HttpException) {
             const exp = exception as any
 
-            console.log(exp)
             statusCode = exception.getStatus();
             message = exp.getResponse().message || exp.response;
             error = exp.getResponse().error
         }
 
-        console.log(exception)
 
-        // // Log the error using your logger service
-        // this.logger.error(`[${request.method}] ${request.url}`, exception.stack, 'ExceptionFilter');
 
+        if (
+            exception["parent"] && exception["parent"]["code"] === 'ER_DUP_ENTRY'
+        ) {
+            statusCode = HttpStatus.CONFLICT
+            message = 'Duplicate entry error: This record already exists.';
+            error = "Conflict"
+        } else if (
+            exception["parent"] && exception["parent"]["code"] === 'ER_NO_REFERENCED_ROW_2'
+        ) {
+            statusCode = HttpStatus.BAD_REQUEST
+            message = 'Foreign key constraint error: Referenced record not found.';
+            error = "Bad Request"
+        } else if (exception["parent"]) {
+            statusCode = HttpStatus.INTERNAL_SERVER_ERROR
+            message = "database error"
+        }
+
+
+        //Foreign key constraint error: Referenced record not found.'
 
         this.loggerService.error({
             message: error,

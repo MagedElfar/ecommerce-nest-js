@@ -58,8 +58,8 @@ import { ProductsSubCategoriesModule } from './feachers/products-sub-categories/
         retryAttempts: 1,
         logging: false,
         sync: {
-          alter: true,
-          // force: true
+          alter: false,
+          force: false
         },
         autoLoadModels: true
       }),

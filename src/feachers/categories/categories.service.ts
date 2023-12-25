@@ -123,9 +123,6 @@ export class CategoriesService {
 
             return category["dataValues"]
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('Category is already in exist');
-            }
             throw error
         }
     }

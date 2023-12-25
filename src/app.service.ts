@@ -16,26 +16,30 @@ export class AppService {
   }
 
   async onApplicationBootstrap() {
-    await this.dropAllForeignKeys()
-    await this.sequelize.sync({
-      alter: true
-    })
-    await this.sequelize.query(`
-    ALTER TABLE products_sub_categories
-    ADD CONSTRAINT subCategoryId_fk
-    FOREIGN KEY (subCategoryId)
-    REFERENCES seb_categories(id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE;
-  `)
-    await this.sequelize.query(`
-    ALTER TABLE products_sub_categories
-    ADD CONSTRAINT productId_fk
-    FOREIGN KEY (productId)
-    REFERENCES products(id)
-    ON DELETE CASCADE
-    ON UPDATE CASCADE;
-  `)
+    // await this.dropAllForeignKeys()
+    // this.sequelize.addModels(models)
+    // await this.sequelize.sync({
+    //   alter: true,
+    //   force: true
+    // })
+
+
+    //   await this.sequelize.query(`
+    //   ALTER TABLE products_sub_categories
+    //   ADD CONSTRAINT subCategoryId_fk
+    //   FOREIGN KEY (subCategoryId)
+    //   REFERENCES seb_categories(id)
+    //   ON DELETE CASCADE
+    //   ON UPDATE CASCADE;
+    // `)
+    //   await this.sequelize.query(`
+    //   ALTER TABLE products_sub_categories
+    //   ADD CONSTRAINT productId_fk
+    //   FOREIGN KEY (productId)
+    //   REFERENCES products(id)
+    //   ON DELETE CASCADE
+    //   ON UPDATE CASCADE;
+    // `)
 
 
   }

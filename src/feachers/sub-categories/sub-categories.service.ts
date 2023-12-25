@@ -116,13 +116,7 @@ export class SubCategoriesService {
 
             return subCategory["dataValues"]
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('Category is already in exist');
-            }
 
-            if (error.name === "SequelizeForeignKeyConstraintError") {
-                throw new NotFoundException('Parent category not found');
-            }
             throw error
         }
     }
@@ -147,13 +141,6 @@ export class SubCategoriesService {
                 slug
             }
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('Category is already in exist');
-            }
-
-            if (error.name === "SequelizeForeignKeyConstraintError") {
-                throw new NotFoundException('Parent category not found');
-            }
             throw error
         }
     }
