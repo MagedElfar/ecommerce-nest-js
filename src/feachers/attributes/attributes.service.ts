@@ -5,12 +5,16 @@ import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { IAttribute } from './attribute.interface';
 import { AttributeValues } from '../attribute-values/attribute-values.entity';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
+import { Sequelize } from 'sequelize-typescript';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class AttributesService {
     constructor(
         @InjectModel(Attribute)
-        private readonly attributeModel: typeof Attribute
+        private readonly attributeModel: typeof Attribute,
+        private readonly sequelize: Sequelize,
+
     ) { }
 
     async findAll(): Promise<IAttribute[]> {
@@ -19,19 +23,31 @@ export class AttributesService {
                 include: [
                     {
                         model: AttributeValues,
-                        attributes: ["id", "value"]
+                        attributes: [
+                            "id",
+                            "value",
+                            [
+                                this.sequelize.literal(
+                                    '(SELECT COUNT(*) FROM product_variations_attributes WHERE product_variations_attributes.attrId = values.id)'
+                                ),
+                                'totalProducts'
+                            ],
+                        ]
                     }
-                ]
-            })
+                ],
+                group: ['values.id'],
+
+            });
 
             const attributes = result.map(item => item["dataValues"]);
 
-            return attributes
+            return attributes;
 
         } catch (error) {
-            throw error
+            throw error;
         }
     }
+
 
     async findOneById(id: number): Promise<IAttribute | null> {
         try {
@@ -54,9 +70,7 @@ export class AttributesService {
             return attribute["dataValues"];
 
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('Product is already exist');
-            }
+
             throw error
         }
     }
@@ -75,9 +89,6 @@ export class AttributesService {
                 ...updateAttributeDto,
             }
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('Attribute is already in exist');
-            }
 
             throw error
         }

@@ -18,6 +18,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         let error: any = 'Internal Server Error';
 
 
+        console.log("exception = ", exception)
+
 
         if (exception instanceof HttpException) {
             const exp = exception as any
@@ -26,7 +28,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             message = exp.getResponse().message || exp.response;
             error = exp.getResponse().error
         }
-
 
 
         if (
@@ -51,7 +52,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
         this.loggerService.error({
             message: error,
-            logData: { error: JSON.stringify(exception.stack || exception.message) }
+            logData: { error: exception.stack || exception.message }
         })
         response.status(statusCode).json({
             message: message,

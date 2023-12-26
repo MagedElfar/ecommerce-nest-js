@@ -30,7 +30,7 @@ export class LoggerService {
                 const endpoint = data && data.endpoint ? ` [${data.endpoint}]` : '';
                 const method = data && data.method ? ` ${data.method}` : '';
                 const statusCode = data && data.statusCode ? ` ${data.statusCode}` : '';
-                const logData = data && data.logData ? ` ${JSON.stringify(data.logData, null, 2)}` : '';
+                const logData = data && data.logData ? ` ${JSON.stringify(data.logData, null, 2).replace(/\\n/g, '\n')}` : '';
                 // return `[${timestamp}] ${level}:${endpoint} ${message}${logData}`;
                 return `[${timestamp}] ${level}:${endpoint}${method} ${statusCode} ${message}${logData}`;
             })
@@ -43,8 +43,7 @@ export class LoggerService {
                 const endpoint = data && data.endpoint ? ` [${data.endpoint}]` : '';
                 const method = data && data.method ? ` ${data.method}` : '';
                 const statusCode = data && data.statusCode ? ` ${data.statusCode}` : '';
-                const logData = data && data.logData ? ` ${JSON.stringify(data.logData, null, 2)}` : '';
-                // return `[${timestamp}] ${level}:${endpoint} ${message}${logData}`;
+                const logData = data && data.logData ? ` ${JSON.stringify(data.logData, null, 2).replace(/\\n/g, '\n')}` : '';                // return `[${timestamp}] ${level}:${endpoint} ${message}${logData}`;
                 return `[${timestamp}] ${level}:${endpoint}${method} ${statusCode} ${message}${logData}`;
 
             })
@@ -84,7 +83,9 @@ export class LoggerService {
     }
 
     public error(loggerDto: LoggerDto) {
+
         const { req = null, statusCode = "", logData: errorData, message } = loggerDto;
+
         const data = req ? {
             endpoint: req.originalUrl,
             logData: errorData ? errorData : "",

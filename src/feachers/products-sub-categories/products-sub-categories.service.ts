@@ -5,6 +5,8 @@ import { Transaction } from 'sequelize';
 import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.dto';
 import { IProductSubCategory } from './products-sub-categories.interface';
 import { Sequelize } from 'sequelize-typescript';
+import { Product } from '../products/product.entity';
+import { SubCategory } from '../sub-categories/sub-category.entity';
 
 @Injectable()
 export class ProductsSubCategoriesService {
@@ -13,6 +15,8 @@ export class ProductsSubCategoriesService {
         private readonly productsSubCategoryModel: typeof ProductSubCategory,
         private sequelize: Sequelize,
     ) { }
+
+
 
     async findOne(
         data: Partial<Omit<IProductSubCategory, "product" | "subCategory">>,
@@ -58,8 +62,7 @@ export class ProductsSubCategoriesService {
                 {
                     subCategoryId,
                     productId
-                }
-                ,
+                },
                 transaction
             )
 
@@ -73,6 +76,16 @@ export class ProductsSubCategoriesService {
                     subCategoryId
                 },
                 {
+                    include: [
+                        {
+                            model: Product,
+                            attributes: ["id", "name"]
+                        },
+                        {
+                            model: SubCategory,
+                            attributes: ["id", "name"]
+                        }
+                    ],
                     transaction
                 }
             )
@@ -85,9 +98,18 @@ export class ProductsSubCategoriesService {
 
             if (!t) await transaction.rollback()
 
-            if (error instanceof BadRequestException || error instanceof NotFoundException) throw error
-            if (error.parent)
-                throw new InternalServerErrorException(error.parent);
+            throw error
+        }
+    }
+
+    async delete(id: number): Promise<void> {
+        try {
+            const isDeleted = await this.productsSubCategoryModel.destroy({ where: { id } })
+
+            if (!isDeleted) throw new NotFoundException();
+
+            return;
+        } catch (error) {
             throw error
         }
     }

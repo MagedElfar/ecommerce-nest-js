@@ -1,5 +1,5 @@
 import { CreateCategoryDto } from './dto/createCategory.dto';
-import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Category } from './category.entity';
 import * as slugify from "slugify"
@@ -11,6 +11,7 @@ import { CategoryImage } from '../category-image/category-image.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Sequelize } from 'sequelize-typescript';
 import { SubCategory } from '../sub-categories/sub-category.entity';
+import { Product } from '../products/product.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -19,7 +20,6 @@ export class CategoriesService {
         private categoryModel: typeof Category,
         private readonly cloudinaryService: CloudinaryService,
         private sequelize: Sequelize,
-
     ) { }
 
     async findAll(categoryQueryDto: CategoryQueryDto): Promise<ICategory[]> {
@@ -30,16 +30,27 @@ export class CategoriesService {
                 where: {
                     name: { [Op.like]: `%${name}%` },
                 },
+                attributes: {
+                    include: [
+                        [
+                            this.sequelize.fn('COUNT', this.sequelize.col('products.id')),
+                            'totalProducts'
+                        ]
+                    ]
+                },
+
                 include: [
+                    {
+                        model: Product,
+                        attributes: []
+                    },
                     {
                         model: CategoryImage,
                         attributes: ["id", "url"]
                     },
-                    {
-                        model: SubCategory,
-                        attributes: ["id", "name", "slug"]
-                    }
                 ],
+                group: ['category.id'],
+                subQuery: false,
                 limit,
                 offset: (page - 1) * limit
             });
@@ -89,25 +100,50 @@ export class CategoriesService {
 
     async findOne(data: Partial<Omit<ICategory, "image" | "subCategories" | "parent">>): Promise<ICategory | null> {
         try {
+            const categoryId = data.id;
+
             const category = await this.categoryModel.findOne({
-                where: data,
+                where: { id: categoryId },
                 include: [
                     {
+                        model: Product,
+                        attributes: [],
+                    },
+                    {
                         model: CategoryImage,
-                        attributes: ["id", "url"]
+                        attributes: ["id", "url"],
                     },
                     {
                         model: SubCategory,
-                        attributes: ["id", "name", "slug"]
-                    }
+                        attributes: [
+                            "id",
+                            "name",
+                            "slug",
+                            [
+                                this.sequelize.literal(
+                                    '(SELECT COUNT(*) FROM products_sub_categories WHERE products_sub_categories.subCategoryId = SubCategories.id)'
+                                ),
+                                'totalProducts',
+                            ],
+                        ],
+                    },
                 ],
-            })
+                attributes: {
+                    include: [
+                        [
+                            this.sequelize.literal('(SELECT COUNT(*) FROM Products WHERE Products.categoryId = Category.id)'),
+                            'totalProducts',
+                        ],
+                    ],
+                },
+                group: ['Category.id', 'Products.id', 'SubCategories.id'],
+            });
 
             if (!category) return null;
 
-            return category["dataValues"]
+            return category["dataValues"];
         } catch (error) {
-            throw error
+            throw error;
         }
     }
 
@@ -186,3 +222,4 @@ export class CategoriesService {
         }
     }
 }
+

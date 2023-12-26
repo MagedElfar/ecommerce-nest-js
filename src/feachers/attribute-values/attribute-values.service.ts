@@ -26,10 +26,6 @@ export class AttributeValuesService {
             return value["dataValues"]
         } catch (error) {
 
-            console.log(error)
-            if (error.name === "SequelizeForeignKeyConstraintError") {
-                throw new NotFoundException("Attribute isn't exsist");
-            }
             throw error;
         }
     }

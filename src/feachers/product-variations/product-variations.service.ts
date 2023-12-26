@@ -1,3 +1,4 @@
+import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
 import { CreateProductVariationDto } from './dto/create-product-variations.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductVariations } from './product-variations.entity';
@@ -90,7 +91,7 @@ export class ProductVariationsService {
 
     async findOneById(
         id: number,
-        t: Transaction
+        t?: Transaction
     ): Promise<ProductVariations | null> {
 
         const transaction = t || await this.sequelize.transaction();
@@ -135,6 +136,37 @@ export class ProductVariationsService {
             if (!productVariant) throw new NotFoundException()
 
             return productVariant["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async update(id: number, updateProductVariationDto: UpdateProductVariationDto) {
+        try {
+            const variant = await this.findOneById(id);
+
+            if (!variant) throw new NotFoundException();
+
+            await this.productVariationModel.update(updateProductVariationDto, { where: { id } });
+
+            return {
+                ...variant,
+                ...updateProductVariationDto
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async delete(id: number) {
+        try {
+            const variant = await this.findOneById(id);
+
+            if (!variant) throw new NotFoundException();
+
+            await this.productVariationModel.destroy({ where: { id } });
+
+            return;
         } catch (error) {
             throw error
         }

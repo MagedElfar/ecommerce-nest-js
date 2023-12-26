@@ -1,4 +1,4 @@
-import { BelongsTo, Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 import { AttributeValues } from '../attribute-values/attribute-values.entity';
 import { ProductVariations } from '../product-variations/product-variations.entity';
 
@@ -6,6 +6,14 @@ import { ProductVariations } from '../product-variations/product-variations.enti
     tableName: 'product_variations_attributes',
 })
 export class ProductVariationAttribute extends Model<ProductVariationAttribute> {
+
+    @PrimaryKey
+    @AutoIncrement
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false,
+    })
+    id: number;
 
     @ForeignKey(() => ProductVariations)
     @Column

@@ -1,3 +1,4 @@
+import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { BadRequestException, ConflictException, HttpException, Inject, Injectable, InternalServerErrorException, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -11,7 +12,6 @@ import { AttributeValues } from '../attribute-values/attribute-values.entity';
 import { Attribute } from '../attributes/attribute.entity';
 import { Category } from '../categories/category.entity';
 import { Brand } from '../brands/brands.entity';
-import { ProductSubCategory } from '../products-sub-categories/products-sub-category.entity';
 import { SubCategory } from '../sub-categories/sub-category.entity';
 import { ProductsSubCategoriesService } from '../products-sub-categories/products-sub-categories.service';
 
@@ -89,20 +89,51 @@ export class ProductsService {
 
             if (error instanceof HttpException) throw error
 
-            // if (error.parent && error.parent.code === 'ER_DUP_ENTRY') {
-            //     // This is an example for handling duplicate entry errors
-            //     throw new ConflictException('Duplicate entry error: This record already exists.');
-            // } else if (error.parent && error.parent.code === 'ER_NO_REFERENCED_ROW_2') {
-            //     // throw new BadRequestException('Foreign key constraint error: Referenced record not found.');
-            //     throw new BadRequestException(error);
-            // } else if (error.parent) {
+            throw error
+        }
+    }
 
-            //     throw new InternalServerErrorException(error);
-            // }
+    async updated(id: number, updateProductDto: UpdateProductDto): Promise<IProduct> {
+        try {
+            let product = await this.findOneById(id);
 
-            // if (error.parent) throw new InternalServerErrorException(error.parent)
+            if (!product) throw new NotFoundException("product not found");
 
+            if (updateProductDto.name) {
+                const slug: string = slugify.default(updateProductDto.name, {
+                    lower: true,
+                    trim: true
+                })
 
+                updateProductDto["slug"] = slug
+            }
+
+            await this.productModel.update(updateProductDto, { where: { id } })
+
+            return {
+                ...product,
+                ...updateProductDto
+            }
+
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async delete(id: number): Promise<void> {
+        try {
+
+            const product = await this.findOneById(id);
+
+            if (!product) throw new NotFoundException("product not found");
+
+            const isDeleted = await this.productModel.destroy({ where: { id } });
+
+            if (!isDeleted) throw new NotFoundException("product not found");
+
+            return;
+
+        } catch (error) {
             throw error
         }
     }

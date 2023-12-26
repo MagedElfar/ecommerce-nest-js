@@ -40,5 +40,4 @@ export class SubCategory extends Model<SubCategory> {
     @BelongsToMany(() => Product, () => ProductSubCategory)
     products?: Product[];
 
-
 }

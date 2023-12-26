@@ -133,9 +133,6 @@ export class UsersService {
                 ...updateUserDto
             }
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('user email or name address is already in use');
-            }
             throw error
         }
     }

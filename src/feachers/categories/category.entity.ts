@@ -31,5 +31,5 @@ export class Category extends Model<Category> {
     image: CategoryImage
 
     @HasMany(() => Product)
-    product: Product
+    products: Product[]
 }

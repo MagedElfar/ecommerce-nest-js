@@ -115,4 +115,17 @@ export class ProductVariationAttributesService {
             throw error
         }
     }
+
+    async delete(id: number): Promise<void> {
+        try {
+            const isDeleted = await this.productAttributeModel.destroy({ where: { id } });
+
+            if (!isDeleted) throw new NotFoundException();
+
+            return
+        } catch (error) {
+            throw error
+        }
+    }
+
 }
