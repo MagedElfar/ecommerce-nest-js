@@ -3,6 +3,7 @@ import { User } from "../users/user.entity";
 import { ProductVariations } from "../product-variations/product-variations.entity";
 import { Brand } from "../brands/brands.entity";
 import { SubCategory } from "../sub-categories/sub-category.entity";
+import { ProductImage } from "../products-image/products-image.entity";
 
 export interface IProduct extends IModel {
     name?: string;
@@ -15,5 +16,6 @@ export interface IProduct extends IModel {
     attributes?: { [key: string]: string[] }[],
     brandId?: number
     brand?: Brand
-    subCategories?: SubCategory[]
+    subCategories?: SubCategory[],
+    image?: ProductImage
 }

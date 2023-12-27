@@ -30,6 +30,7 @@ import { ProductVariationAttributesModule } from './feachers/product_variation_a
 import { SubCategoriesModule } from './feachers/sub-categories/sub-categories.module';
 import { SubCategoryImageModule } from './feachers/sub-category-image/sub-category-image.module';
 import { ProductsSubCategoriesModule } from './feachers/products-sub-categories/products-sub-categories.module';
+import { ProductsImageModule } from './feachers/products-image/products-image.module';
 
 @Module({
   imports: [
@@ -78,6 +79,7 @@ import { ProductsSubCategoriesModule } from './feachers/products-sub-categories/
     BrandsModule,
     BrandsImageModule,
     ProductsModule,
+    ProductsImageModule,
     AttributesModule,
     AttributeValuesModule,
     ProductVariationsModule,

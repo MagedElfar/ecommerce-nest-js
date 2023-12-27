@@ -1,15 +1,27 @@
 import { UserRole } from 'src/core/constants';
 import { ProductsService } from './products.service';
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { User } from 'src/core/decorators/user.decorator';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductQueryDto } from './dto/product-query.dto';
 
 @Controller('products')
 export class ProductsController {
 
     constructor(private readonly productsService: ProductsService) { }
+
+
+    @Get()
+    async findAll(@Query() productQueryDto: ProductQueryDto) {
+        try {
+            const products = await this.productsService.findAll(productQueryDto);
+            return products
+        } catch (error) {
+            throw error
+        }
+    }
 
     @Post()
     @Roles([UserRole.ADMIN])
@@ -18,7 +30,6 @@ export class ProductsController {
             createProductDto.userId = userId
 
             const product = await this.productsService.create(createProductDto)
-
 
             return { product }
         } catch (error) {

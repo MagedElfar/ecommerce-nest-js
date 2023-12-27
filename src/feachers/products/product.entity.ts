@@ -1,16 +1,15 @@
-import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { User } from "../users/user.entity";
 import { ProductVariations } from "../product-variations/product-variations.entity";
 import { Category } from "../categories/category.entity";
 import { Brand } from "../brands/brands.entity";
 import { SubCategory } from "../sub-categories/sub-category.entity";
 import { ProductSubCategory } from "../products-sub-categories/products-sub-category.entity";
+import { ProductImage } from "../products-image/products-image.entity";
 
 @Table({
 
     indexes: [
-
-
         {
 
             unique: true,
@@ -60,6 +59,9 @@ export class Product extends Model<Product> {
 
     @ForeignKey(() => Brand)
     brandId: number
+
+    @HasOne(() => ProductImage)
+    image: ProductImage
 
     @BelongsTo(() => Brand, { onDelete: "SET NULL" })
     brand: Brand

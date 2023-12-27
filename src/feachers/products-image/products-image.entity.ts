@@ -1,8 +1,8 @@
+import { Product } from './../products/product.entity';
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Category } from '../categories/category.entity';
 
-@Table({ tableName: "category_image" })
-export class CategoryImage extends Model<CategoryImage> {
+@Table({ tableName: "products_image" })
+export class ProductImage extends Model<ProductImage> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -15,11 +15,11 @@ export class CategoryImage extends Model<CategoryImage> {
     })
     storageKey: string
 
-    @ForeignKey(() => Category)
+    @ForeignKey(() => Product)
     @Column
-    categoryId: number;
+    productId: number;
 
-    @BelongsTo(() => Category, { onDelete: "CASCADE" })
-    category: Category;
+    @BelongsTo(() => Product, { onDelete: "CASCADE" })
+    product: Product;
 
 }

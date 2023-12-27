@@ -1,6 +1,4 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { User } from 'src/feachers/users/user.entity';
-import { Category } from '../categories/category.entity';
 import { Brand } from '../brands/brands.entity';
 
 @Table({ tableName: "brands_image" })
