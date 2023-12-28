@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Category } from './category.entity';
+import { Category } from './categories.entity';
 import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
 import { CloudinaryModule } from 'src/utility/cloudinary/cloudinary.module';

@@ -1,16 +1,15 @@
 import { CreateSubCategoryDto } from './dto/create-sub-category.dto';
 import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { SubCategory } from './sub-category.entity';
+import { SubCategory } from './sub-categories.entity';
 import * as slugify from "slugify"
-import { ISubCategory } from './sub-category.interface';
+import { ISubCategory } from './sub-categories.interface';
 import { UpdateSubCategoryDto } from './dto/update-sub-category.dto';
 import { SubCategoryQueryDto } from './dto/sub-categoryQuery.dto';
 import { Op } from 'sequelize';
-import { CategoryImage } from '../category-image/category-image.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Sequelize } from 'sequelize-typescript';
-import { SubCategoryImage } from '../sub-category-image/sub-category-image.entity';
+import { SubCategoryImage } from '../sub-categories-images/sub-categories-images.entity';
 
 @Injectable()
 export class SubCategoriesService {

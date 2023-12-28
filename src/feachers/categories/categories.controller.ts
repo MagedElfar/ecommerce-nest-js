@@ -1,10 +1,10 @@
 import { CategoriesService } from './categories.service';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/createCategory.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
-import { UpdateCategoryDto } from './dto/updateCategory.dto';
-import { CategoryQueryDto } from './dto/categoryQuery.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryQueryDto } from './dto/category-query.dto';
 
 @Controller('categories')
 export class CategoriesController {

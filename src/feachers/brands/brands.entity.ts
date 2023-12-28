@@ -1,9 +1,6 @@
-import { Table, Column, Model, DataType, HasMany, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { UserRole } from 'src/core/constants';
-import { UserImages } from 'src/feachers/users-images/users-images.entity';
-import { CategoryImage } from '../category-image/category-image.entity';
-import { BrandImage } from '../brands-image/brands-image.entity';
-import { Product } from '../products/product.entity';
+import { Table, Column, Model, DataType, HasMany, HasOne } from 'sequelize-typescript';
+import { Product } from '../products/products.entity';
+import { BrandImage } from '../brands-images/brands-images.entity';
 
 @Table({
     indexes: [

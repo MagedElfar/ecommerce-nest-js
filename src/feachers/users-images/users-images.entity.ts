@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize
 import { User } from 'src/feachers/users/user.entity';
 
 @Table({
-    tableName: "user_images",
+    tableName: "users_images",
     indexes: [
         {
             unique: true,

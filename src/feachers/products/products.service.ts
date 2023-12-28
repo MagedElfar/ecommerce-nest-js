@@ -2,23 +2,22 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { HttpException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Product } from './product.entity';
-import { IProduct } from './product.interface';
+import { Product } from './products.entity';
+import { IProduct } from './products.interface';
 import * as slugify from "slugify"
-import { ProductVariationsService } from '../product-variations/product-variations.service';
 import { Sequelize } from 'sequelize-typescript';
-import { ProductVariations } from '../product-variations/product-variations.entity';
-import { AttributeValues } from '../attribute-values/attribute-values.entity';
 import { Attribute } from '../attributes/attribute.entity';
-import { Category } from '../categories/category.entity';
+import { Category } from '../categories/categories.entity';
 import { Brand } from '../brands/brands.entity';
-import { SubCategory } from '../sub-categories/sub-category.entity';
+import { SubCategory } from '../sub-categories/sub-categories.entity';
 import { ProductsSubCategoriesService } from '../products-sub-categories/products-sub-categories.service';
 import { Includeable, Op, WhereOptions, where } from 'sequelize';
 import { ProductQueryDto } from './dto/product-query.dto';
-import { ProductVariationAttribute } from '../product_variation_attributes/product_variation_attributes.entity';
-import { ProductImage } from '../products-image/products-image.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
+import { AttributeValues } from '../attributes-values/attributes-values.entity';
+import { ProductVariations } from '../products-variations/products-variations.entity';
+import { ProductVariationsService } from '../products-variations/products-variations.service';
+import { ProductImage } from '../products-images/products-images.entity';
 
 @Injectable()
 export class ProductsService {

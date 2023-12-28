@@ -12,8 +12,8 @@ import {
     IsArray
 } from "class-validator";
 import { transformFloat } from "src/core/pipes/parseFloat.pipe";
-import { CreateProductVariationDto } from "src/feachers/product-variations/dto/create-product-variations.dto";
 import { CreateProductSubCategoryDto } from "src/feachers/products-sub-categories/dto/create-product-sub-category.dto";
+import { CreateProductVariationDto } from "src/feachers/products-variations/dto/create-product-variations.dto";
 
 export class CreateProductDto {
     @IsNotEmpty()

@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { ProductSubCategory } from './products-sub-category.entity';
+import { ProductSubCategory } from './products-sub-categories.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
 import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.dto';
 import { IProductSubCategory } from './products-sub-categories.interface';
 import { Sequelize } from 'sequelize-typescript';
-import { Product } from '../products/product.entity';
-import { SubCategory } from '../sub-categories/sub-category.entity';
+import { Product } from '../products/products.entity';
+import { SubCategory } from '../sub-categories/sub-categories.entity';
 
 @Injectable()
 export class ProductsSubCategoriesService {

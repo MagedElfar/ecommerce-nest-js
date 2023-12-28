@@ -1,17 +1,17 @@
-import { CreateCategoryDto } from './dto/createCategory.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Category } from './category.entity';
+import { Category } from './categories.entity';
 import * as slugify from "slugify"
-import { ICategory } from './category.interface';
-import { UpdateCategoryDto } from './dto/updateCategory.dto';
-import { CategoryQueryDto } from './dto/categoryQuery.dto';
+import { ICategory } from './categories.interface';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CategoryQueryDto } from './dto/category-query.dto';
 import { Op } from 'sequelize';
-import { CategoryImage } from '../category-image/category-image.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Sequelize } from 'sequelize-typescript';
-import { SubCategory } from '../sub-categories/sub-category.entity';
-import { Product } from '../products/product.entity';
+import { SubCategory } from '../sub-categories/sub-categories.entity';
+import { Product } from '../products/products.entity';
+import { CategoryImage } from '../categories-images/categories-images.entity';
 
 @Injectable()
 export class CategoriesService {

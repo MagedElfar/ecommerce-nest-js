@@ -1,12 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Attribute } from './attribute.entity';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { IAttribute } from './attribute.interface';
-import { AttributeValues } from '../attribute-values/attribute-values.entity';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { Sequelize } from 'sequelize-typescript';
-import { Product } from '../products/product.entity';
+import { AttributeValues } from '../attributes-values/attributes-values.entity';
 
 @Injectable()
 export class AttributesService {

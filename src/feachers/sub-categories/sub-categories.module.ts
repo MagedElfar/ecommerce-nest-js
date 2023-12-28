@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SubCategoriesService } from './sub-categories.service';
 import { CloudinaryModule } from 'src/utility/cloudinary/cloudinary.module';
-import { SubCategory } from './sub-category.entity';
+import { SubCategory } from './sub-categories.entity';
 import { SubCategoriesController } from './sub-categories.controller';
 
 @Module({

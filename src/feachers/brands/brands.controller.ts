@@ -2,9 +2,9 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException,
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { BrandsService } from './brands.service';
-import { CreateBrandDto } from './dto/createBrands.dto';
-import { BrandQueryDto } from './dto/brandsQuery.dto';
-import { UpdateBrandDto } from './dto/updateBrand.dto';
+import { CreateBrandDto } from './dto/create-brands.dto';
+import { BrandQueryDto } from './dto/brands-query.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Controller('brands')
 export class BrandsController {

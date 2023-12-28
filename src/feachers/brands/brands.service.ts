@@ -1,15 +1,15 @@
-import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Brand } from './brands.entity';
 import * as slugify from "slugify"
 import { IBrand } from './brands.interface';
-import { BrandQueryDto } from './dto/brandsQuery.dto';
+import { BrandQueryDto } from './dto/brands-query.dto';
 import { Op } from 'sequelize';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Sequelize } from 'sequelize-typescript';
-import { BrandImage } from '../brands-image/brands-image.entity';
-import { CreateBrandDto } from './dto/createBrands.dto';
-import { UpdateBrandDto } from './dto/updateBrand.dto';
+import { CreateBrandDto } from './dto/create-brands.dto';
+import { UpdateBrandDto } from './dto/update-brand.dto';
+import { BrandImage } from '../brands-images/brands-images.entity';
 
 @Injectable()
 export class BrandsService {

@@ -1,5 +1,5 @@
 import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
-import { AttributeValues } from "../attribute-values/attribute-values.entity";
+import { AttributeValues } from "../attributes-values/attributes-values.entity";
 
 @Table({
     indexes: [

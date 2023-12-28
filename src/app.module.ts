@@ -17,20 +17,20 @@ import { UsersImagesModule } from './feachers/users-images/users-images.module';
 import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
 import { AdminModule } from './feachers/admin/admin.module';
 import { CategoriesModule } from './feachers/categories/categories.module';
-import { CategoryImageModule } from './feachers/category-image/category-image.module';
 import { models } from './core/database/models';
 import { ProfilesModule } from './feachers/profiles/profiles.module';
 import { BrandsModule } from './feachers/brands/brands.module';
-import { BrandsImageModule } from './feachers/brands-image/brands-image.module';
 import { ProductsModule } from './feachers/products/products.module';
 import { AttributesModule } from './feachers/attributes/attributes.module';
-import { AttributeValuesModule } from './feachers/attribute-values/attribute-values.module';
-import { ProductVariationsModule } from './feachers/product-variations/product-variations.module';
-import { ProductVariationAttributesModule } from './feachers/product_variation_attributes/product_variation_attributes.module';
 import { SubCategoriesModule } from './feachers/sub-categories/sub-categories.module';
-import { SubCategoryImageModule } from './feachers/sub-category-image/sub-category-image.module';
 import { ProductsSubCategoriesModule } from './feachers/products-sub-categories/products-sub-categories.module';
-import { ProductsImageModule } from './feachers/products-image/products-image.module';
+import { AttributeValuesModule } from './feachers/attributes-values/attributes-values.module';
+import { BrandsImageModule } from './feachers/brands-images/brands-images.module';
+import { CategoryImageModule } from './feachers/categories-images/categories-images.module';
+import { ProductsImageModule } from './feachers/products-images/products-images.module';
+import { ProductVariationAttributesModule } from './feachers/products-variations-attributes/products-variations-attributes.module';
+import { ProductVariationsModule } from './feachers/products-variations/products-variations.module';
+import { SubCategoryImageModule } from './feachers/sub-categories-images/sub-categories-images.module';
 
 @Module({
   imports: [
