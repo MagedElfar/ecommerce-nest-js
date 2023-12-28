@@ -5,6 +5,7 @@ import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CategoryQueryDto } from './dto/category-query.dto';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('categories')
 export class CategoriesController {
@@ -12,6 +13,7 @@ export class CategoriesController {
     constructor(private categoriesService: CategoriesService) { }
 
     @Get()
+    @Public()
     async findAll(@Query() categoryQueryDto: CategoryQueryDto) {
         try {
             const categories = await this.categoriesService.findAll(categoryQueryDto);
@@ -47,6 +49,7 @@ export class CategoriesController {
     }
 
     @Get(":id")
+    @Public()
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
             const category = await this.categoriesService.findOne({ id });
@@ -60,6 +63,7 @@ export class CategoriesController {
     }
 
     @Delete(":id")
+    @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

@@ -1,17 +1,18 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { ProductVariationsModule } from './../products-variations/products-variations.module';
+import { ProductsVariationImageService } from './products-variations-images.service';
+import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { CategoriesModule } from '../categories/categories.module';
 import { CloudinaryModule } from 'src/utility/cloudinary/cloudinary.module';
-import { ProductsImageService } from './products-variations-images.service';
-import { ProductImage } from './products-variations-images.entity';
-import { ProductsModule } from '../products/products.module';
+import { ProductVariationImage } from './products-variations-images.entity';
+import { ProductsVariationsImageController } from './products-variations-images.controller';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([ProductImage]),
-    ProductsModule,
+    SequelizeModule.forFeature([ProductVariationImage]),
+    ProductVariationsModule,
     CloudinaryModule,
   ],
-  providers: [ProductsImageService],
+  controllers: [ProductsVariationsImageController],
+  providers: [ProductsVariationImageService],
 })
-export class ProductsImageModule { }
+export class ProductsVariationImageModule { }

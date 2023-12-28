@@ -1,3 +1,4 @@
+import { ProductVariationImage } from './../../feachers/products-variations-images/products-variations-images.entity';
 
 import { AttributeValues } from "src/feachers/attributes-values/attributes-values.entity";
 import { Attribute } from "src/feachers/attributes/attribute.entity";
@@ -30,5 +31,6 @@ export const models: any[] = [
     Attribute,
     AttributeValues,
     ProductVariationAttribute,
-    ProductSubCategory
+    ProductSubCategory,
+    ProductVariationImage
 ]

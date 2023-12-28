@@ -1,3 +1,4 @@
+import { CloudinaryModule } from './../../utility/cloudinary/cloudinary.module';
 import { Module, forwardRef } from '@nestjs/common';
 import { ProductVariationsController } from './products-variations.controller';
 import { ProductVariationsService } from './products-variations.service';
@@ -10,7 +11,8 @@ import { ProductVariationAttributesModule } from '../products-variations-attribu
   imports: [
     SequelizeModule.forFeature([ProductVariations]),
     forwardRef(() => ProductsModule),
-    forwardRef(() => ProductVariationAttributesModule)
+    forwardRef(() => ProductVariationAttributesModule),
+    CloudinaryModule
   ],
   controllers: [ProductVariationsController],
   providers: [ProductVariationsService],

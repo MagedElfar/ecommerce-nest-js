@@ -1,7 +1,8 @@
-import { BelongsTo, Column, ForeignKey, Model, Table, DataType, BelongsToMany } from "sequelize-typescript";
+import { BelongsTo, Column, ForeignKey, Model, Table, DataType, BelongsToMany, HasMany } from "sequelize-typescript";
 import { Product } from "../products/products.entity";
 import { AttributeValues } from "../attributes-values/attributes-values.entity";
 import { ProductVariationAttribute } from "../products-variations-attributes/products-variations-attributes.entity";
+import { ProductVariationImage } from "../products-variations-images/products-variations-images.entity";
 
 @Table({
     tableName: "products_variations",
@@ -26,6 +27,9 @@ export class ProductVariations extends Model<ProductVariations>{
     @ForeignKey(() => Product)
     @Column
     productId: number
+
+    @HasMany(() => ProductVariationImage)
+    images: ProductVariationImage[]
 
     @BelongsTo(() => Product, { onDelete: "CASCADE" })
     product?: Product

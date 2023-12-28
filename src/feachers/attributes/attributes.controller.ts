@@ -4,6 +4,7 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPip
 import { UserRole } from 'src/core/constants';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('attributes')
 export class AttributesController {
@@ -11,6 +12,7 @@ export class AttributesController {
     constructor(private readonly attributesService: AttributesService) { }
 
     @Get()
+    @Public()
     async findAll() {
         try {
             const attributes = await this.attributesService.findAll();

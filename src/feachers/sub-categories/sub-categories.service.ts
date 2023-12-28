@@ -21,13 +21,14 @@ export class SubCategoriesService {
 
     ) { }
 
-    async findAll(subCategoryQueryDto: SubCategoryQueryDto): Promise<ISubCategory[]> {
+    async findAll(subCategoryQueryDto: SubCategoryQueryDto): Promise<any> {
         try {
-            const { limit, page, name } = subCategoryQueryDto;
+            const { limit, page, name, ...data } = subCategoryQueryDto;
 
-            const result = await this.subCategoryModel.findAll({
+            const subCategories = await this.subCategoryModel.findAndCountAll({
                 where: {
                     name: { [Op.like]: `%${name}%` },
+                    ...data
                 },
                 include: [
                     {
@@ -39,26 +40,8 @@ export class SubCategoriesService {
                 offset: (page - 1) * limit
             });
 
-            const subCategories = result.map(item => item["dataValues"])
 
             return subCategories
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async getCount(subCategoryQueryDto: SubCategoryQueryDto): Promise<number> {
-        try {
-
-            const { name } = subCategoryQueryDto;
-            const count = await this.subCategoryModel.count({
-                where: {
-                    name: { [Op.like]: `%${name}%` },
-
-                },
-            });
-
-            return count
         } catch (error) {
             throw error
         }
@@ -127,7 +110,8 @@ export class SubCategoriesService {
 
             if (!subCategory) throw new NotFoundException();
 
-            const slug: string = slugify.default(updateSubCategoryDto.name);
+
+            const slug: string = slugify.default(updateSubCategoryDto?.name || subCategory.name);
 
             await this.subCategoryModel.update<SubCategory>({
                 ...updateSubCategoryDto,

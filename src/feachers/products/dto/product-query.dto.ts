@@ -20,10 +20,11 @@ export class ProductQueryDto extends QueryDto {
     @IsInt()
     subCategoryId: number
 
-    @Transform(param => transformInt(param))
     @IsOptional()
-    @IsInt()
-    brandId: number
+    @IsArray()
+    @IsNumber({}, { each: true })
+    @Transform(({ value }) => value.map(Number)) // Transform each element to a number
+    brands: number[]
 
     @Transform(param => transformFloat(param))
     @IsOptional()

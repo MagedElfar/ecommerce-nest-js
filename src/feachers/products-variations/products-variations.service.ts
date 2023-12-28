@@ -1,6 +1,6 @@
 import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
 import { CreateProductVariationDto } from './dto/create-product-variations.dto';
-import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductVariations } from './products-variations.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductsService } from '../products/products.service';
@@ -9,6 +9,8 @@ import { Transaction } from 'sequelize';
 import { Attribute } from '../attributes/attribute.entity';
 import { AttributeValues } from '../attributes-values/attributes-values.entity';
 import { ProductVariationAttributesService } from '../products-variations-attributes/products-variations-attributes.service';
+import { ProductVariationImage } from '../products-variations-images/products-variations-images.entity';
+import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ProductVariationsService {
@@ -21,7 +23,7 @@ export class ProductVariationsService {
         @Inject(forwardRef(() => ProductVariationAttributesService))
         private productVariationAttributesService: ProductVariationAttributesService,
         private sequelize: Sequelize,
-
+        private readonly cloudinaryService: CloudinaryService
     ) { }
 
     async create(
@@ -100,7 +102,15 @@ export class ProductVariationsService {
 
             const productVariant = await this.productVariationModel.findByPk(
                 id,
-                { transaction }
+                {
+                    include: [
+                        {
+                            model: ProductVariationImage,
+                            attributes: ["storageKey"]
+                        }
+                    ],
+                    transaction
+                }
             );
 
             if (!productVariant) return null
@@ -120,17 +130,23 @@ export class ProductVariationsService {
 
             const productVariant = await this.productVariationModel.findOne({
                 where: data,
-                include: [{
-                    model: AttributeValues,
-                    attributes: ["value", "id"],
-                    through: { attributes: [] },
-                    include: [
-                        {
-                            model: Attribute,
-                            attributes: ["id", "name"],
-                        }
-                    ]
-                }],
+                include: [
+                    {
+                        model: ProductVariationImage,
+                        attributes: ["id", "url"]
+                    },
+                    {
+                        model: AttributeValues,
+                        attributes: ["value", "id"],
+                        through: { attributes: ["id"] },
+                        include: [
+                            {
+                                model: Attribute,
+                                attributes: ["id", "name"],
+                            }
+                        ]
+                    }
+                ],
             });
 
             if (!productVariant) throw new NotFoundException()
@@ -159,15 +175,27 @@ export class ProductVariationsService {
     }
 
     async delete(id: number) {
+        const transaction = await this.sequelize.transaction()
         try {
             const variant = await this.findOneById(id);
 
             if (!variant) throw new NotFoundException();
 
-            await this.productVariationModel.destroy({ where: { id } });
+            const images = variant.images;
 
+            await Promise.all(images.map(async image => {
+                await this.cloudinaryService.delete(image.storageKey)
+            }))
+
+            await this.productVariationModel.destroy({
+                where: { id },
+                transaction
+            });
+
+            await transaction.commit();
             return;
         } catch (error) {
+            await transaction.rollback()
             throw error
         }
     }

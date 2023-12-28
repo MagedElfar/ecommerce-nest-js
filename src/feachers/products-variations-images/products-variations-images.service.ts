@@ -1,66 +1,51 @@
+import { ProductVariationsService } from './../products-variations/products-variations.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { UploadProductImageDto } from './dto/upload-variation-image.dto';
+import { UploadProductVariationImageDto } from './dto/upload-variation-image.dto';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { ProductsFolder } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
-import { ProductImage } from './products-variations-images.entity';
-import { IProductImage } from './products-variations-images.interface';
-import { ProductsService } from '../products/products.service';
+import { ProductVariationImage } from './products-variations-images.entity';
+import { IProductVariationImage } from './products-variations-images.interface';
 
 @Injectable()
-export class ProductsImageService {
+export class ProductsVariationImageService {
     constructor(
-        @InjectModel(ProductImage)
-        private readonly productImageModel: typeof ProductImage,
-        private readonly productsService: ProductsService,
+        @InjectModel(ProductVariationImage)
+        private readonly productVariationImageModel: typeof ProductVariationImage,
+        private readonly productVariationsService: ProductVariationsService,
         private sequelize: Sequelize,
         private readonly cloudinaryService: CloudinaryService,
 
     ) { }
 
-    async create(uploadProductImageDto: UploadProductImageDto): Promise<IProductImage> {
+    async create(uploadProductVariationImageDto: UploadProductVariationImageDto): Promise<IProductVariationImage> {
 
         let storageKey: string = "";
         let url: string = ""
 
         try {
 
-            const product = await this.productsService.findOneById(uploadProductImageDto.productId);
+            const product = await this.productVariationsService.findOneById(uploadProductVariationImageDto.productVariationId);
 
             if (!product) throw new NotFoundException("product not found")
 
             const cloudinary = await this.cloudinaryService.upload({
-                file: uploadProductImageDto.file,
+                file: uploadProductVariationImageDto.file,
                 folder: ProductsFolder
             });
 
             storageKey = cloudinary.public_id
             url = cloudinary.url
 
-            let image = await this.findOne({ productId: uploadProductImageDto.productId });
 
-            if (image) {
+            const image = await this.productVariationImageModel.create({
+                productVariationId: uploadProductVariationImageDto.productVariationId,
+                url: cloudinary.url,
+                storageKey
+            })
 
-                await this.cloudinaryService.delete(image.storageKey);
-
-                await this.update(image.id, { url, storageKey })
-
-                return {
-                    ...image,
-                    storageKey,
-                    url
-                }
-
-            } else {
-                image = await this.productImageModel.create({
-                    productId: uploadProductImageDto.productId,
-                    url: cloudinary.url,
-                    storageKey
-                })
-
-                return image["dataValues"]
-            }
+            return image["dataValues"]
 
         } catch (error) {
             if (storageKey)
@@ -70,9 +55,9 @@ export class ProductsImageService {
 
     }
 
-    async findById(id: number): Promise<IProductImage | null> {
+    async findById(id: number): Promise<IProductVariationImage | null> {
         try {
-            const image = await this.productImageModel.findByPk(id)
+            const image = await this.productVariationImageModel.findByPk(id)
 
             if (!image) return null;
 
@@ -81,41 +66,16 @@ export class ProductsImageService {
             throw error
         }
     }
-
-    async findOne(data: Partial<Omit<IProductImage, "category">>): Promise<IProductImage | null> {
-        try {
-            const image = await this.productImageModel.findOne({ where: data })
-
-            if (!image) return null;
-
-            return image["dataValues"]
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async update(id: number, data: Partial<Omit<IProductImage, "category">>): Promise<IProductImage | null> {
-        try {
-
-            await this.productImageModel.update(data, { where: { id } })
-
-            return
-        } catch (error) {
-            throw error
-        }
-    }
-
 
     async delete(id: number): Promise<void> {
         const t = await this.sequelize.transaction();
-
         try {
 
             const image = await this.findById(id)
 
             if (!image) throw new NotFoundException();
 
-            const isDelete = await this.productImageModel.destroy({
+            const isDelete = await this.productVariationImageModel.destroy({
                 where: { id },
                 transaction: t
             },)
@@ -123,7 +83,6 @@ export class ProductsImageService {
             if (!isDelete) throw new NotFoundException();
 
             await this.cloudinaryService.delete(image.storageKey)
-
 
             t.commit()
             return

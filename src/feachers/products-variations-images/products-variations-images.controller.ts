@@ -1,30 +1,39 @@
-import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ProductsImageService } from './products-variations-images.service';
-import { UploadProductImageDto } from './dto/upload-variation-image.dto';
+import { UploadProductVariationImageDto } from './dto/upload-variation-image.dto';
+import { ProductsVariationImageService } from './products-variations-images.service';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('variations-images')
-export class ProductsController {
-    constructor(private productsImageService: ProductsImageService) { }
+export class ProductsVariationsImageController {
+    constructor(private productsVariationImageService: ProductsVariationImageService) { }
 
     @Post()
     @UseInterceptors(
-        FileInterceptor('file', {
+        FilesInterceptor('files', 10, {
             storage: memoryStorage(),
         }),
     )
     async upload(
-        @UploadedFile() file: Express.Multer.File,
-        @Body() uploadProductImageDto: UploadProductImageDto
+        @UploadedFiles() files: Express.Multer.File[],
+        @Body() uploadProductVariationImageDto: UploadProductVariationImageDto
     ) {
         try {
-            const image = await this.productsImageService.create({
-                productId: uploadProductImageDto.productId,
-                file
-            })
+            console.log("files = ", files)
 
-            return { image }
+            const images = await Promise.all(files.map(
+                async file => {
+                    const image = await this.productsVariationImageService.create({
+                        productVariationId: uploadProductVariationImageDto.productVariationId,
+                        file
+                    })
+
+                    return image;
+                })
+            );
+
+            return { images }
         } catch (error) {
             throw error
         }
@@ -34,7 +43,7 @@ export class ProductsController {
     @HttpCode(HttpStatus.NO_CONTENT)
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
-            await this.productsImageService.delete(id);
+            await this.productsVariationImageService.delete(id);
             return
         } catch (error) {
             throw error

@@ -19,6 +19,7 @@ export class ProductsController {
         @Body() uploadProductImageDto: UploadProductImageDto
     ) {
         try {
+
             const image = await this.productsImageService.create({
                 productId: uploadProductImageDto.productId,
                 file

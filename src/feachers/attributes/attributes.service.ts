@@ -27,7 +27,7 @@ export class AttributesService {
                             "value",
                             [
                                 this.sequelize.literal(
-                                    '(SELECT COUNT(*) FROM product_variations_attributes WHERE product_variations_attributes.attrId = values.id)'
+                                    '(SELECT COUNT(*) FROM products_variations_attributes WHERE products_variations_attributes.attrId = values.id)'
                                 ),
                                 'totalProducts'
                             ],

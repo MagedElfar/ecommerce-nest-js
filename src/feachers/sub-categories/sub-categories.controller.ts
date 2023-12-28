@@ -5,6 +5,7 @@ import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { UpdateSubCategoryDto } from './dto/update-sub-category.dto';
 import { SubCategoryQueryDto } from './dto/sub-categoryQuery.dto';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('sub-categories')
 export class SubCategoriesController {
@@ -12,11 +13,11 @@ export class SubCategoriesController {
     constructor(private subCategoriesService: SubCategoriesService) { }
 
     @Get()
+    @Public()
     async findAll(@Query() categoryQueryDto: SubCategoryQueryDto) {
         try {
             const subCategories = await this.subCategoriesService.findAll(categoryQueryDto);
-            const count = await this.subCategoriesService.getCount(categoryQueryDto)
-            return { count, subCategories }
+            return subCategories
         } catch (error) {
             throw error
         }
@@ -47,6 +48,7 @@ export class SubCategoriesController {
     }
 
     @Get(":id")
+    @Public()
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
             const subCategory = await this.subCategoriesService.findOne({ id });
@@ -60,6 +62,7 @@ export class SubCategoriesController {
     }
 
     @Delete(":id")
+    @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

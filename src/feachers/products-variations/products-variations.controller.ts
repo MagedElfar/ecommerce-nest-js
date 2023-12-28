@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { CreateProductVariationDto } from './dto/create-product-variations.dto';
 import { ProductVariationsService } from './products-variations.service';
 import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('products-variations')
 export class ProductVariationsController {
@@ -35,6 +36,22 @@ export class ProductVariationsController {
         try {
 
             const productVariation = await this.productVariationsService.update(id, updateProductVariationDto)
+
+
+            return { productVariation }
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @Get(":id")
+    @Public()
+    async get(
+        @Param("id", ParseIntPipe) id: number,
+    ) {
+        try {
+
+            const productVariation = await this.productVariationsService.findOneFullData({ id })
 
 
             return { productVariation }

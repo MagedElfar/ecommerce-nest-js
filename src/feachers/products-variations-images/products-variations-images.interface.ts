@@ -1,7 +1,7 @@
 import { IMedia } from "src/core/interface/media.interface";
-import { Product } from "../products/products.entity";
+import { ProductVariations } from "../products-variations/products-variations.entity";
 
-export interface IProductImage extends IMedia {
-    productId?: number;
-    product?: Product
+export interface IProductVariationImage extends IMedia {
+    productVariationId: number;
+    productVariation: ProductVariations;
 }

@@ -12,6 +12,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { SubCategory } from '../sub-categories/sub-categories.entity';
 import { Product } from '../products/products.entity';
 import { CategoryImage } from '../categories-images/categories-images.entity';
+import { SubCategoryImage } from '../sub-categories-images/sub-categories-images.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -126,6 +127,12 @@ export class CategoriesService {
                                 'totalProducts',
                             ],
                         ],
+                        include: [
+                            {
+                                model: SubCategoryImage,
+                                attributes: ["id", "url"]
+                            }
+                        ]
                     },
                 ],
                 attributes: {

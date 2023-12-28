@@ -5,6 +5,7 @@ import { BrandsService } from './brands.service';
 import { CreateBrandDto } from './dto/create-brands.dto';
 import { BrandQueryDto } from './dto/brands-query.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('brands')
 export class BrandsController {
@@ -12,6 +13,7 @@ export class BrandsController {
     constructor(private brandsService: BrandsService) { }
 
     @Get()
+    @Public()
     async findAll(@Query() brandQueryDto: BrandQueryDto) {
         try {
             const categories = await this.brandsService.findAll(brandQueryDto);
@@ -47,6 +49,7 @@ export class BrandsController {
     }
 
     @Get(":id")
+    @Public()
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
             const brand = await this.brandsService.findOne({ id });
@@ -60,6 +63,7 @@ export class BrandsController {
     }
 
     @Delete(":id")
+    @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

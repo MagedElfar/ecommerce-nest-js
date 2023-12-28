@@ -26,7 +26,10 @@ export class ProductsImageService {
 
         try {
 
+
             const product = await this.productsService.findOneById(uploadProductImageDto.productId);
+
+            console.log("image = ")
 
             if (!product) throw new NotFoundException("product not found")
 

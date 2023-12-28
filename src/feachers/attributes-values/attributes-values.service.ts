@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { IAttributeValue } from './attributes-values.interface';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
 
 @Injectable()
 export class AttributeValuesService {
@@ -58,6 +59,35 @@ export class AttributeValuesService {
             throw error
         } finally {
             if (!t) await transaction.commit()
+        }
+    }
+
+    async delete(
+        id: number,
+    ): Promise<void> {
+        try {
+            const isDeleted = await this.attributeValueModel.destroy({ where: { id } })
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async update(id: number, updateAttributeValueDto: UpdateAttributeValueDto): Promise<IAttributeValue> {
+        try {
+
+            let value = await this.findOneById(id);
+
+            if (!value) throw new NotFoundException();
+
+            await this.attributeValueModel.update<AttributeValues>(updateAttributeValueDto, { where: { id } })
+
+            return {
+                ...value,
+                ...updateAttributeValueDto,
+            }
+        } catch (error) {
+
+            throw error
         }
     }
 }

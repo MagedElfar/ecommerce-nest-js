@@ -1,8 +1,8 @@
-import { Product } from '../products/products.entity';
+import { ProductVariations } from '../products-variations/products-variations.entity';
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
-@Table({ tableName: "products-variations-images" })
-export class ProductImage extends Model<ProductImage> {
+@Table({ tableName: "products_variations_images" })
+export class ProductVariationImage extends Model<ProductVariationImage> {
     @Column({
         type: DataType.STRING,
         allowNull: false,
@@ -15,11 +15,11 @@ export class ProductImage extends Model<ProductImage> {
     })
     storageKey: string
 
-    @ForeignKey(() => Product)
+    @ForeignKey(() => ProductVariations)
     @Column
-    productId: number;
+    productVariationId: number;
 
-    @BelongsTo(() => Product, { onDelete: "CASCADE" })
-    product: Product;
+    @BelongsTo(() => ProductVariations, { onDelete: "CASCADE" })
+    productVariation: ProductVariations;
 
 }

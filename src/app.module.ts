@@ -1,4 +1,4 @@
-import { Module, Inject, MiddlewareConsumer } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './feachers/users/users.module';
@@ -31,6 +31,7 @@ import { ProductsImageModule } from './feachers/products-images/products-images.
 import { ProductVariationAttributesModule } from './feachers/products-variations-attributes/products-variations-attributes.module';
 import { ProductVariationsModule } from './feachers/products-variations/products-variations.module';
 import { SubCategoryImageModule } from './feachers/sub-categories-images/sub-categories-images.module';
+import { ProductsVariationImageModule } from './feachers/products-variations-images/products-variations-images.module';
 
 @Module({
   imports: [
@@ -84,7 +85,8 @@ import { SubCategoryImageModule } from './feachers/sub-categories-images/sub-cat
     AttributeValuesModule,
     ProductVariationsModule,
     ProductVariationAttributesModule,
-    ProductsSubCategoriesModule
+    ProductsSubCategoriesModule,
+    ProductsVariationImageModule
   ],
   controllers: [AppController],
   providers: [

@@ -18,6 +18,7 @@ import { AttributeValues } from '../attributes-values/attributes-values.entity';
 import { ProductVariations } from '../products-variations/products-variations.entity';
 import { ProductVariationsService } from '../products-variations/products-variations.service';
 import { ProductImage } from '../products-images/products-images.entity';
+import { ProductVariationImage } from '../products-variations-images/products-variations-images.entity';
 
 @Injectable()
 export class ProductsService {
@@ -29,7 +30,6 @@ export class ProductsService {
         private readonly productsSubCategoriesService: ProductsSubCategoriesService,
         private sequelize: Sequelize,
         private readonly cloudinaryService: CloudinaryService,
-
     ) { }
 
     private filterCriteria(filterOptions: Partial<Omit<ProductQueryDto, "limit" | "offset">>): {
@@ -47,7 +47,7 @@ export class ProductsService {
 
         if (filterOptions.categoryId) where.categoryId = filterOptions.categoryId;
 
-        if (filterOptions.brandId) where.brandId = filterOptions.brandId;
+        if (filterOptions.brands) where.brandId = { [Op.in]: filterOptions.brands };
 
         // Add price range filtering
         if (filterOptions.minPrice || filterOptions.maxPrice) {
@@ -218,14 +218,22 @@ export class ProductsService {
 
             if (!product) throw new NotFoundException("product not found");
 
+            //delete product from database
             const isDeleted = await this.productModel.destroy({ where: { id }, transaction });
-
-            const keys = []
 
             if (!isDeleted) throw new NotFoundException("product not found");
 
+            const keys = []
+
+            //get product image storage key and push it in key array
             keys.push(product.image.storageKey)
 
+            //get product variations images storage key and push it in key array
+            product.variations.forEach(variation => {
+                variation.images.forEach(image => keys.push(image.storageKey))
+            })
+
+            //delete all image from the cloud
             await Promise.all(keys.map(async (key) => {
                 await this.cloudinaryService.delete(key);
                 return;
@@ -265,6 +273,10 @@ export class ProductsService {
                     {
                         model: ProductVariations,
                         include: [
+                            {
+                                model: ProductVariationImage,
+                                attributes: ["id", "url"]
+                            },
                             {
                                 model: AttributeValues,
                                 attributes: ["value", "id"],
@@ -319,6 +331,16 @@ export class ProductsService {
                         {
                             model: ProductImage,
                             attributes: ["storageKey"]
+                        },
+                        {
+                            model: ProductVariations,
+                            attributes: ["id"],
+                            include: [
+                                {
+                                    model: ProductVariationImage,
+                                    attributes: ["storageKey"]
+                                }
+                            ]
                         }
                     ]
                 }

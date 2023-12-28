@@ -6,6 +6,7 @@ import { User } from 'src/core/decorators/user.decorator';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
+import { Public } from 'src/core/decorators/public.decorator';
 
 @Controller('products')
 export class ProductsController {
@@ -14,6 +15,7 @@ export class ProductsController {
 
 
     @Get()
+    @Public()
     async findAll(@Query() productQueryDto: ProductQueryDto) {
         try {
             const products = await this.productsService.findAll(productQueryDto);
@@ -38,6 +40,7 @@ export class ProductsController {
     }
 
     @Get(":id")
+    @Public()
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
 
@@ -63,6 +66,7 @@ export class ProductsController {
     }
 
     @Delete(":id")
+    @Roles([UserRole.ADMIN])
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
 
