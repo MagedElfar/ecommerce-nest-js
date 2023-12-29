@@ -8,4 +8,8 @@ export class CreateBrandDto {
     @IsNotEmpty()
     @Transform((param) => transformLowerCase(param))
     name: string
+
+    @IsOptional()
+    @IsInt()
+    categoryId: number
 }

@@ -1,9 +1,9 @@
 import { ProductVariationImage } from './../../feachers/products-variations-images/products-variations-images.entity';
-
 import { AttributeValues } from "src/feachers/attributes-values/attributes-values.entity";
 import { Attribute } from "src/feachers/attributes/attribute.entity";
 import { BrandImage } from "src/feachers/brands-images/brands-images.entity";
 import { Brand } from "src/feachers/brands/brands.entity";
+import { CategoriesAttribute } from 'src/feachers/categories-attributes/categories-attributes.entity';
 import { CategoryImage } from "src/feachers/categories-images/categories-images.entity";
 import { Category } from "src/feachers/categories/categories.entity";
 import { ProductImage } from "src/feachers/products-images/products-images.entity";
@@ -21,6 +21,7 @@ export const models: any[] = [
     UserImages,
     Category,
     CategoryImage,
+    CategoriesAttribute,
     SubCategory,
     SubCategoryImage,
     Brand,

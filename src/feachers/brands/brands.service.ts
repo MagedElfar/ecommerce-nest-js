@@ -130,7 +130,7 @@ export class BrandsService {
 
             if (!brand) throw new NotFoundException();
 
-            const slug: string = slugify.default(updateBrandDto.name);
+            const slug: string = slugify.default(updateBrandDto.name || brand.name);
 
             await this.brandModel.update<Brand>({
                 ...updateBrandDto,

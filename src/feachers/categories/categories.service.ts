@@ -1,3 +1,4 @@
+import { models } from './../../core/database/models';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
@@ -13,6 +14,10 @@ import { SubCategory } from '../sub-categories/sub-categories.entity';
 import { Product } from '../products/products.entity';
 import { CategoryImage } from '../categories-images/categories-images.entity';
 import { SubCategoryImage } from '../sub-categories-images/sub-categories-images.entity';
+import { Brand } from '../brands/brands.entity';
+import { BrandImage } from '../brands-images/brands-images.entity';
+import { AttributeValues } from '../attributes-values/attributes-values.entity';
+import { Attribute } from '../attributes/attribute.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -111,6 +116,14 @@ export class CategoriesService {
                         attributes: [],
                     },
                     {
+                        model: Brand,
+                        attributes: ["id", "name"],
+                        include: [{
+                            model: BrandImage,
+                            attributes: ["id", "url"]
+                        }]
+                    },
+                    {
                         model: CategoryImage,
                         attributes: ["id", "url"],
                     },
@@ -134,21 +147,61 @@ export class CategoriesService {
                             }
                         ]
                     },
+                    {
+                        model: AttributeValues,
+                        attributes: ["id", "value"],
+                        as: 'attributes',
+                        through: { attributes: [], where: { categoryId: data.id } },
+                        include: [{ model: Attribute, attributes: ["id", "name"] }]
+                    }
                 ],
-                attributes: {
-                    include: [
-                        [
-                            this.sequelize.literal('(SELECT COUNT(*) FROM Products WHERE Products.categoryId = Category.id)'),
-                            'totalProducts',
-                        ],
-                    ],
-                },
-                group: ['Category.id', 'Products.id', 'SubCategories.id'],
+                // attributes: { 
+                //     include: [
+                //         [
+                //             this.sequelize.literal('(SELECT COUNT(*) FROM Products WHERE Products.categoryId = Category.id)'),
+                //             'totalProducts',
+                //         ],
+                //     ],
+                // },
+                // group: ['Category.id', 'Products.id', 'SubCategories.id'],
             });
 
             if (!category) return null;
 
-            return category["dataValues"];
+            // attributes: data.category.attributes.map(attr => ({
+            //     id: attr.attribute.id,
+            //     name: attr.attribute.name,
+            //     values: [{
+            //         id: attr.id,
+            //         value: attr.value,
+            //     }],
+            // })),
+            const attributes = category["dataValues"].attributes.reduce((acc: any[], attr) => {
+
+                const name = attr.attribute.name
+                const index = acc.findIndex((item) => item.name === name)
+                if (index === -1) {
+                    acc.push({
+                        name,
+                        values: [{
+                            id: attr.id,
+                            value: attr.value,
+                        }],
+                    })
+                } else {
+                    acc[index].values.push({
+                        id: attr.id,
+                        value: attr.value,
+                    })
+                }
+
+                return acc;
+            }, []);
+
+            return {
+                ...category["dataValues"],
+                attributes
+            };
         } catch (error) {
             throw error;
         }
