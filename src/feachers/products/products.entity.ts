@@ -6,6 +6,7 @@ import { SubCategory } from "../sub-categories/sub-categories.entity";
 import { ProductSubCategory } from "../products-sub-categories/products-sub-categories.entity";
 import { ProductVariations } from "../products-variations/products-variations.entity";
 import { ProductImage } from "../products-images/products-images.entity";
+import { CartItem } from "../cart-items/cart-item-entity";
 
 @Table({
     indexes: [
@@ -70,4 +71,7 @@ export class Product extends Model<Product> {
         onDelete: "CASCADE"
     })
     subCategories?: SubCategory[];
+
+    @HasMany(() => CartItem)
+    items: CartItem[]
 } 

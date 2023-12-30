@@ -32,6 +32,10 @@ export class CreateProductVariationDto {
     sku: string
 
     @IsOptional()
+    @IsString()
+    name: string
+
+    @IsOptional()
     @ArrayMinSize(1)
     @ValidateNested({ each: true })
     @Type(() => PartialType(OmitType(CreateProductAttributesDto, ['productVariationId'])))

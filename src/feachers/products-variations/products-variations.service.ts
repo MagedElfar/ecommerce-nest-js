@@ -11,6 +11,8 @@ import { AttributeValues } from '../attributes-values/attributes-values.entity';
 import { ProductVariationAttributesService } from '../products-variations-attributes/products-variations-attributes.service';
 import { ProductVariationImage } from '../products-variations-images/products-variations-images.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
+import { Product } from '../products/products.entity';
+import { ProductImage } from '../products-images/products-images.entity';
 
 @Injectable()
 export class ProductVariationsService {
@@ -102,8 +104,13 @@ export class ProductVariationsService {
 
             const productVariant = await this.productVariationModel.findByPk(
                 id,
+
                 {
                     include: [
+                        {
+                            model: Product,
+                            attributes: ["id", "price", "name"],
+                        },
                         {
                             model: ProductVariationImage,
                             attributes: ["storageKey"]

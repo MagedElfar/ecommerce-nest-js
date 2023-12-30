@@ -1,6 +1,7 @@
 import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
 import { UserRole } from 'src/core/constants';
 import { UserImages } from 'src/feachers/users-images/users-images.entity';
+import { Cart } from '../carts/carts.entity';
 
 @Table({
     indexes: [
@@ -40,4 +41,7 @@ export class User extends Model<User> {
 
     @HasOne(() => UserImages)
     image: UserImages;
+
+    @HasOne(() => Cart)
+    cart: Cart;
 }

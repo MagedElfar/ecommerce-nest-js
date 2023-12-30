@@ -33,6 +33,8 @@ import { ProductVariationsModule } from './feachers/products-variations/products
 import { SubCategoryImageModule } from './feachers/sub-categories-images/sub-categories-images.module';
 import { ProductsVariationImageModule } from './feachers/products-variations-images/products-variations-images.module';
 import { CategoriesAttributesModule } from './feachers/categories-attributes/categories-attributes.module';
+import { CartsModule } from './feachers/carts/carts.module';
+import { CartItemsModule } from './feachers/cart-items/cart-items.module';
 
 @Module({
   imports: [
@@ -88,7 +90,9 @@ import { CategoriesAttributesModule } from './feachers/categories-attributes/cat
     ProductVariationAttributesModule,
     ProductsSubCategoriesModule,
     ProductsVariationImageModule,
-    CategoriesAttributesModule
+    CategoriesAttributesModule,
+    CartsModule,
+    CartItemsModule
   ],
   controllers: [AppController],
   providers: [
