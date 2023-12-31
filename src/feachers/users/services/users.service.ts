@@ -7,6 +7,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { UpdateUserDto } from '../dto/updateUserDto.dto';
 import { Op } from 'sequelize';
 import { Media } from 'src/feachers/media/media.entity';
+import { Phone } from 'src/feachers/phones/phone.entity';
+import { Address } from 'src/feachers/addresses/address.entity';
 
 
 @Injectable()
@@ -70,15 +72,29 @@ export class UsersService {
         }
     }
 
-    async findOneFullData(data: Partial<Omit<IUser, "image">>): Promise<Partial<IUser> | null> {
+    async findOneFullData(data: Partial<Omit<IUser, "image" | "addresses" | "phones">>): Promise<Partial<IUser> | null> {
         try {
             const user = await this.userModel.findOne({
                 where: data,
                 attributes: { exclude: ["password"] },
-                include: [{
-                    model: Media,
-                    attributes: ["id", "url", "type"],
-                }]
+                include: [
+                    {
+                        model: Media,
+                        attributes: ["id", "url", "type"],
+                    },
+                    {
+                        model: Phone,
+                        attributes: {
+                            exclude: ["createdAt", "updatedAt", "userId"]
+                        }
+                    },
+                    {
+                        model: Address,
+                        attributes: {
+                            exclude: ["createdAt", "updatedAt", "userId"]
+                        }
+                    }
+                ]
             });
 
             if (!user) return null
@@ -125,7 +141,7 @@ export class UsersService {
         }
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto | Partial<Omit<IUser, "image">>): Promise<Partial<IUser>> {
+    async update(id: number, updateUserDto: UpdateUserDto | Partial<Omit<IUser, "image" | "addresses" | "phones">>): Promise<Partial<IUser>> {
         try {
             let user = await this.findById(id);
 

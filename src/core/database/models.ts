@@ -1,3 +1,4 @@
+import { Address } from "src/feachers/addresses/address.entity";
 import { AttributeValues } from "src/feachers/attributes-values/attributes-values.entity";
 import { Attribute } from "src/feachers/attributes/attribute.entity";
 import { Brand } from "src/feachers/brands/brands.entity";
@@ -6,6 +7,7 @@ import { Cart } from 'src/feachers/carts/carts.entity';
 import { CategoriesAttribute } from 'src/feachers/categories-attributes/categories-attributes.entity';
 import { Category } from "src/feachers/categories/categories.entity";
 import { Media } from "src/feachers/media/media.entity";
+import { Phone } from "src/feachers/phones/phone.entity";
 import { ProductSubCategory } from "src/feachers/products-sub-categories/products-sub-categories.entity";
 import { ProductVariationAttribute } from "src/feachers/products-variations-attributes/products-variations-attributes.entity";
 import { ProductVariationImage } from "src/feachers/products-variations-images/products-variations-images.entity";
@@ -29,5 +31,7 @@ export const models: any[] = [
     Cart,
     CartItem,
     Media,
-    ProductVariationImage
+    ProductVariationImage,
+    Address,
+    Phone
 ]

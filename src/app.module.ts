@@ -31,6 +31,8 @@ import { CartsModule } from './feachers/carts/carts.module';
 import { CartItemsModule } from './feachers/cart-items/cart-items.module';
 import { MediaModule } from './feachers/media/media.module';
 import { ProductsVariationImageModule } from './feachers/products-variations-images/products-variations-images.module';
+import { AddressesModule } from './feachers/addresses/addresses.module';
+import { PhonesModule } from './feachers/phones/phones.module';
 
 @Module({
   imports: [
@@ -84,7 +86,9 @@ import { ProductsVariationImageModule } from './feachers/products-variations-ima
     CategoriesAttributesModule,
     CartsModule,
     CartItemsModule,
-    MediaModule
+    MediaModule,
+    AddressesModule,
+    PhonesModule
   ],
   controllers: [AppController],
   providers: [

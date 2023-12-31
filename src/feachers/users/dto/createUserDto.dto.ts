@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
 
 export class CreateUserDto {
@@ -22,6 +22,15 @@ export class CreateUserDto {
     })
     @IsNotEmpty()
     readonly email: string
+
+    @IsOptional()
+    @IsString()
+    firstName: string;
+
+    @IsOptional()
+    @IsString()
+    lastName: string;
+
 
     // @IsEnum(Gender, {
     //     message: 'gender must be either male or female',
