@@ -1,9 +1,5 @@
-import { logger } from './core/logger/winston.config';
 import { Injectable } from '@nestjs/common';
 import { Sequelize } from 'sequelize-typescript';
-import { User } from './feachers/users/user.entity';
-import { UserImages } from './feachers/users-images/users-images.entity';
-import { models } from './core/database/models';
 
 
 @Injectable()

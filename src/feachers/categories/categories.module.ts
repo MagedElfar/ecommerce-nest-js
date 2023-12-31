@@ -1,14 +1,25 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Category } from './categories.entity';
-import { CategoriesService } from './categories.service';
-import { CategoriesController } from './categories.controller';
-import { CloudinaryModule } from 'src/utility/cloudinary/cloudinary.module';
+import { CategoriesService } from './services/categories.service';
+import { CategoriesController } from './controllers/categories.controller';
+import { MediaModule } from '../media/media.module';
+import { CategoryImageService } from './services/categories-images.service';
+import { CategoryImageController } from './controllers/categories-images.controller';
 
 @Module({
-    imports: [SequelizeModule.forFeature([Category]), CloudinaryModule],
-    providers: [CategoriesService],
-    controllers: [CategoriesController],
+    imports: [
+        SequelizeModule.forFeature([Category]),
+        MediaModule,
+    ],
+    providers: [
+        CategoriesService,
+        CategoryImageService
+    ],
+    controllers: [
+        CategoriesController,
+        CategoryImageController
+    ],
     exports: [CategoriesService]
 })
 export class CategoriesModule { }

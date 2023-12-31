@@ -5,8 +5,8 @@ import { Brand } from "../brands/brands.entity";
 import { SubCategory } from "../sub-categories/sub-categories.entity";
 import { ProductSubCategory } from "../products-sub-categories/products-sub-categories.entity";
 import { ProductVariations } from "../products-variations/products-variations.entity";
-import { ProductImage } from "../products-images/products-images.entity";
 import { CartItem } from "../cart-items/cart-item-entity";
+import { Media } from "../media/media.entity";
 
 @Table({
     indexes: [
@@ -60,8 +60,12 @@ export class Product extends Model<Product> {
     @ForeignKey(() => Brand)
     brandId: number
 
-    @HasOne(() => ProductImage)
-    image: ProductImage
+    @ForeignKey(() => Media)
+    @Column({ allowNull: true })
+    imageId: number
+
+    @BelongsTo(() => Media, { onDelete: "SET NULL" })
+    image: Media
 
     @BelongsTo(() => Brand, { onDelete: "SET NULL" })
     brand: Brand

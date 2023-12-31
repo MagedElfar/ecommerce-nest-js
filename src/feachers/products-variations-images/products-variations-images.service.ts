@@ -1,12 +1,13 @@
 import { ProductVariationsService } from './../products-variations/products-variations.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { UploadProductVariationImageDto } from './dto/upload-variation-image.dto';
-import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { ProductsFolder } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { ProductVariationImage } from './products-variations-images.entity';
 import { IProductVariationImage } from './products-variations-images.interface';
+import { MediaService } from '../media/media.service';
+import { UploadImageDto } from './dto/upload-image.dto';
+import { IMedia } from '../media/media.interface';
 
 @Injectable()
 export class ProductsVariationImageService {
@@ -15,41 +16,34 @@ export class ProductsVariationImageService {
         private readonly productVariationImageModel: typeof ProductVariationImage,
         private readonly productVariationsService: ProductVariationsService,
         private sequelize: Sequelize,
-        private readonly cloudinaryService: CloudinaryService,
+        private readonly mediaService: MediaService,
 
     ) { }
 
-    async create(uploadProductVariationImageDto: UploadProductVariationImageDto): Promise<IProductVariationImage> {
-
-        let storageKey: string = "";
-        let url: string = ""
+    async create(uploadImageDto: UploadImageDto): Promise<IProductVariationImage> {
 
         try {
 
-            const product = await this.productVariationsService.findOneById(uploadProductVariationImageDto.productVariationId);
+            const product = await this.productVariationsService.findOneById(uploadImageDto.variationId);
 
             if (!product) throw new NotFoundException("product not found")
 
-            const cloudinary = await this.cloudinaryService.upload({
-                file: uploadProductVariationImageDto.file,
+            const image = await this.mediaService.create({
+                file: uploadImageDto.file,
                 folder: ProductsFolder
-            });
-
-            storageKey = cloudinary.public_id
-            url = cloudinary.url
-
-
-            const image = await this.productVariationImageModel.create({
-                productVariationId: uploadProductVariationImageDto.productVariationId,
-                url: cloudinary.url,
-                storageKey
             })
 
-            return image["dataValues"]
+            const variantImage = await this.productVariationImageModel.create({
+                variationId: uploadImageDto.variationId,
+                imageId: image.id
+            })
+
+            return {
+                ...variantImage["dataValues"],
+                image
+            }
 
         } catch (error) {
-            if (storageKey)
-                await this.cloudinaryService.delete(storageKey)
             throw error
         }
 
@@ -68,26 +62,16 @@ export class ProductsVariationImageService {
     }
 
     async delete(id: number): Promise<void> {
-        const t = await this.sequelize.transaction();
         try {
 
             const image = await this.findById(id)
 
             if (!image) throw new NotFoundException();
 
-            const isDelete = await this.productVariationImageModel.destroy({
-                where: { id },
-                transaction: t
-            },)
+            await this.mediaService.delete(image.imageId)
 
-            if (!isDelete) throw new NotFoundException();
-
-            await this.cloudinaryService.delete(image.storageKey)
-
-            t.commit()
             return
         } catch (error) {
-            t.rollback()
             throw error
         }
     }

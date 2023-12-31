@@ -1,4 +1,4 @@
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/services/users.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UpdateRoleDto } from './dto/update-role.dto';
 

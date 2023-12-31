@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { UploadProductVariationImageDto } from './dto/upload-variation-image.dto';
+import { UploadImageDto } from './dto/upload-image.dto';
 import { ProductsVariationImageService } from './products-variations-images.service';
 import { Public } from 'src/core/decorators/public.decorator';
 
@@ -17,7 +17,7 @@ export class ProductsVariationsImageController {
     )
     async upload(
         @UploadedFiles() files: Express.Multer.File[],
-        @Body() uploadProductVariationImageDto: UploadProductVariationImageDto
+        @Body() uploadImageDto: UploadImageDto
     ) {
         try {
             console.log("files = ", files)
@@ -25,7 +25,7 @@ export class ProductsVariationsImageController {
             const images = await Promise.all(files.map(
                 async file => {
                     const image = await this.productsVariationImageService.create({
-                        productVariationId: uploadProductVariationImageDto.productVariationId,
+                        variationId: uploadImageDto.variationId,
                         file
                     })
 
@@ -34,17 +34,6 @@ export class ProductsVariationsImageController {
             );
 
             return { images }
-        } catch (error) {
-            throw error
-        }
-    }
-
-    @Delete(":id")
-    @HttpCode(HttpStatus.NO_CONTENT)
-    async delete(@Param("id", ParseIntPipe) id: number) {
-        try {
-            await this.productsVariationImageService.delete(id);
-            return
         } catch (error) {
             throw error
         }

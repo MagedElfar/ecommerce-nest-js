@@ -5,10 +5,10 @@ import { Cart } from './carts.entity';
 import { CreateCartDto } from './dto/create-cart-dto';
 import { ICart } from './carts.interface';
 import { CartItem } from '../cart-items/cart-item-entity';
-import { ProductImage } from '../products-images/products-images.entity';
 import { ProductVariations } from '../products-variations/products-variations.entity';
 import { Product } from '../products/products.entity';
 import { CartItemsService } from '../cart-items/cart-items.service';
+import { Media } from '../media/media.entity';
 
 @Injectable()
 export class CartsService {
@@ -48,7 +48,7 @@ export class CartsService {
                                 model: Product,
                                 attributes: ["id", "price", "name"],
                                 include: [{
-                                    model: ProductImage,
+                                    model: Media,
                                     attributes: ["id", "url"]
                                 }]
                             }

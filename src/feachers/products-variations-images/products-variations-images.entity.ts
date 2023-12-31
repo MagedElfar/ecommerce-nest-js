@@ -1,25 +1,30 @@
+import { Media } from '../media/media.entity';
 import { ProductVariations } from '../products-variations/products-variations.entity';
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
 
 @Table({ tableName: "products_variations_images" })
 export class ProductVariationImage extends Model<ProductVariationImage> {
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    url: string;
 
+    @PrimaryKey
+    @AutoIncrement
     @Column({
-        type: DataType.STRING,
+        type: DataType.INTEGER,
         allowNull: false,
     })
-    storageKey: string
+    id: number;
 
     @ForeignKey(() => ProductVariations)
     @Column
-    productVariationId: number;
+    variationId: number;
 
     @BelongsTo(() => ProductVariations, { onDelete: "CASCADE" })
     productVariation: ProductVariations;
+
+    @ForeignKey(() => Media)
+    @Column
+    imageId: number;
+
+    @BelongsTo(() => Media, { onDelete: "CASCADE" })
+    image: Media;
 
 }

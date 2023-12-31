@@ -7,9 +7,9 @@ import { CartsService } from '../carts/carts.service';
 import { CreateItemDto } from './dto/create-item-dto';
 import { ICartItem } from './cart-items-interface';
 import { ProductVariations } from '../products-variations/products-variations.entity';
-import { ProductImage } from '../products-images/products-images.entity';
 import { Product } from '../products/products.entity';
 import { Cart } from '../carts/carts.entity';
+import { Media } from '../media/media.entity';
 
 @Injectable()
 export class CartItemsService {
@@ -52,7 +52,7 @@ export class CartItemsService {
                             model: Product,
                             attributes: ["id", "price", "name"],
                             include: [{
-                                model: ProductImage,
+                                model: Media,
                                 attributes: ["id", "url"]
                             }]
                         }

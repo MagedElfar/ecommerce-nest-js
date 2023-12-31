@@ -2,7 +2,7 @@ import { Table, Column, Model, DataType, HasOne, ForeignKey, BelongsTo, BelongsT
 import { Category } from '../categories/categories.entity';
 import { ProductSubCategory } from '../products-sub-categories/products-sub-categories.entity';
 import { Product } from '../products/products.entity';
-import { SubCategoryImage } from '../sub-categories-images/sub-categories-images.entity';
+import { Media } from '../media/media.entity';
 
 
 @Table({
@@ -34,8 +34,12 @@ export class SubCategory extends Model<SubCategory> {
     @BelongsTo(() => Category, { onDelete: "SET NULL" })
     category: Category
 
-    @HasOne(() => SubCategoryImage)
-    image: SubCategoryImage
+    @ForeignKey(() => Media)
+    @Column({ allowNull: true })
+    imageId: number
+
+    @BelongsTo(() => Media, { onDelete: "SET NULL" })
+    image: Media
 
     @BelongsToMany(() => Product, () => ProductSubCategory)
     products?: Product[];

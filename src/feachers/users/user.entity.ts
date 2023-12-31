@@ -1,7 +1,7 @@
-import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { UserRole } from 'src/core/constants';
-import { UserImages } from 'src/feachers/users-images/users-images.entity';
 import { Cart } from '../carts/carts.entity';
+import { Media } from '../media/media.entity';
 
 @Table({
     indexes: [
@@ -39,8 +39,12 @@ export class User extends Model<User> {
     })
     role: UserRole
 
-    @HasOne(() => UserImages)
-    image: UserImages;
+    @ForeignKey(() => Media)
+    @Column({ allowNull: true })
+    imageId: number;
+
+    @BelongsTo(() => Media, { onDelete: "SET NULL" })
+    image: Media;
 
     @HasOne(() => Cart)
     cart: Cart;

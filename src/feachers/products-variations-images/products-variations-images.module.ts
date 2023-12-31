@@ -2,15 +2,15 @@ import { ProductVariationsModule } from './../products-variations/products-varia
 import { ProductsVariationImageService } from './products-variations-images.service';
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { CloudinaryModule } from 'src/utility/cloudinary/cloudinary.module';
 import { ProductVariationImage } from './products-variations-images.entity';
 import { ProductsVariationsImageController } from './products-variations-images.controller';
+import { MediaModule } from '../media/media.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([ProductVariationImage]),
     ProductVariationsModule,
-    CloudinaryModule,
+    MediaModule,
   ],
   controllers: [ProductsVariationsImageController],
   providers: [ProductsVariationImageService],

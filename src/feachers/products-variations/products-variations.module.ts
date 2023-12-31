@@ -6,13 +6,14 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ProductVariations } from './products-variations.entity';
 import { ProductsModule } from '../products/products.module';
 import { ProductVariationAttributesModule } from '../products-variations-attributes/products-variations-attributes.module';
+import { MediaModule } from '../media/media.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([ProductVariations]),
     forwardRef(() => ProductsModule),
     forwardRef(() => ProductVariationAttributesModule),
-    CloudinaryModule
+    MediaModule
   ],
   controllers: [ProductVariationsController],
   providers: [ProductVariationsService],

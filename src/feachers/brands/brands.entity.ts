@@ -1,7 +1,7 @@
-import { Table, Column, Model, DataType, HasMany, HasOne, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Product } from '../products/products.entity';
-import { BrandImage } from '../brands-images/brands-images.entity';
 import { Category } from '../categories/categories.entity';
+import { Media } from '../media/media.entity';
 
 @Table({
     indexes: [
@@ -34,7 +34,10 @@ export class Brand extends Model<Brand> {
     @HasMany(() => Product)
     products: Product[]
 
-    @HasOne(() => BrandImage)
-    image: BrandImage
+    @ForeignKey(() => Media)
+    @Column({ allowNull: true })
+    imageId: number
 
+    @BelongsTo(() => Media, { onDelete: "SET NULL" })
+    image: Media
 }

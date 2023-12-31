@@ -3,16 +3,16 @@ import { CreateProductVariationDto } from './dto/create-product-variations.dto';
 import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductVariations } from './products-variations.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { ProductsService } from '../products/products.service';
+import { ProductsService } from '../products/services/products.service';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
 import { Attribute } from '../attributes/attribute.entity';
 import { AttributeValues } from '../attributes-values/attributes-values.entity';
 import { ProductVariationAttributesService } from '../products-variations-attributes/products-variations-attributes.service';
-import { ProductVariationImage } from '../products-variations-images/products-variations-images.entity';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Product } from '../products/products.entity';
-import { ProductImage } from '../products-images/products-images.entity';
+import { Media } from '../media/media.entity';
+import { MediaService } from '../media/media.service';
 
 @Injectable()
 export class ProductVariationsService {
@@ -25,7 +25,7 @@ export class ProductVariationsService {
         @Inject(forwardRef(() => ProductVariationAttributesService))
         private productVariationAttributesService: ProductVariationAttributesService,
         private sequelize: Sequelize,
-        private readonly cloudinaryService: CloudinaryService
+        private readonly mediaService: MediaService
     ) { }
 
     async create(
@@ -112,8 +112,9 @@ export class ProductVariationsService {
                             attributes: ["id", "price", "name"],
                         },
                         {
-                            model: ProductVariationImage,
-                            attributes: ["storageKey"]
+                            model: Media,
+                            attributes: ["id", "storageKey"],
+                            through: { attributes: [] }
                         }
                     ],
                     transaction
@@ -139,8 +140,9 @@ export class ProductVariationsService {
                 where: data,
                 include: [
                     {
-                        model: ProductVariationImage,
-                        attributes: ["id", "url"]
+                        model: Media,
+                        attributes: ["id", "url"],
+                        through: { attributes: ["id"] }
                     },
                     {
                         model: AttributeValues,
@@ -191,7 +193,7 @@ export class ProductVariationsService {
             const images = variant.images;
 
             await Promise.all(images.map(async image => {
-                await this.cloudinaryService.delete(image.storageKey)
+                await this.mediaService.delete(image.id)
             }))
 
             await this.productVariationModel.destroy({

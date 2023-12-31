@@ -1,5 +1,5 @@
 import { UpdateUserDto } from 'src/feachers/users/dto/updateUserDto.dto';
-import { UsersService } from '../../users/users.service';
+import { UsersService } from '../../users/services/users.service';
 import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put } from '@nestjs/common';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';

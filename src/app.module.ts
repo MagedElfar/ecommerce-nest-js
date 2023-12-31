@@ -13,7 +13,6 @@ import { LoggerMiddleware } from './core/logger/logger.middleware';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
 import { RolesGuard } from './core/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { UsersImagesModule } from './feachers/users-images/users-images.module';
 import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
 import { AdminModule } from './feachers/admin/admin.module';
 import { CategoriesModule } from './feachers/categories/categories.module';
@@ -25,16 +24,13 @@ import { AttributesModule } from './feachers/attributes/attributes.module';
 import { SubCategoriesModule } from './feachers/sub-categories/sub-categories.module';
 import { ProductsSubCategoriesModule } from './feachers/products-sub-categories/products-sub-categories.module';
 import { AttributeValuesModule } from './feachers/attributes-values/attributes-values.module';
-import { BrandsImageModule } from './feachers/brands-images/brands-images.module';
-import { CategoryImageModule } from './feachers/categories-images/categories-images.module';
-import { ProductsImageModule } from './feachers/products-images/products-images.module';
 import { ProductVariationAttributesModule } from './feachers/products-variations-attributes/products-variations-attributes.module';
 import { ProductVariationsModule } from './feachers/products-variations/products-variations.module';
-import { SubCategoryImageModule } from './feachers/sub-categories-images/sub-categories-images.module';
-import { ProductsVariationImageModule } from './feachers/products-variations-images/products-variations-images.module';
 import { CategoriesAttributesModule } from './feachers/categories-attributes/categories-attributes.module';
 import { CartsModule } from './feachers/carts/carts.module';
 import { CartItemsModule } from './feachers/cart-items/cart-items.module';
+import { MediaModule } from './feachers/media/media.module';
+import { ProductsVariationImageModule } from './feachers/products-variations-images/products-variations-images.module';
 
 @Module({
   imports: [
@@ -73,26 +69,22 @@ import { CartItemsModule } from './feachers/cart-items/cart-items.module';
     CloudinaryModule,
     AuthModule,
     UsersModule,
-    UsersImagesModule,
     AdminModule,
     CategoriesModule,
-    CategoryImageModule,
     SubCategoriesModule,
-    SubCategoryImageModule,
     ProfilesModule,
     BrandsModule,
-    BrandsImageModule,
     ProductsModule,
-    ProductsImageModule,
     AttributesModule,
     AttributeValuesModule,
     ProductVariationsModule,
-    ProductVariationAttributesModule,
-    ProductsSubCategoriesModule,
     ProductsVariationImageModule,
+    ProductsSubCategoriesModule,
+    ProductVariationAttributesModule,
     CategoriesAttributesModule,
     CartsModule,
-    CartItemsModule
+    CartItemsModule,
+    MediaModule
   ],
   controllers: [AppController],
   providers: [

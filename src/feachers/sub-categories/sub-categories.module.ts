@@ -1,14 +1,16 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { SubCategoriesService } from './sub-categories.service';
-import { CloudinaryModule } from 'src/utility/cloudinary/cloudinary.module';
+import { SubCategoriesService } from './services/sub-categories.service';
 import { SubCategory } from './sub-categories.entity';
-import { SubCategoriesController } from './sub-categories.controller';
+import { SubCategoriesController } from './controllers/sub-categories.controller';
+import { MediaModule } from '../media/media.module';
+import { SubCategoryImageController } from './controllers/sub-categories-images.controller';
+import { SubCategoryImageService } from './services/sub-categories-images.service';
 
 @Module({
-    imports: [SequelizeModule.forFeature([SubCategory]), CloudinaryModule],
-    providers: [SubCategoriesService],
-    controllers: [SubCategoriesController],
+    imports: [SequelizeModule.forFeature([SubCategory]), MediaModule],
+    providers: [SubCategoriesService, SubCategoryImageService],
+    controllers: [SubCategoriesController, SubCategoryImageController],
     exports: [SubCategoriesService]
 })
 export class SubCategoriesModule { }

@@ -1,7 +1,8 @@
-import { IMedia } from "src/core/interface/media.interface";
-import { ProductVariations } from "../products-variations/products-variations.entity";
+import { IMedia } from "src/feachers/media/media.interface";
+import { Media } from "../media/media.entity";
 
 export interface IProductVariationImage extends IMedia {
-    productVariationId: number;
-    productVariation: ProductVariations;
+    variationId?: number;
+    imageId?: number;
+    image?: IMedia
 }

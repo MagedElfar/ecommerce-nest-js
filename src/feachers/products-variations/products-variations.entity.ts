@@ -2,8 +2,10 @@ import { BelongsTo, Column, ForeignKey, Model, Table, DataType, BelongsToMany, H
 import { Product } from "../products/products.entity";
 import { AttributeValues } from "../attributes-values/attributes-values.entity";
 import { ProductVariationAttribute } from "../products-variations-attributes/products-variations-attributes.entity";
-import { ProductVariationImage } from "../products-variations-images/products-variations-images.entity";
+// import { ProductVariationImage } from "../products-variations-images/products-variations-images.entity";
 import { CartItem } from "../cart-items/cart-item-entity";
+import { Media } from "../media/media.entity";
+import { ProductVariationImage } from "../products-variations-images/products-variations-images.entity";
 
 @Table({
     tableName: "products_variations",
@@ -34,8 +36,8 @@ export class ProductVariations extends Model<ProductVariations>{
     @Column
     productId: number
 
-    @HasMany(() => ProductVariationImage)
-    images: ProductVariationImage[]
+    @BelongsToMany(() => Media, () => ProductVariationImage)
+    images?: AttributeValues[];
 
     @BelongsTo(() => Product, { onDelete: "CASCADE" })
     product?: Product
