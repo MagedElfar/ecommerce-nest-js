@@ -7,6 +7,7 @@ import { Phone } from './phone.entity';
 @Module({
   imports: [SequelizeModule.forFeature([Phone])],
   controllers: [PhonesController],
-  providers: [PhonesService]
+  providers: [PhonesService],
+  exports: [PhonesService]
 })
 export class PhonesModule { }

@@ -3,7 +3,10 @@ import { User } from '../users/user.entity';
 import { CartItem } from '../cart-items/cart-item-entity';
 import { Cart } from '../carts/carts.entity';
 import { Product } from '../products/products.entity';
-import { ProductVariations } from '../products-variations/products-variations.entity';
+import { } from '../products-variations/products-variations.entity';
+import { IProductVariation } from '../products-variations/products-variations.interface';
+import { IProduct } from '../products/products.interface';
+import { ICart } from '../carts/carts.interface';
 
 export interface ICartItem extends IModel {
 
@@ -13,13 +16,13 @@ export interface ICartItem extends IModel {
 
     cartId?: number
 
-    cart?: Cart;
+    cart?: ICart;
 
     productId?: number
 
-    product?: Product;
+    product?: IProduct;
 
     variantId?: number
 
-    variant?: ProductVariations;
+    variant?: IProductVariation;
 }

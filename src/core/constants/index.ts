@@ -5,6 +5,24 @@ export enum UserRole {
     Vendor = "vendor"
 }
 
+export enum OrderStatus {
+    PADDING = "padding",
+    PROCESSING = "processing",
+    COMPLETED = "completed",
+    CANCELLED = "cancelled"
+}
+
+export enum PaymentMethod {
+    CARD = "card",
+    CASH = "cash"
+}
+
+export enum PaymentStatus {
+    SUCCUSS = "succuss",
+    FAILED = "failed",
+    PADDING = "padding",
+}
+
 //decorator
 export const IS_PUBLIC_KEY = 'isPublic';
 

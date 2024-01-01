@@ -1,12 +1,13 @@
 import { IModel } from 'src/core/interface/model.interface';
-import { User } from '../users/user.entity';
+import { IUser } from '../users/users.interface';
+import { ICartItem } from '../cart-items/cart-items-interface';
 import { CartItem } from '../cart-items/cart-item-entity';
 
 export interface ICart extends IModel {
 
     userId?: number
 
-    user?: User;
+    user?: IUser;
 
     items?: CartItem[]
 }

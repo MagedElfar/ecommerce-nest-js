@@ -30,7 +30,7 @@ export class CartsService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICart, "user">>): Promise<ICart | null> {
+    async findOne(data: Partial<Omit<ICart, "user" | "items">>): Promise<ICart | null> {
         try {
 
             const cart = await this.cartModel.findOne(

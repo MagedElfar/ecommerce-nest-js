@@ -166,19 +166,30 @@ export class ProductVariationsService {
         }
     }
 
-    async update(id: number, updateProductVariationDto: UpdateProductVariationDto) {
+    async update(
+        id: number,
+        updateProductVariationDto: UpdateProductVariationDto,
+        t?: Transaction
+    ) {
+        const transaction = t || await this.sequelize.transaction()
         try {
             const variant = await this.findOneById(id);
 
             if (!variant) throw new NotFoundException();
 
-            await this.productVariationModel.update(updateProductVariationDto, { where: { id } });
+            await this.productVariationModel.update(updateProductVariationDto, {
+                where: { id },
+                transaction
+            });
 
+
+            if (!t) await transaction.commit()
             return {
                 ...variant,
                 ...updateProductVariationDto
             }
         } catch (error) {
+            if (!t) await transaction.rollback()
             throw error
         }
     }

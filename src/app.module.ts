@@ -33,6 +33,10 @@ import { MediaModule } from './feachers/media/media.module';
 import { ProductsVariationImageModule } from './feachers/products-variations-images/products-variations-images.module';
 import { AddressesModule } from './feachers/addresses/addresses.module';
 import { PhonesModule } from './feachers/phones/phones.module';
+import { OrdersModule } from './feachers/orders/orders.module';
+import { PaymentsModule } from './feachers/payments/payments.module';
+import { OrdersItemsModule } from './feachers/orders-items/orders-items.module';
+import { PaymentsMethodsModule } from './feachers/payments-methods/payments-method.module';
 
 @Module({
   imports: [
@@ -88,7 +92,11 @@ import { PhonesModule } from './feachers/phones/phones.module';
     CartItemsModule,
     MediaModule,
     AddressesModule,
-    PhonesModule
+    PhonesModule,
+    OrdersModule,
+    PaymentsMethodsModule,
+    PaymentsModule,
+    OrdersItemsModule,
   ],
   controllers: [AppController],
   providers: [

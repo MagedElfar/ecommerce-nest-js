@@ -10,6 +10,8 @@ import { ProductVariations } from '../products-variations/products-variations.en
 import { Product } from '../products/products.entity';
 import { Cart } from '../carts/carts.entity';
 import { Media } from '../media/media.entity';
+import { Sequelize } from 'sequelize-typescript';
+import { Transaction } from 'sequelize';
 
 @Injectable()
 export class CartItemsService {
@@ -18,7 +20,8 @@ export class CartItemsService {
         private readonly cartItemModel: typeof CartItem,
         private readonly variationServices: ProductVariationsService,
         @Inject(forwardRef(() => CartsService))
-        private readonly cartServices: CartsService
+        private readonly cartServices: CartsService,
+        private readonly sequelize: Sequelize,
     ) { }
 
     async create(createItemDto: CreateItemDto): Promise<ICartItem> {
@@ -137,15 +140,21 @@ export class CartItemsService {
         }
     }
 
-    async deleteCartItems(cartId: number): Promise<void> {
+    async deleteCartItems(cartId: number, t?: Transaction): Promise<void> {
+        const transaction = t || await this.sequelize.transaction()
         try {
 
-            const isDeleted = await this.cartItemModel.destroy({ where: { cartId } })
+            const isDeleted = await this.cartItemModel.destroy({
+                where: { cartId },
+                transaction
+            })
 
             if (!isDeleted) throw new NotFoundException();
 
+            if (!t) await transaction.commit()
             return
         } catch (error) {
+            if (!t) await transaction.rollback()
             throw error
         }
     }
