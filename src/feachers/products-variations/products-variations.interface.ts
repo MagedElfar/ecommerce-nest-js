@@ -2,6 +2,7 @@ import { IModel } from "src/core/interface/model.interface";
 import { Product } from "../products/products.entity";
 import { IAttributeValue } from "../attributes-values/attributes-values.interface";
 import { Media } from "../media/media.entity";
+import { IProductVariationAttributes } from "../products-variations-attributes/products-variations-attributes.interface";
 
 export interface IProductVariation extends IModel {
     quantity?: number
@@ -12,7 +13,7 @@ export interface IProductVariation extends IModel {
 
     sku?: string,
 
-    attributes?: IAttributeValue[],
+    attributes?: IAttributeValue[] | IProductVariationAttributes[],
 
     image?: Media[]
 

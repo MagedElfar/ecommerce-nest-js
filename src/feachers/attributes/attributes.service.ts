@@ -79,7 +79,7 @@ export class AttributesService {
 
             let attribute = await this.findOneById(id);
 
-            if (!attribute) throw new NotFoundException();
+            if (!attribute) throw new NotFoundException("attribute not exist");
 
             await this.attributeModel.update<Attribute>(updateAttributeDto, { where: { id } })
 

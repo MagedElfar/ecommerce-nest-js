@@ -16,5 +16,8 @@ export default () => ({
         apiKey: process.env.CLOUD_API_KEY!,
         apiSecret: process.env.CLOUD_API_SECRET!,
         cloudName: process.env.CLOUD_NAME!
+    },
+    stripe: {
+        secretKey: process.env.STRIPE_SECRET_KEY
     }
 });

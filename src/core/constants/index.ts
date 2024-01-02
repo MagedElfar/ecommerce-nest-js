@@ -7,7 +7,7 @@ export enum UserRole {
 
 export enum OrderStatus {
     PADDING = "padding",
-    PROCESSING = "processing",
+    CONFIRMED = "confirmed",
     COMPLETED = "completed",
     CANCELLED = "cancelled"
 }

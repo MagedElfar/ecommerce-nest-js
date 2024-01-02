@@ -1,7 +1,7 @@
 import { MediaService } from 'src/feachers/media/media.service';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { CreateProductDto } from '../dto/create-product.dto';
-import { HttpException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { ConflictException, HttpException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from '../products.entity';
 import { IProduct } from '../products.interface';
@@ -36,17 +36,19 @@ export class ProductsService {
         where: WhereOptions<Product>,
         include?: Includeable[]
     } {
-        const options = {}
 
         const where: WhereOptions<Product> = {}
 
         const include: Includeable[] = []
 
 
+        //filler by name if exist in query
         if (filterOptions.name) where.name = { [Op.like]: `%${filterOptions.name}%` };
 
+        //filler by categoryId if exist in query
         if (filterOptions.categoryId) where.categoryId = filterOptions.categoryId;
 
+        //filler by brandId if exist in query
         if (filterOptions.brands) where.brandId = { [Op.in]: filterOptions.brands };
 
         // Add price range filtering
@@ -62,6 +64,8 @@ export class ProductsService {
             }
         }
 
+
+        //filler by subcategoryId if exist in query
         if (filterOptions.subCategoryId) {
             include.push({
                 model: SubCategory,
@@ -73,6 +77,7 @@ export class ProductsService {
             },)
         }
 
+        //filler by attribute if exist in query
         if (filterOptions.attributes) {
             include.push({
                 model: ProductVariations,
@@ -123,14 +128,20 @@ export class ProductsService {
         const transaction = await this.sequelize.transaction()
 
         try {
-            const { variations, subCategories = [], ...productDto } = createProductDto;
+            const { variations: ProVariations, subCategories = [], ...productDto } = createProductDto;
 
+            //1-check if product exist
+            const isProduct = await this.findOne({ name: createProductDto.name })
+
+            if (isProduct) throw new ConflictException(`product with name "${createProductDto.name}" already exist`)
+
+            //2-create product slug
             const slug: string = slugify.default(createProductDto.name, {
                 lower: true,
                 trim: true
             })
 
-            //add product
+            //3-create new product in data base
             const product = await this.productModel.create<Product>(
                 {
                     ...productDto,
@@ -142,9 +153,10 @@ export class ProductsService {
                 }
             )
 
-            //add product variant
-            if (variations && variations.length > 0) {
-                await Promise.all(variations.map(async variant => {
+            //4-create new product variations if exist
+            if (ProVariations && ProVariations.length > 0) {
+
+                const variations = await Promise.all(ProVariations.map(async variant => {
                     return await this.productVariationsService.create(
                         {
                             ...variant,
@@ -153,6 +165,7 @@ export class ProductsService {
                         transaction
                     )
                 }))
+
             }
 
             //add product sub categories if exist
@@ -351,6 +364,19 @@ export class ProductsService {
             )
 
             if (!product) throw new NotFoundException()
+
+            return product["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOne(data: Partial<Omit<Product, "variations" | "subCategories">>): Promise<IProduct | null> {
+        try {
+
+            const product = await this.productModel.findOne({ where: data })
+
+            if (!product) return null
 
             return product["dataValues"]
         } catch (error) {

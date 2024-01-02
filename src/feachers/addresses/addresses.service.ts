@@ -53,7 +53,9 @@ export class AddressesService {
             const address = await this.findOneById(id);
 
             if (!address || address.userId !== updateAddressDto.userId)
-                throw new ForbiddenException();
+                throw new ForbiddenException(
+                    "address no exist or you don't have permission for that operation"
+                );
 
             await this.addressModel.update(updateAddressDto, { where: { id } })
 
@@ -71,7 +73,9 @@ export class AddressesService {
             const address = await this.addressModel.findByPk(id);
 
             if (!address || address.userId !== userId)
-                throw new ForbiddenException();
+                throw new ForbiddenException(
+                    "address no exist or you don't have permission for that operation"
+                );
 
             await this.addressModel.destroy({ where: { id } })
             return;

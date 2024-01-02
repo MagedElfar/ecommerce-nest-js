@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { OrderItem } from '../orders-items/order-item-entity';
 import { OrderStatus } from 'src/core/constants';
 import { PaymentMethod } from '../payments-methods/payment-method.entity';
+import { OrderCancelReason } from '../orders-cancel-reasons/order-cancel-reason.entity';
 
 @Table({
     indexes: [{
@@ -20,6 +21,12 @@ export class Order extends Model<Order> {
         defaultValue: uuidv4()
     })
     orderNumber: string;
+
+    @Column({
+        type: DataType.DECIMAL(10, 2),
+        allowNull: false,
+    })
+    total: number;
 
     @Column({
         type: DataType.DECIMAL(10, 2),
@@ -70,4 +77,7 @@ export class Order extends Model<Order> {
 
     @HasMany(() => OrderItem)
     items: OrderItem[]
+
+    @HasMany(() => OrderCancelReason)
+    cancelReasons: OrderCancelReason[]
 }

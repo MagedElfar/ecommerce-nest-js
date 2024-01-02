@@ -1,6 +1,6 @@
 import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
 import { CreateProductVariationDto } from './dto/create-product-variations.dto';
-import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductVariations } from './products-variations.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductsService } from '../products/services/products.service';
@@ -13,6 +13,7 @@ import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Product } from '../products/products.entity';
 import { Media } from '../media/media.entity';
 import { MediaService } from '../media/media.service';
+import { IProductVariation } from './products-variations.interface';
 
 @Injectable()
 export class ProductVariationsService {
@@ -39,15 +40,28 @@ export class ProductVariationsService {
 
             const { attributes = [], ...createDto } = createProductVariationDto;
 
-            //check if the product exist if request come from the module controller
+
+            //1-check if the product exist if request come from the module controller
             if (!t) {
                 const product = await this.productsService.findOneById(createProductVariationDto.productId);
 
                 if (!product) throw new NotFoundException("product not found");
             }
 
-            //create new product variant record in databases
-            const variant = await this.productVariationModel.create<ProductVariations>(
+            //2-check if variation name exist
+            if (createProductVariationDto.name) {
+                const variant = await this.findOne({ name: createProductVariationDto.name })
+
+                if (variant) throw new ConflictException(`variant with name "${createProductVariationDto.name}" already exist`);
+            }
+
+            //3-check if variation sku exist
+            let variant = await this.findOne({ sku: createProductVariationDto.sku })
+
+            if (variant) throw new ConflictException(`variant with sku "${createProductVariationDto.sku}" already exist`);
+
+            //4-create new product variant record in databases
+            variant = await this.productVariationModel.create<ProductVariations>(
                 createDto,
                 {
                     transaction,
@@ -65,7 +79,7 @@ export class ProductVariationsService {
                 }
             )
 
-            // add attributes in case the attribute founds
+            //5-add attributes in case the attribute founds
             if (attributes && attributes.length > 0) {
 
                 const attrs = await Promise.all(attributes.map(async (attr) => {
@@ -132,6 +146,22 @@ export class ProductVariationsService {
             throw error
         }
     }
+
+    async findOne(data: Partial<Omit<ProductVariations, "attributes">>): Promise<ProductVariations | null> {
+        try {
+
+            const productVariant = await this.productVariationModel.findOne({
+                where: data,
+            });
+
+            if (!productVariant) return null;
+
+            return productVariant["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
 
     async findOneFullData(data: Partial<Omit<ProductVariations, "attributes">>): Promise<ProductVariations | null> {
         try {

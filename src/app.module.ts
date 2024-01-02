@@ -37,6 +37,7 @@ import { OrdersModule } from './feachers/orders/orders.module';
 import { PaymentsModule } from './feachers/payments/payments.module';
 import { OrdersItemsModule } from './feachers/orders-items/orders-items.module';
 import { PaymentsMethodsModule } from './feachers/payments-methods/payments-method.module';
+import { OrdersCancelReasonsModule } from './feachers/orders-cancel-reasons/orders-cancel-reasons.module';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { PaymentsMethodsModule } from './feachers/payments-methods/payments-meth
     PaymentsMethodsModule,
     PaymentsModule,
     OrdersItemsModule,
+    OrdersCancelReasonsModule,
   ],
   controllers: [AppController],
   providers: [
