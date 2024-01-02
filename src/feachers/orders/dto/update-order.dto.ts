@@ -5,17 +5,17 @@ export class UpdateOrderDto {
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
-    phoneId: number
+    phoneId?: number
 
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
-    addressId: number
+    addressId?: number
 
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
-    userId: number
+    userId?: number
 
     @IsOptional()
     @IsEnum(OrderStatus)
@@ -23,11 +23,11 @@ export class UpdateOrderDto {
 
     @IsOptional()
     @IsBoolean()
-    updateStock: boolean = false;
+    updateStock?: boolean = false;
 
     @IsOptional()
     @IsString()
-    reason: string;
+    reason?: string;
 
     deliveredAt?: Date
 

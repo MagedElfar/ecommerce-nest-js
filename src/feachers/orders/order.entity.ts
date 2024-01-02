@@ -7,6 +7,7 @@ import { OrderItem } from '../orders-items/order-item-entity';
 import { OrderStatus } from 'src/core/constants';
 import { PaymentMethod } from '../payments-methods/payment-method.entity';
 import { OrderCancelReason } from '../orders-cancel-reasons/order-cancel-reason.entity';
+import { Payment } from '../payments/payment.entity';
 
 @Table({
     indexes: [{
@@ -74,6 +75,9 @@ export class Order extends Model<Order> {
 
     @BelongsTo(() => PaymentMethod, { onDelete: "SET NULL" })
     paymentMethod: PaymentMethod
+
+    @HasOne(() => Payment)
+    payment: Payment
 
     @HasMany(() => OrderItem)
     items: OrderItem[]

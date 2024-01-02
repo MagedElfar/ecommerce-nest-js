@@ -18,6 +18,9 @@ export default () => ({
         cloudName: process.env.CLOUD_NAME!
     },
     stripe: {
-        secretKey: process.env.STRIPE_SECRET_KEY
+        secretKey: process.env.STRIPE_SECRET_KEY,
+        webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+        successUrl: "http://localhost:3000/api",
+        cancelUrl: "http://localhost:3000/api"
     }
 });

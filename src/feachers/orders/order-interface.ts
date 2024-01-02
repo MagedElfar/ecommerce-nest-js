@@ -5,6 +5,7 @@ import { IPhone } from "../phones/phone.interface";
 import { IOrderItem } from "../orders-items/order-item.interface";
 import { PaymentMethod } from "../payments-methods/payment-method.entity";
 import { IOrderCancelReason } from "../orders-cancel-reasons/order-cancel-reason.interface";
+import { IPaymentMethod } from "../payments-methods/payment-method.interface";
 
 export interface IOrder extends IModel {
 
@@ -30,7 +31,7 @@ export interface IOrder extends IModel {
 
     paymentMethodId?: number
 
-    paymentMethod?: PaymentMethod
+    paymentMethod?: IPaymentMethod
 
     items?: IOrderItem[]
 

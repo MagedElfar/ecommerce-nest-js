@@ -13,7 +13,7 @@ export enum OrderStatus {
 }
 
 export enum PaymentMethod {
-    CARD = "card",
+    STRIPE = "stripe",
     CASH = "cash"
 }
 

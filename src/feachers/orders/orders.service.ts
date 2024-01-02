@@ -27,6 +27,8 @@ import { OrderCancelReason } from '../orders-cancel-reasons/order-cancel-reason.
 import { OrdersCancelReasonsService } from '../orders-cancel-reasons/orders-cancel-reasons.service';
 import { UpdateUserDto } from '../users/dto/updateUserDto.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { Transaction } from 'sequelize';
+import { Payment } from '../payments/payment.entity';
 
 @Injectable()
 export class OrdersService {
@@ -45,8 +47,8 @@ export class OrdersService {
         private readonly sequelize: Sequelize,
     ) { }
 
-    async create(createOrderDto: CreateOrderDto) {
-        const transaction = await this.sequelize.transaction()
+    async create(createOrderDto: CreateOrderDto, t?: Transaction): Promise<IOrder> {
+        const transaction = t || await this.sequelize.transaction()
         try {
             const { userId, addressAndAddressId, phoneAndPhoneId } = createOrderDto;
 
@@ -124,19 +126,16 @@ export class OrdersService {
                 }, transaction)
             }))
 
-            //11-empty user cart
+
+            // //11-empty user cart
             await this.cartItemService.deleteCartItems(cart.id, transaction)
 
 
-            await transaction.commit()
-            return {
-                ...order["dataValues"],
-                items,
-                paymentMethod
-            }
+            if (!t) await transaction.commit()
+            return await this.findById(order.id)
 
         } catch (error) {
-            await transaction.rollback()
+            if (!t) await transaction.rollback()
             throw error
         }
     }
@@ -171,7 +170,18 @@ export class OrdersService {
         }
     }
 
-    async findOne(data: Partial<Omit<IOrder, "phone" | "address" | "items" | "cancelReasons">>, user?: IUser): Promise<IOrder> {
+    async findOneByOrderNumber(orderNumber: string): Promise<IOrder> {
+        try {
+
+            const orders = await this.orderModel.findOne({ where: { orderNumber } })
+
+            return orders
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOne(data: Partial<Omit<IOrder, "phone" | "address" | "items" | "paymentMethod" | "cancelReasons">>, user?: IUser): Promise<IOrder> {
         try {
             const order = await this.orderModel.findOne({
                 where: data,
@@ -210,6 +220,10 @@ export class OrdersService {
                         model: PaymentMethod,
                         attributes: { exclude: ["updatedAt", "createdAt"] }
                     },
+                    {
+                        model: Payment,
+                        attributes: { exclude: ["updatedAt", "createdAt"] }
+                    },
                 ]
             })
 
@@ -232,12 +246,20 @@ export class OrdersService {
                         attributes: { exclude: ["updatedAt", "createdAt"] },
                     },
                     {
+                        model: PaymentMethod,
+                        attributes: ["name"]
+                    },
+                    {
                         model: OrderItem,
                         attributes: { exclude: ["updatedAt", "createdAt"] },
                         include: [
                             {
                                 model: ProductVariations,
                                 attributes: ["quantity"]
+                            },
+                            {
+                                model: Product,
+                                attributes: ["name", "price"]
                             }
                         ]
                     }

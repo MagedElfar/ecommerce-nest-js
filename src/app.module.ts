@@ -38,6 +38,9 @@ import { PaymentsModule } from './feachers/payments/payments.module';
 import { OrdersItemsModule } from './feachers/orders-items/orders-items.module';
 import { PaymentsMethodsModule } from './feachers/payments-methods/payments-method.module';
 import { OrdersCancelReasonsModule } from './feachers/orders-cancel-reasons/orders-cancel-reasons.module';
+import { StripeModule } from './utility/stripe/stripe.module';
+import { CheckoutModule } from './feachers/checkout/checkout.module';
+import { RawBodyMiddleware } from './core/middleware/raw-body.middleware';
 
 @Module({
   imports: [
@@ -99,6 +102,8 @@ import { OrdersCancelReasonsModule } from './feachers/orders-cancel-reasons/orde
     PaymentsModule,
     OrdersItemsModule,
     OrdersCancelReasonsModule,
+    StripeModule,
+    CheckoutModule,
   ],
   controllers: [AppController],
   providers: [
@@ -125,5 +130,6 @@ import { OrdersCancelReasonsModule } from './feachers/orders-cancel-reasons/orde
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(RawBodyMiddleware).forRoutes("stripe")
   }
 }

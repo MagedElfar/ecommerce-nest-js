@@ -24,17 +24,17 @@ export class Payment extends Model<Payment> {
     })
     chargeId: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    cardNumber: string;
+    // @Column({
+    //     type: DataType.STRING,
+    //     allowNull: false,
+    // })
+    // cardNumber: string;
 
-    @Column({
-        type: DataType.STRING,
-        allowNull: false,
-    })
-    cardExpiry: string;
+    // @Column({
+    //     type: DataType.STRING,
+    //     allowNull: false,
+    // })
+    // cardExpiry: string;
 
     @Column({
         type: DataType.ENUM(...Object.values(PaymentStatus)),
