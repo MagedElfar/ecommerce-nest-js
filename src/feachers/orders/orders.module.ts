@@ -12,6 +12,8 @@ import { OrdersItemsModule } from '../orders-items/orders-items.module';
 import { CartItemsModule } from '../cart-items/cart-items.module';
 import { PaymentsMethodsModule } from '../payments-methods/payments-method.module';
 import { OrdersCancelReasonsModule } from '../orders-cancel-reasons/orders-cancel-reasons.module';
+import { StockModule } from '../stock/stock.module';
+import { ProductsModule } from '../products/products.module';
 
 @Module({
   imports: [
@@ -20,10 +22,11 @@ import { OrdersCancelReasonsModule } from '../orders-cancel-reasons/orders-cance
     PhonesModule,
     AddressesModule,
     PaymentsMethodsModule,
-    ProductVariationsModule,
+    ProductsModule,
     OrdersItemsModule,
     CartItemsModule,
-    OrdersCancelReasonsModule
+    OrdersCancelReasonsModule,
+    StockModule
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersHelper],

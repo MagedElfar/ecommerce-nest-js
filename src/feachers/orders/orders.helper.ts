@@ -1,26 +1,25 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
-import { ICartItem } from "../cart-items/cart-items-interface";
+import { Injectable } from "@nestjs/common";
+import { IOrderItem } from "../orders-items/order-item.interface";
+import { ProductsService } from "../products/services/products.service";
 
 @Injectable()
 export class OrdersHelper {
-    quantityAvailability(items: ICartItem[]): void {
-        items.forEach(item => {
-            const quantity = item.quantity;
-            const availableQuantity = item.variant.quantity
 
-            if (quantity > availableQuantity)
-                throw new BadRequestException(
-                    `quantity is not available for product "${item.product.name}"`
-                )
-        })
+    constructor(private readonly productsService: ProductsService) { }
 
-        return
+    async calculateOrderTotal(items: IOrderItem[]): Promise<number> {
+        let sum = 0
+
+        await Promise.all(items.map(async item => {
+            const product = await this.productsService.findOne({ id: item.productId });
+            sum += parseFloat(`${item.quantity * product.price}`)
+
+            sum = parseFloat(sum.toFixed(2))
+        }))
+
+        return sum
+
     }
 
-    calculateOrderTotal(items: ICartItem[]): number {
-        return items.reduce((sum, item) => {
-            sum += parseFloat(`${item.total}`)
-            return parseFloat(sum.toFixed(2))
-        }, 0)
-    }
+
 }

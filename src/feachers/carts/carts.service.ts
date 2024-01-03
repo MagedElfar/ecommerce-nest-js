@@ -38,7 +38,6 @@ export class CartsService {
                     where: data,
                     include: [{
                         model: CartItem,
-                        attributes: ["id", "total", "quantity"],
                         include: [
                             {
                                 model: ProductVariations,

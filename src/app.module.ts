@@ -41,6 +41,7 @@ import { OrdersCancelReasonsModule } from './feachers/orders-cancel-reasons/orde
 import { StripeModule } from './utility/stripe/stripe.module';
 import { CheckoutModule } from './feachers/checkout/checkout.module';
 import { RawBodyMiddleware } from './core/middleware/raw-body.middleware';
+import { StockModule } from './feachers/stock/stock.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { RawBodyMiddleware } from './core/middleware/raw-body.middleware';
     OrdersCancelReasonsModule,
     StripeModule,
     CheckoutModule,
+    StockModule,
   ],
   controllers: [AppController],
   providers: [

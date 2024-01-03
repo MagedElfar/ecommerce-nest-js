@@ -112,7 +112,7 @@ export class StripeService {
             if (event.data.object.payment_status === "unpaid" && order) {
                 await this.ordersService.update(order.id, {
                     status: OrderStatus.CANCELLED,
-                    updateStock: true
+                    removeFromStock: true
                 })
 
                 await this.paymentsService.create({

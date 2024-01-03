@@ -39,7 +39,7 @@ export class Order extends Model<Order> {
         type: DataType.DATE,
         allowNull: true
     })
-    deliveredAt: Date
+    deliveredAt: string
 
     @Column({
         allowNull: false,

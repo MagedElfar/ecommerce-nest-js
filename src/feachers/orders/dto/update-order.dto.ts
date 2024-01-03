@@ -23,12 +23,16 @@ export class UpdateOrderDto {
 
     @IsOptional()
     @IsBoolean()
-    updateStock?: boolean = false;
+    removeFromStock?: boolean = false;
+
+    @IsOptional()
+    @IsBoolean()
+    addToStock?: boolean = false;
 
     @IsOptional()
     @IsString()
     reason?: string;
 
-    deliveredAt?: Date
+    deliveredAt?: string
 
 }

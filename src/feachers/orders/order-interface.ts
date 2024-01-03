@@ -15,7 +15,7 @@ export interface IOrder extends IModel {
 
     subTotal?: number;
 
-    deliveredAt?: Date
+    deliveredAt?: string
 
     userId?: number
 
