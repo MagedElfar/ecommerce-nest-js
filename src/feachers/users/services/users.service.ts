@@ -9,6 +9,7 @@ import { Op } from 'sequelize';
 import { Media } from 'src/feachers/media/media.entity';
 import { Phone } from 'src/feachers/phones/phone.entity';
 import { Address } from 'src/feachers/addresses/address.entity';
+import { UpdateRoleDto } from '../dto/update-role.dto';
 
 
 @Injectable()
@@ -20,11 +21,32 @@ export class UsersService {
         private userModel: typeof User,
     ) { }
 
+
+    async findById(id: number): Promise<IUser | null> {
+        try {
+            const user = await this.userModel.findByPk(
+                id,
+                {
+                    include: [{
+                        model: Media,
+                        attributes: ["id", "storageKey"]
+                    }]
+                }
+            );
+
+            if (!user) return null
+
+            return user["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
     async findAll(userQueryDto: UserQueryDto) {
         try {
             const { limit, page, name } = userQueryDto;
 
-            const result = await this.userModel.findAll({
+            const result = await this.userModel.findAndCountAll({
                 where: {
                     name: { [Op.like]: `%${name}%` }
                 },
@@ -36,25 +58,8 @@ export class UsersService {
                 offset: (page - 1) * limit
             });
 
-            const users = result.map(item => item["dataValues"])
 
-            return users
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async getCount(userQueryDto: UserQueryDto): Promise<number> {
-        try {
-
-            const { name } = userQueryDto;
-            const count = await this.userModel.count({
-                where: {
-                    name: { [Op.like]: `%${name}%` }
-                },
-            });
-
-            return count
+            return result
         } catch (error) {
             throw error
         }
@@ -108,25 +113,6 @@ export class UsersService {
     }
 
 
-    async findById(id: number): Promise<IUser | null> {
-        try {
-            const user = await this.userModel.findByPk(
-                id,
-                {
-                    include: [{
-                        model: Media,
-                        attributes: ["id", "storageKey"]
-                    }]
-                }
-            );
-
-            if (!user) return null
-
-            return user["dataValues"]
-        } catch (error) {
-            throw error
-        }
-    }
 
     async create(createUserDto: CreateUserDto): Promise<IUser> {
         try {
@@ -151,14 +137,26 @@ export class UsersService {
 
             const { password, ...result } = user
 
-            return {
-                ...result,
-                ...updateUserDto
-            }
+            return await this.findOneFullData({ id })
         } catch (error) {
             throw error
         }
     }
+
+    async updateRole(updateRoleDto: UpdateRoleDto): Promise<void> {
+        try {
+            const { userId, role } = updateRoleDto;
+
+            const user = await this.findById(userId);
+
+            if (!user) throw new NotFoundException();
+
+            await this.update(userId, { role })
+        } catch (error) {
+            throw error
+        }
+    }
+
 
 
 }

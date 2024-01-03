@@ -14,7 +14,6 @@ import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
 import { RolesGuard } from './core/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
-import { AdminModule } from './feachers/admin/admin.module';
 import { CategoriesModule } from './feachers/categories/categories.module';
 import { models } from './core/database/models';
 import { ProfilesModule } from './feachers/profiles/profiles.module';
@@ -80,7 +79,6 @@ import { StockModule } from './feachers/stock/stock.module';
     CloudinaryModule,
     AuthModule,
     UsersModule,
-    AdminModule,
     CategoriesModule,
     SubCategoriesModule,
     ProfilesModule,

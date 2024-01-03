@@ -19,6 +19,8 @@ export class AuthService {
 
             const token = await this.generateToken({ id: user.id })
 
+            user = await this.usersService.findOneFullData({ id: user.id })
+
             return { user: user, token };
 
         } catch (error) {

@@ -1,4 +1,4 @@
-import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './createUserDto.dto';
 
 // Extend the CreateUserDto and exclude the password property
