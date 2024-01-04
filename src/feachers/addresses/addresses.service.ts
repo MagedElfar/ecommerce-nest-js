@@ -4,6 +4,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAddress } from './address.interface';
+import { AddressQueryDto } from './dto/adress-query.dto';
 
 @Injectable()
 export class AddressesService {
@@ -12,6 +13,24 @@ export class AddressesService {
         @InjectModel(Address)
         private readonly addressModel: typeof Address
     ) { }
+
+    async findAll(addressQueryDto: AddressQueryDto) {
+        try {
+
+            const { limit, page } = addressQueryDto
+
+            const result = await this.addressModel.findAndCountAll({
+                where: { userId: addressQueryDto.userId },
+                limit,
+                offset: (page - 1) * limit
+            });
+
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
+
 
     async create(createAddressDto: CreateAddressDto): Promise<IAddress> {
         try {

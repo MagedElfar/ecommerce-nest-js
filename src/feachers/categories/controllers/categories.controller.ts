@@ -6,14 +6,22 @@ import { UserRole } from 'src/core/constants';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryQueryDto } from '../dto/category-query.dto';
 import { Public } from 'src/core/decorators/public.decorator';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { CategorySchema } from 'src/utility/swagger/schema/category.scheme';
 
+@ApiTags("Category")
 @Controller('categories')
+@ApiBearerAuth()
 export class CategoriesController {
 
     constructor(private categoriesService: CategoriesService) { }
 
     @Get()
     @Public()
+    @ApiOperation({ summary: "get all categories" })
+    @ApiOkResponse({
+        type: CategorySchema
+    })
     async findAll(@Query() categoryQueryDto: CategoryQueryDto) {
         try {
             const categories = await this.categoriesService.findAll(categoryQueryDto);
@@ -26,11 +34,15 @@ export class CategoriesController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "create new category" })
+    @ApiCreatedResponse({
+        type: CategorySchema
+    })
     async create(@Body() createCategoryDto: CreateCategoryDto) {
         try {
             const category = await this.categoriesService.create(createCategoryDto);
 
-            return { category }
+            return category
         } catch (error) {
             throw error
         }
@@ -38,6 +50,14 @@ export class CategoriesController {
 
     @Put(":id")
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "update category" })
+    @ApiParam({
+        name: "id",
+        description: "category id"
+    })
+    @ApiOkResponse({
+        type: CategorySchema
+    })
     async update(@Param("id", ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateCategoryDto) {
         try {
             const category = await this.categoriesService.update(id, updateCategoryDto);
@@ -50,6 +70,14 @@ export class CategoriesController {
 
     @Get(":id")
     @Public()
+    @ApiOperation({ summary: "get specific category" })
+    @ApiParam({
+        name: "id",
+        description: "category id"
+    })
+    @ApiOkResponse({
+        type: CategorySchema
+    })
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
             const category = await this.categoriesService.findOne({ id });
@@ -65,6 +93,11 @@ export class CategoriesController {
     @Delete(":id")
     @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: "delete category" })
+    @ApiParam({
+        name: "id",
+        description: "category id"
+    })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
             await this.categoriesService.delete(id);

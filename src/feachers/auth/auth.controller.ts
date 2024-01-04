@@ -32,7 +32,7 @@ export class AuthController {
         description: "succuss request",
         type: AuthSchema,
     })
-    async login(@Request() req: Req) {
+    async login(@Request() req: Req, @Body() loginDto: LoginDto) {
         try {
             return await this.authService.login(req.user);
         } catch (error) {

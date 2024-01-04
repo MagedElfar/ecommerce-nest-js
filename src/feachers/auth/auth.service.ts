@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
@@ -34,7 +34,7 @@ export class AuthService {
             email: signUpDto.email
         })
 
-        if (user) throw new ForbiddenException('This email already exist');
+        if (user) throw new ConflictException('This email already exist');
 
         // hash the password
         const pass = await this.hashPassword(signUpDto.password);

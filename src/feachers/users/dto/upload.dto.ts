@@ -6,10 +6,6 @@ export class UploadImageDto extends UploadMediaDto {
     @ApiProperty({ description: "user id" })
     userId: number;
 
-    @ApiProperty({
-        description: 'File to upload',
-        type: 'string',
-        format: 'binary', // Specify the format as 'binary' for file uploads
-    })
-    file: Express.Multer.File
+    @ApiProperty({ type: 'string', format: 'binary' })
+    file: any;
 }

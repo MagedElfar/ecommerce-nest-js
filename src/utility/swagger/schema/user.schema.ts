@@ -1,22 +1,19 @@
 import { UserRole } from 'src/core/constants';
 import { BaseSchema } from './base.schema';
 import { ApiPropertyOptional, OmitType } from "@nestjs/swagger"
-import { MediaSchema } from './media.schema';
-import { AddressSchema } from './address.schema';
+import { MediaSchema } from './media.schema'
 import { PhoneSchema } from './phone.schema';
 import { CartSchema } from './cart,schema';
 import { FindAllSchema } from './find-all.schema';
-
-
-class UserPhoneSchema extends OmitType(PhoneSchema, ["user"]) { }
-class UserAddressSchema extends OmitType(AddressSchema, ["user"]) { }
+import { AddressSchema } from './address.schema';
 
 
 
 export class UserSchema extends BaseSchema {
 
     @ApiPropertyOptional({
-        description: "uses name 'unique value'"
+        description: "uses name",
+        uniqueItems: true
     })
     name?: string
 
@@ -31,7 +28,8 @@ export class UserSchema extends BaseSchema {
     lastName?: string;
 
     @ApiPropertyOptional({
-        description: "uses email 'unique value'"
+        description: "uses email",
+        uniqueItems: true
     })
     email?: string;
 
@@ -60,13 +58,13 @@ export class UserSchema extends BaseSchema {
         description: "uses address",
         isArray: true,
     })
-    addresses?: UserAddressSchema
+    addresses?: AddressSchema
 
     @ApiPropertyOptional({
         description: "uses phones",
         isArray: true,
     })
-    phones?: UserPhoneSchema
+    phones?: PhoneSchema
 
     @ApiPropertyOptional({
         description: "uses shipping cart"
@@ -81,3 +79,4 @@ export class FindAllUserSchema extends FindAllSchema {
     })
     rows: UserSchema
 }
+

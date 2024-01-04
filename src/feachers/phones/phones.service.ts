@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { CreatePhoneDto } from './dto/create-phone.dto';
 import { IPhone } from './phone.interface';
 import { UpdatePhoneDto } from './dto/update-add.dto';
+import { PhoneQueryDto } from './dto/phone-query.dto';
 
 @Injectable()
 export class PhonesService {
@@ -11,6 +12,25 @@ export class PhonesService {
         @InjectModel(Phone)
         private readonly phoneModel: typeof Phone
     ) { }
+
+
+    async findAll(phoneQueryDto: PhoneQueryDto) {
+        try {
+
+            const { limit, page } = phoneQueryDto
+
+            const result = await this.phoneModel.findAndCountAll({
+                where: { userId: phoneQueryDto.userId },
+                limit,
+                offset: (page - 1) * limit
+            });
+
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
+
 
     async create(createPhoneDto: CreatePhoneDto): Promise<IPhone> {
         try {

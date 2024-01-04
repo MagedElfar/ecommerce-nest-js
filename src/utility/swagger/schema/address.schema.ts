@@ -1,6 +1,6 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
+import { ApiPropertyOptional, OmitType } from "@nestjs/swagger";
 import { BaseSchema } from "./base.schema";
-import { UserSchema } from "./user.schema";
+import { FindAllSchema } from "./find-all.schema";
 
 export class AddressSchema extends BaseSchema {
 
@@ -18,7 +18,13 @@ export class AddressSchema extends BaseSchema {
 
     @ApiPropertyOptional({ description: "user id" })
     userId: number
+}
 
-    @ApiPropertyOptional({ description: "user object" })
-    user: UserSchema;
+export class FindAlAddressSchema extends FindAllSchema {
+
+    @ApiPropertyOptional({
+        description: "user array",
+        isArray: true
+    })
+    rows: AddressSchema
 }

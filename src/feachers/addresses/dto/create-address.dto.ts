@@ -4,7 +4,7 @@ import { IsNotEmpty, IsOptional, IsString } from "class-validator"
 export class CreateAddressDto {
 
     @ApiProperty({
-        example: 'Egypt , USA etc...',
+        example: 'Egypt',
         description: "Address country name"
     })
     @IsNotEmpty()
@@ -12,7 +12,7 @@ export class CreateAddressDto {
     country: string
 
     @ApiProperty({
-        example: 'Alexandria , Cairo etc...',
+        example: 'Alexandria',
         description: "Address city name"
     })
     @IsNotEmpty()
@@ -20,6 +20,7 @@ export class CreateAddressDto {
     city: string
 
     @ApiProperty({
+        example: "12 - street num",
         description: "your street name"
     })
     @IsNotEmpty()
@@ -27,6 +28,7 @@ export class CreateAddressDto {
     street: string
 
     @ApiProperty({
+        example: "32 floor 5 at somewhere",
         description: "your address details like floor and apartment num etc..."
     })
     @IsNotEmpty()

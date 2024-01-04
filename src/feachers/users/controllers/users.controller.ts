@@ -3,7 +3,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Param, 
 import { User } from 'src/core/decorators/user.decorator';
 import { UpdateUserDto } from '../dto/updateUserDto.dto';
 import { UserQueryDto } from '../dto/userQuery.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindAllUserSchema, UserSchema } from 'src/utility/swagger/schema/user.schema';
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
@@ -12,6 +12,7 @@ import { CreateUserDto } from '../dto/createUserDto.dto';
 
 @ApiTags('User')
 @Controller('users')
+@ApiBearerAuth()
 export class UsersController {
 
     constructor(private readonly usersService: UsersService) { }

@@ -1,7 +1,7 @@
 import { UsersImagesService } from '../services/users-images.service';
-import { Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Express } from "express"
 import { memoryStorage } from 'multer';
 import { User } from 'src/core/decorators/user.decorator';
@@ -10,6 +10,7 @@ import { UploadImageDto } from '../dto/upload.dto';
 
 @ApiTags("User Image")
 @Controller('users-images')
+@ApiBearerAuth()
 export class UsersImagesController {
 
     constructor(private usersImagesService: UsersImagesService) { }
@@ -30,13 +31,12 @@ export class UsersImagesController {
                 userId: { type: 'integer', description: "user id" },
                 file: {
                     type: 'file',
-                    // format: 'binary',
                     description: "file to upload"
                 },
             },
         },
     })
-    @ApiOkResponse({
+    @ApiCreatedResponse({
         type: MediaSchema
     })
     async upload(@UploadedFile() file: Express.Multer.File, @User("id") userId: number) {

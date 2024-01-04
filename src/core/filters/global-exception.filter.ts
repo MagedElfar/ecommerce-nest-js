@@ -33,16 +33,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         if (
             exception["parent"] && exception["parent"]["code"] === 'ER_DUP_ENTRY'
         ) {
+            console.log(exception["parent"])
             statusCode = HttpStatus.CONFLICT
-            message = 'Duplicate entry error: This record already exists.';
+            message = exception["parent"]["sqlMessage"];
+            // message = 'Duplicate entry error: This record already exists.';
             error = "Conflict"
         } else if (
             exception["parent"] && exception["parent"]["code"] === 'ER_NO_REFERENCED_ROW_2'
         ) {
+            console.log(exception["parent"])
             statusCode = HttpStatus.BAD_REQUEST
-            message = 'Foreign key constraint error: Referenced record not found.';
+            message = exception["parent"]["sqlMessage"];
+            // message = 'Foreign key constraint error: Referenced record not found.';
             error = "Bad Request"
         } else if (exception["parent"]) {
+            console.log(exception["parent"])
             statusCode = HttpStatus.INTERNAL_SERVER_ERROR
             message = "database error"
         }
