@@ -3,7 +3,10 @@ import { BrandsImageService } from '../services/brands-images.service';
 import { UploadImageDto } from '../dto/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
+@ApiTags("Brands Images")
 @Controller('brands-images')
 export class BrandsImageController {
     constructor(private brandsImageService: BrandsImageService) { }
@@ -14,6 +17,24 @@ export class BrandsImageController {
             storage: memoryStorage(),
         }),
     )
+    @ApiOperation({ summary: "upload brand image" })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ["file", "brandId"],
+            properties: {
+                brandId: { type: 'integer', description: "user id" },
+                file: {
+                    type: 'file',
+                    description: "file to upload"
+                },
+            },
+        },
+    })
+    @ApiCreatedResponse({
+        type: MediaDto
+    })
     async upload(
         @UploadedFile() file: Express.Multer.File,
         @Body() uploadImageDto: UploadImageDto

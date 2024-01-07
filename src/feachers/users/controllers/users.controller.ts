@@ -3,12 +3,14 @@ import { Body, Controller, Get, HttpCode, HttpStatus, NotFoundException, Param, 
 import { User } from 'src/core/decorators/user.decorator';
 import { UpdateUserDto } from '../dto/updateUserDto.dto';
 import { UserQueryDto } from '../dto/userQuery.dto';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FindAllUserSchema, UserSchema } from 'src/utility/swagger/schema/user.schema';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, OmitType } from '@nestjs/swagger';
+import { UserDto, UserOmittedPropertyDto } from 'src/feachers/users/dto/user.dto';
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UpdateRoleDto } from '../dto/update-role.dto';
 import { CreateUserDto } from '../dto/createUserDto.dto';
+import { UserScop } from '../user.entity';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
 
 @ApiTags('User')
 @Controller('users')
@@ -18,13 +20,14 @@ export class UsersController {
     constructor(private readonly usersService: UsersService) { }
 
     @Get()
-    @ApiOperation({ summary: 'retrieve all users' })
-    @ApiOkResponse({
-        type: FindAllUserSchema
-    })
+    @ApiOperation({ summary: 'Find all users' })
+    @ApiFindAllResponse(UserOmittedPropertyDto)
     async findAll(@Query() userQueryDto: UserQueryDto) {
         try {
-            const users = await this.usersService.findAll(userQueryDto);
+            const users = await this.usersService.findAll(userQueryDto, [
+                UserScop.EXCLUDE_PASSWORD,
+                UserScop.WITH_Media
+            ]);
             return users
         } catch (error) {
             throw error
@@ -34,11 +37,19 @@ export class UsersController {
     @Get(":id")
     @ApiOperation({ summary: 'retrieve user by id' })
     @ApiOkResponse({
-        type: UserSchema
+        type: OmitType(UserDto, ["password"])
     })
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
-            const user = await this.usersService.findOneFullData({ id })
+            const user = await this.usersService.findById(
+                id,
+                [
+                    UserScop.EXCLUDE_PASSWORD,
+                    UserScop.WITH_Media,
+                    UserScop.WITH_PHONE,
+                    UserScop.WITH_ADDRESS
+                ]
+            )
 
             if (!user) throw new NotFoundException();
 
@@ -52,7 +63,7 @@ export class UsersController {
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "create new user used by admin" })
     @ApiCreatedResponse({
-        type: UserSchema
+        type: OmitType(UserDto, ["password", "addresses", "phones", "image"])
     })
     async create(
         @Body() createUserDto: CreateUserDto,
@@ -62,15 +73,13 @@ export class UsersController {
         } catch (error) {
             throw error
         }
-
-
     }
 
     @Put()
     @ApiOperation({ summary: 'update user' })
     @ApiResponse({
         description: "succuss request",
-        type: UserSchema,
+        type: OmitType(UserDto, ["password"]),
     })
     async updated(@User("id") id: number, @Body() updateUserDto: UpdateUserDto) {
         try {
@@ -86,7 +95,7 @@ export class UsersController {
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: 'update user used by admin' })
     @ApiOkResponse({
-        type: UserSchema
+        type: OmitType(UserDto, ["password"])
     })
     async updatedById(@Param("id", ParseIntPipe) id: number, @Body() updateUserDto: UpdateUserDto) {
         try {

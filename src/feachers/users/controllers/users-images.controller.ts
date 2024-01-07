@@ -5,8 +5,8 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse,
 import { Express } from "express"
 import { memoryStorage } from 'multer';
 import { User } from 'src/core/decorators/user.decorator';
-import { MediaSchema } from 'src/utility/swagger/schema/media.schema';
 import { UploadImageDto } from '../dto/upload.dto';
+import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("User Image")
 @Controller('users-images')
@@ -37,7 +37,7 @@ export class UsersImagesController {
         },
     })
     @ApiCreatedResponse({
-        type: MediaSchema
+        type: MediaDto
     })
     async upload(@UploadedFile() file: Express.Multer.File, @User("id") userId: number) {
         try {

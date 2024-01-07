@@ -1,3 +1,4 @@
+import { ApiPropertyOptional } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
 import { IsOptional, IsString } from "class-validator";
 import { QueryDto } from "src/core/dto/query.dto";
@@ -7,5 +8,9 @@ export class BrandQueryDto extends QueryDto {
     @IsOptional()
     @IsString()
     @Transform((param) => transformLowerCase(param))
+    @ApiPropertyOptional({
+        description: "brand name",
+        example: "nike"
+    })
     name: string = ""
 }

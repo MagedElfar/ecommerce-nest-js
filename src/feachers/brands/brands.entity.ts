@@ -1,8 +1,22 @@
-import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo, Scopes } from 'sequelize-typescript';
 import { Product } from '../products/products.entity';
 import { Category } from '../categories/categories.entity';
 import { Media } from '../media/media.entity';
 
+export enum BrandScope {
+    WITH_IMAGE = "with imaged"
+}
+
+@Scopes(() => ({
+    [BrandScope.WITH_IMAGE]: {
+        include: [{
+            model: Media,
+            attributes: {
+                exclude: ["createdAt", "updatedAt"]
+            }
+        }]
+    }
+}))
 @Table({
     indexes: [
         {

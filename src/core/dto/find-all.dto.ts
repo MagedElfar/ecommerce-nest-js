@@ -1,9 +1,10 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 
-export class FindAllSchema {
+
+export class FindAllDto<Rows> {
 
     @ApiPropertyOptional({
-        description: "total of records in database"
+        description: "total number of model records "
     })
     count: number
 }

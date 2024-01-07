@@ -1,15 +1,13 @@
 import { UserRole } from 'src/core/constants';
-import { BaseSchema } from './base.schema';
+import { BaseDto } from '../../../core/dto/base-model.dto';
 import { ApiPropertyOptional, OmitType } from "@nestjs/swagger"
-import { MediaSchema } from './media.schema'
-import { PhoneSchema } from './phone.schema';
-import { CartSchema } from './cart,schema';
-import { FindAllSchema } from './find-all.schema';
-import { AddressSchema } from './address.schema';
+
+import { AddressDto } from 'src/feachers/addresses/dto/address.dto';
+import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 
 
-export class UserSchema extends BaseSchema {
+export class UserDto extends BaseDto {
 
     @ApiPropertyOptional({
         description: "uses name",
@@ -40,7 +38,8 @@ export class UserSchema extends BaseSchema {
     password?: string;
 
     @ApiPropertyOptional({
-        description: `uses role , valid values [${Object.values(UserRole)}]`
+        description: "uses role",
+        enum: UserRole
     })
     role?: UserRole
 
@@ -52,31 +51,19 @@ export class UserSchema extends BaseSchema {
     @ApiPropertyOptional({
         description: "uses image object"
     })
-    image?: MediaSchema;
+    image?: MediaDto;
 
     @ApiPropertyOptional({
         description: "uses address",
         isArray: true,
     })
-    addresses?: AddressSchema
+    addresses?: AddressDto
 
     @ApiPropertyOptional({
         description: "uses phones",
         isArray: true,
     })
-    phones?: PhoneSchema
-
-    @ApiPropertyOptional({
-        description: "uses shipping cart"
-    })
-    cart?: CartSchema;
+    phones?: any
 }
 
-export class FindAllUserSchema extends FindAllSchema {
-
-    @ApiPropertyOptional({
-        description: "user array"
-    })
-    rows: UserSchema
-}
-
+export class UserOmittedPropertyDto extends OmitType(UserDto, ["password", "image", "phones", "addresses"]) { }

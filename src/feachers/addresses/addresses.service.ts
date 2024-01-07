@@ -1,10 +1,10 @@
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { CreateAddressDto } from './dto/create-address.dto';
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAddress } from './address.interface';
-import { AddressQueryDto } from './dto/adress-query.dto';
+import { AddressQueryDto } from './dto/address-query.dto';
 
 @Injectable()
 export class AddressesService {
@@ -34,6 +34,7 @@ export class AddressesService {
 
     async create(createAddressDto: CreateAddressDto): Promise<IAddress> {
         try {
+
             const address = await this.addressModel.create(createAddressDto);
 
             return address["dataValues"]
@@ -69,19 +70,17 @@ export class AddressesService {
     async update(id: number, updateAddressDto: UpdateAddressDto): Promise<IAddress | null> {
         try {
 
-            const address = await this.findOneById(id);
+            const address = await this.findOne({
+                id,
+                userId: updateAddressDto.userId
+            });
 
-            if (!address || address.userId !== updateAddressDto.userId)
-                throw new ForbiddenException(
-                    "address no exist or you don't have permission for that operation"
-                );
+            if (!address)
+                throw new NotFoundException();
 
             await this.addressModel.update(updateAddressDto, { where: { id } })
 
-            return {
-                ...address,
-                ...updateAddressDto
-            }
+            return await this.findOneById(id)
         } catch (error) {
             throw error
         }
@@ -89,12 +88,10 @@ export class AddressesService {
 
     async delete(id: number, userId: number): Promise<void> {
         try {
-            const address = await this.addressModel.findByPk(id);
+            const address = await this.findOne({ id, userId });
 
-            if (!address || address.userId !== userId)
-                throw new ForbiddenException(
-                    "address no exist or you don't have permission for that operation"
-                );
+            if (!address)
+                throw new NotFoundException();
 
             await this.addressModel.destroy({ where: { id } })
             return;

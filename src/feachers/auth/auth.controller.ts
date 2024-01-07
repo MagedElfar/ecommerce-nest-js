@@ -1,12 +1,11 @@
 import { Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { SignUpDto } from './dto/signup.dto';
+import { SignResponseUpDto, SignUpDto } from './dto/signup.dto';
 import { Request as Req } from 'express';
 import { Public } from 'src/core/decorators/public.decorator';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiHideProperty, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse, OmitType } from '@nestjs/swagger';
-import { LoginDto } from './dto/login.dto';
-import { AuthSchema } from 'src/utility/swagger/schema/auth.schema';
+import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { LoginDto, LoginResponseDto } from './dto/login.dto';
 
 @ApiTags("Authentication")
 @Controller('auth')
@@ -17,7 +16,7 @@ export class AuthController {
     @Post('signup')
     @ApiCreatedResponse({
         description: "succuss request",
-        type: AuthSchema,
+        type: SignResponseUpDto,
 
     })
     async signUp(@Body() signUpDto: SignUpDto) {
@@ -30,7 +29,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({
         description: "succuss request",
-        type: AuthSchema,
+        type: LoginResponseDto,
     })
     async login(@Request() req: Req, @Body() loginDto: LoginDto) {
         try {

@@ -1,11 +1,11 @@
-import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { SignUpDto } from './dto/signup.dto';
-import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { IUser } from 'src/feachers/users/users.interface';
+import { UserScop } from '../users/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +19,12 @@ export class AuthService {
 
             const token = await this.generateToken({ id: user.id })
 
-            user = await this.usersService.findOneFullData({ id: user.id })
+            user = await this.usersService.findById(user.id, [
+                UserScop.EXCLUDE_PASSWORD,
+                UserScop.WITH_Media,
+                UserScop.WITH_PHONE,
+                UserScop.WITH_ADDRESS
+            ])
 
             return { user: user, token };
 

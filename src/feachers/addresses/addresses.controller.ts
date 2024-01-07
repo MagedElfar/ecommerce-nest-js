@@ -5,8 +5,9 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { User } from 'src/core/decorators/user.decorator';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { AddressSchema, FindAlAddressSchema } from 'src/utility/swagger/schema/address.schema';
-import { AddressQueryDto } from './dto/adress-query.dto';
+import { AddressQueryDto } from './dto/address-query.dto';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { AddressDto } from './dto/address.dto';
 
 
 @ApiTags("Addresses")
@@ -17,10 +18,8 @@ export class AddressesController {
     constructor(private readonly addressesService: AddressesService) { }
 
     @Get()
-    @ApiOkResponse({
-        type: FindAlAddressSchema
-    })
-    @ApiOperation({ summary: "get all user address" })
+    @ApiFindAllResponse(AddressDto)
+    @ApiOperation({ summary: "get all user addresses" })
     async get(
         @Query() addressQueryDto: AddressQueryDto,
         @User("id") userId: number
@@ -44,7 +43,7 @@ export class AddressesController {
         description: "Address id",
     })
     @ApiOkResponse({
-        type: AddressSchema
+        type: AddressDto
     })
     async getOne(
         @Param("id", ParseIntPipe) id: number,
@@ -68,7 +67,7 @@ export class AddressesController {
     @Post()
     @ApiOperation({ summary: "create new address" })
     @ApiCreatedResponse({
-        type: AddressSchema
+        type: AddressDto
     })
     async create(@Body() createAddressDto: CreateAddressDto, @User("id") userId: number) {
         try {
@@ -90,7 +89,7 @@ export class AddressesController {
         name: 'id'
     })
     @ApiOkResponse({
-        type: AddressSchema
+        type: AddressDto
     })
     async update(
         @Param("id", ParseIntPipe) id: number,

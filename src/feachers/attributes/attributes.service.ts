@@ -4,43 +4,24 @@ import { Attribute } from './attribute.entity';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { IAttribute } from './attribute.interface';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
-import { Sequelize } from 'sequelize-typescript';
-import { AttributeValues } from '../attributes-values/attributes-values.entity';
 
 @Injectable()
 export class AttributesService {
     constructor(
         @InjectModel(Attribute)
         private readonly attributeModel: typeof Attribute,
-        private readonly sequelize: Sequelize,
-
     ) { }
 
-    async findAll(): Promise<IAttribute[]> {
+    async findAll(scopes: string[] = []): Promise<any> {
         try {
-            const result = await this.attributeModel.findAll({
-                include: [
-                    {
-                        model: AttributeValues,
-                        attributes: [
-                            "id",
-                            "value",
-                            [
-                                this.sequelize.literal(
-                                    '(SELECT COUNT(*) FROM products_variations_attributes WHERE products_variations_attributes.attrId = values.id)'
-                                ),
-                                'totalProducts'
-                            ],
-                        ]
-                    }
-                ],
-                group: ['values.id'],
 
+            const rows = await this.attributeModel.scope(scopes).findAll({
+                group: ['values.id'],
             });
 
-            const attributes = result.map(item => item["dataValues"]);
+            const count = await this.attributeModel.count();
 
-            return attributes;
+            return { rows, count };
 
         } catch (error) {
             throw error;

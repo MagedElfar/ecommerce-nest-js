@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IModel } from "src/core/interface/model.interface";
 
-export class BaseSchema implements IModel {
+export class BaseDto implements IModel {
 
     @ApiPropertyOptional({ description: "record id" })
     id: number

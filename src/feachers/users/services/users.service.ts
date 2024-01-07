@@ -1,14 +1,11 @@
 import { UserQueryDto } from '../dto/userQuery.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from '../dto/createUserDto.dto';
-import { User } from '../user.entity';
+import { User, UserScop } from '../user.entity';
 import { IUser } from '../users.interface';
 import { InjectModel } from '@nestjs/sequelize';
 import { UpdateUserDto } from '../dto/updateUserDto.dto';
 import { Op } from 'sequelize';
-import { Media } from 'src/feachers/media/media.entity';
-import { Phone } from 'src/feachers/phones/phone.entity';
-import { Address } from 'src/feachers/addresses/address.entity';
 import { UpdateRoleDto } from '../dto/update-role.dto';
 
 
@@ -21,39 +18,14 @@ export class UsersService {
         private userModel: typeof User,
     ) { }
 
-
-    async findById(id: number): Promise<IUser | null> {
-        try {
-            const user = await this.userModel.findByPk(
-                id,
-                {
-                    include: [{
-                        model: Media,
-                        attributes: ["id", "storageKey"]
-                    }]
-                }
-            );
-
-            if (!user) return null
-
-            return user["dataValues"]
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async findAll(userQueryDto: UserQueryDto) {
+    async findAll(userQueryDto: UserQueryDto, scope: any[] = []) {
         try {
             const { limit, page, name } = userQueryDto;
 
-            const result = await this.userModel.findAndCountAll({
+            const result = await this.userModel.scope(scope).findAndCountAll({
                 where: {
                     name: { [Op.like]: `%${name}%` }
                 },
-                include: [
-                    { model: Media, attributes: ["id", "url"] }
-                ],
-                attributes: { exclude: ["password"] },
                 limit,
                 offset: (page - 1) * limit
             });
@@ -65,9 +37,11 @@ export class UsersService {
         }
     }
 
-    async findOne(data: Partial<Omit<IUser, "image">>): Promise<IUser | null> {
+    async findById(id: number, scope: any[] = []): Promise<IUser | null> {
         try {
-            const user = await this.userModel.findOne({ where: data });
+            const user = await this.userModel.scope(scope).findByPk(
+                id
+            );
 
             if (!user) return null
 
@@ -77,42 +51,20 @@ export class UsersService {
         }
     }
 
-    async findOneFullData(data: Partial<Omit<IUser, "image" | "addresses" | "phones">>): Promise<Partial<IUser> | null> {
+
+    async findOne(data: Partial<Omit<IUser, "image">>, scope: any[] = []): Promise<IUser | null> {
         try {
-            const user = await this.userModel.findOne({
+            const user = await this.userModel.scope(scope).findOne({
                 where: data,
-                attributes: { exclude: ["password"] },
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["id", "url", "type"],
-                    },
-                    {
-                        model: Phone,
-                        attributes: {
-                            exclude: ["createdAt", "updatedAt", "userId"]
-                        }
-                    },
-                    {
-                        model: Address,
-                        attributes: {
-                            exclude: ["createdAt", "updatedAt", "userId"]
-                        }
-                    }
-                ]
             });
 
             if (!user) return null
 
-
             return user["dataValues"]
         } catch (error) {
-            console.log(error)
             throw error
         }
     }
-
-
 
     async create(createUserDto: CreateUserDto): Promise<IUser> {
         try {
@@ -137,7 +89,12 @@ export class UsersService {
 
             const { password, ...result } = user
 
-            return await this.findOneFullData({ id })
+            return await this.findById(id, [
+                UserScop.EXCLUDE_PASSWORD,
+                UserScop.WITH_Media,
+                UserScop.WITH_PHONE,
+                UserScop.WITH_ADDRESS
+            ])
         } catch (error) {
             throw error
         }
@@ -156,7 +113,4 @@ export class UsersService {
             throw error
         }
     }
-
-
-
 }

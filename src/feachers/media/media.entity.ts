@@ -1,7 +1,9 @@
 import { Product } from '../products/products.entity';
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
-@Table({ tableName: "media" })
+@Table({
+    tableName: "media",
+})
 export class Media extends Model<Media> {
     @Column({
         type: DataType.STRING,

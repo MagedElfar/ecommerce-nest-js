@@ -5,7 +5,6 @@ import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-add.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PhoneQueryDto } from './dto/phone-query.dto';
-import { FindAlLPhoneSchema, PhoneSchema } from 'src/utility/swagger/schema/phone.schema';
 
 @ApiTags("Phones")
 @Controller('phones')
@@ -16,9 +15,9 @@ export class PhonesController {
 
     @Get()
     @ApiOperation({ summary: "get all user phones" })
-    @ApiOkResponse({
-        type: FindAlLPhoneSchema
-    })
+    // @ApiOkResponse({
+    //     type: FindAlLPhoneSchema
+    // })
     async get(
         @Query() phoneQueryDto: PhoneQueryDto,
         @User("id") userId: number
@@ -40,9 +39,9 @@ export class PhonesController {
         name: "id",
         description: "Phone id",
     })
-    @ApiOkResponse({
-        type: PhoneSchema
-    })
+    // @ApiOkResponse({
+    //     type: PhoneSchema
+    // })
     async getOne(
         @Param("id", ParseIntPipe) id: number,
         @User("id") userId: number
@@ -64,9 +63,9 @@ export class PhonesController {
 
     @Post()
     @ApiOperation({ summary: "create phone" })
-    @ApiOkResponse({
-        type: PhoneSchema
-    })
+    // @ApiOkResponse({
+    //     type: PhoneSchema
+    // })
     async create(@Body() createPhoneDto: CreatePhoneDto, @User("id") userId: number) {
         try {
 
@@ -86,9 +85,9 @@ export class PhonesController {
         name: "id",
         description: "Phone id",
     })
-    @ApiOkResponse({
-        type: PhoneSchema
-    })
+    // @ApiOkResponse({
+    //     type: PhoneSchema
+    // })
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updatePhoneDto: UpdatePhoneDto,

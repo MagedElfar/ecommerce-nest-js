@@ -1,7 +1,7 @@
 import { MediaService } from 'src/feachers/media/media.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Brand } from '../brands.entity';
+import { Brand, BrandScope } from '../brands.entity';
 import * as slugify from "slugify"
 import { IBrand } from '../brands.interface';
 import { BrandQueryDto } from '../dto/brands-query.dto';
@@ -9,7 +9,6 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { CreateBrandDto } from '../dto/create-brands.dto';
 import { UpdateBrandDto } from '../dto/update-brand.dto';
-import { Media } from 'src/feachers/media/media.entity';
 
 @Injectable()
 export class BrandsService {
@@ -21,25 +20,17 @@ export class BrandsService {
 
     ) { }
 
-    async findAll(brandQueryDto: BrandQueryDto): Promise<IBrand[]> {
+    async findAll(brandQueryDto: BrandQueryDto, scopes: any[] = []): Promise<any> {
         try {
             const { limit, page, name } = brandQueryDto;
 
-            const result = await this.brandModel.findAll({
+            const brands = await this.brandModel.scope(scopes).findAndCountAll({
                 where: {
                     name: { [Op.like]: `%${name}%` },
                 },
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["id", "url"]
-                    }
-                ],
                 limit,
                 offset: (page - 1) * limit
             });
-
-            const brands = result.map(item => item["dataValues"])
 
             return brands
         } catch (error) {
@@ -47,33 +38,9 @@ export class BrandsService {
         }
     }
 
-    async getCount(brandQueryDto: BrandQueryDto): Promise<number> {
+    async findOneById(id: number, scopes: any[] = []): Promise<IBrand | null> {
         try {
-
-            const { limit, page, name } = brandQueryDto;
-
-            const count = await this.brandModel.count({
-                where: {
-                    name: { [Op.like]: `%${name}%` },
-                },
-            });
-
-            return count
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async findOneById(id: number): Promise<IBrand | null> {
-        try {
-            const brand = await this.brandModel.findByPk(id, {
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["id", "storageKey"]
-                    }
-                ],
-            })
+            const brand = await this.brandModel.scope(scopes).findByPk(id)
 
             if (!brand) return null;
 
@@ -83,16 +50,10 @@ export class BrandsService {
         }
     }
 
-    async findOne(data: Partial<Omit<IBrand, "image">>): Promise<IBrand | null> {
+    async findOne(data: Partial<Omit<IBrand, "image">>, scopes: any[] = []): Promise<IBrand | null> {
         try {
-            const brand = await this.brandModel.findOne({
+            const brand = await this.brandModel.scope(scopes).findOne({
                 where: data,
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["id", "url"]
-                    },
-                ],
             })
 
             if (!brand) return null;
@@ -137,11 +98,7 @@ export class BrandsService {
                 slug
             }, { where: { id } })
 
-            return {
-                ...brand,
-                ...updateBrandDto,
-                slug
-            }
+            return this.findOneById(id, [BrandScope.WITH_IMAGE])
         } catch (error) {
             if (error.name === 'SequelizeUniqueConstraintError') {
                 throw new BadRequestException('brand is already in exist');
