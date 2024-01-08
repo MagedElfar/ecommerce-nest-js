@@ -7,9 +7,10 @@ import { UpdateAttributeDto } from './dto/request/update-attribute.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, OmitType } from '@nestjs/swagger';
 import { AttributeScopes } from './attribute.entity';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
 import { CreateAttributeResponseDto } from './dto/response/createAttribute.dto';
 import { UpdateAttributeResponseDto } from './dto/response/updateAttribute.dto';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { FindAttributesDto } from './dto/response/findAttributes.dto';
 
 
 @ApiTags("Attributes")
@@ -22,6 +23,7 @@ export class AttributesController {
     @Get()
     @Public()
     @ApiOperation({ summary: "Find all attributes" })
+    @ApiFindAllResponse(FindAttributesDto)
     async findAll() {
         try {
             const attributes = await this.attributesService.findAll([AttributeScopes.VALUE_WITH_TOTAL]);
@@ -47,10 +49,7 @@ export class AttributesController {
 
     @Put(":id")
     @Roles([UserRole.ADMIN])
-    @ApiParam({
-        name: "id",
-        description: "attribute id"
-    })
+    @ApiParam({ name: "id", description: "attribute id" })
     @ApiOperation({ summary: "update attribute" })
     @ApiOkResponse({ type: UpdateAttributeResponseDto })
     async update(@Body() updateAttributeDto: UpdateAttributeDto, @Param("id", ParseIntPipe) id: number) {
@@ -66,10 +65,7 @@ export class AttributesController {
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
     @Roles([UserRole.ADMIN])
-    @ApiParam({
-        name: "id",
-        description: "attribute id"
-    })
+    @ApiParam({ name: "id", description: "attribute id" })
     @ApiOperation({ summary: "delete attribute" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

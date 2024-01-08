@@ -1,11 +1,13 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { SubCategoryImageService } from '../services/sub-categories-images.service';
-import { UploadImageDto } from '../dto/upload-image.dto';
+import { UploadImageDto } from '../dto/request/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("Sub category Image")
+@ApiBearerAuth()
 @Controller('sub-categories-images')
 export class SubCategoryImageController {
     constructor(private subCategoryImageService: SubCategoryImageService) { }
@@ -16,6 +18,24 @@ export class SubCategoryImageController {
             storage: memoryStorage(),
         }),
     )
+    @ApiOperation({ summary: "upload sub category image" })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ["file", "brandId"],
+            properties: {
+                brandId: { type: 'integer', description: "user id" },
+                file: {
+                    type: 'file',
+                    description: "file to upload"
+                },
+            },
+        },
+    })
+    @ApiCreatedResponse({
+        type: MediaDto
+    })
     async upload(
         @UploadedFile() file: Express.Multer.File,
         @Body() uploadImageDto: UploadImageDto

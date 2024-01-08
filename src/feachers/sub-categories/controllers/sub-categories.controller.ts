@@ -1,14 +1,20 @@
 import { SubCategoriesService } from '../services/sub-categories.service';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
-import { CreateSubCategoryDto } from '../dto/create-sub-category.dto';
+import { CreateSubCategoryDto } from '../dto/request/create-sub-category.dto';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
-import { UpdateSubCategoryDto } from '../dto/update-sub-category.dto';
-import { SubCategoryQueryDto } from '../dto/sub-categoryQuery.dto';
+import { UpdateSubCategoryDto } from '../dto/request/update-sub-category.dto';
+import { SubCategoryQueryDto } from '../dto/request/sub-categoryQuery.dto';
 import { Public } from 'src/core/decorators/public.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { FindSubCategoriesDto } from '../dto/response/findSubCtegories.dto';
+import { CreateSubCategoryResponseDto } from '../dto/response/createCategory.dto';
+import { UpdateSubCategoryResponseDto } from '../dto/response/updateCategory.dto';
+import { SubCategoryScope } from '../sub-categories.entity';
 
-@ApiTags("Sub category")
+@ApiTags("Sub categories")
+@ApiBearerAuth()
 @Controller('sub-categories')
 export class SubCategoriesController {
 
@@ -16,6 +22,8 @@ export class SubCategoriesController {
 
     @Get()
     @Public()
+    @ApiOperation({ summary: "Find All sub categories" })
+    @ApiFindAllResponse(FindSubCategoriesDto)
     async findAll(@Query() categoryQueryDto: SubCategoryQueryDto) {
         try {
             const subCategories = await this.subCategoriesService.findAll(categoryQueryDto);
@@ -27,6 +35,8 @@ export class SubCategoriesController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "create new sub category" })
+    @ApiCreatedResponse({ type: CreateSubCategoryResponseDto })
     async create(@Body() createCategoryDto: CreateSubCategoryDto) {
         try {
             const subCategory = await this.subCategoriesService.create(createCategoryDto);
@@ -39,6 +49,9 @@ export class SubCategoriesController {
 
     @Put(":id")
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "update sub category" })
+    @ApiParam({ name: "id", description: "sub category id" })
+    @ApiOkResponse({ type: UpdateSubCategoryResponseDto })
     async update(@Param("id", ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateSubCategoryDto) {
         try {
             const subCategory = await this.subCategoriesService.update(id, updateCategoryDto);
@@ -51,9 +64,12 @@ export class SubCategoriesController {
 
     @Get(":id")
     @Public()
+    @ApiOperation({ summary: "Find sub category by id" })
+    @ApiParam({ name: "id", description: "sub category id" })
+    @ApiOkResponse({ type: FindSubCategoriesDto })
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
-            const subCategory = await this.subCategoriesService.findOne({ id });
+            const subCategory = await this.subCategoriesService.findOne({ id }, [SubCategoryScope.WITH_IMAGE]);
 
             if (!subCategory) throw new NotFoundException()
 
@@ -66,6 +82,8 @@ export class SubCategoriesController {
     @Delete(":id")
     @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiOperation({ summary: "delete sub category" })
+    @ApiParam({ name: "id", description: "sub category id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
             await this.subCategoriesService.delete(id);

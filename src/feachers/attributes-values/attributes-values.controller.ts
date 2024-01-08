@@ -5,6 +5,8 @@ import { UserRole } from 'src/core/constants';
 import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
 import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { CreateAttributeValueResponseDto } from './dto/response/createAttribueValue.dto';
+import { UpdateAttributeValueResponseDto } from './dto/response/updateAttribueValue.dto';
 
 @ApiTags("Attributes Values")
 @Controller('attributes-values')
@@ -15,7 +17,7 @@ export class AttributeValuesController {
     @Post()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "create new attribute value" })
-
+    @ApiCreatedResponse({ type: CreateAttributeValueResponseDto })
     async create(@Body() createAttributeValueDto: CreateAttributeValueDto) {
         try {
 
@@ -30,10 +32,8 @@ export class AttributeValuesController {
     @Put()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "update attribute value" })
-    @ApiParam({
-        name: "attribute value id"
-    })
-
+    @ApiParam({ name: "id", description: "attribute value id" })
+    @ApiOkResponse({ type: UpdateAttributeValueResponseDto })
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateAttributeValueDto: UpdateAttributeValueDto
@@ -50,9 +50,7 @@ export class AttributeValuesController {
     @Delete()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "delete attribute value" })
-    @ApiParam({
-        name: "attribute value id"
-    })
+    @ApiParam({ name: "id", description: "attribute value id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
             const value = await this.attributeValuesService.delete(id);

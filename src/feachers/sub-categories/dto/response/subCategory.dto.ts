@@ -2,24 +2,22 @@ import { ApiProperty } from "@nestjs/swagger";
 import { BaseDto } from "src/core/dto/base-model.dto";
 import { MediaDto } from "src/feachers/media/dto/media.dto";
 
-export class BrandDto extends BaseDto {
+export class SubCategoryDto extends BaseDto {
 
     @ApiProperty({
-        description: "brand name",
-        uniqueItems: true,
-        example: "samsung"
+        description: "sub category name",
+        example: "shirts"
     })
-    name: string
+    name: string;
 
     @ApiProperty({
-        description: "brand slug",
-        uniqueItems: true,
-        example: "samsung"
+        description: "sub category slug",
+        example: "shirts"
     })
-    slug: string
+    slug: string;
 
     @ApiProperty({
-        description: "category id",
+        description: "parent category id",
         example: 1
     })
     categoryId: number
@@ -32,7 +30,6 @@ export class BrandDto extends BaseDto {
 
     @ApiProperty({
         description: "image object",
-        uniqueItems: true,
     })
     image: MediaDto
 
