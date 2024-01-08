@@ -1,24 +1,27 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { PhonesService } from './phones.service';
 import { User } from 'src/core/decorators/user.decorator';
-import { CreatePhoneDto } from './dto/create-phone.dto';
-import { UpdatePhoneDto } from './dto/update-add.dto';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { PhoneQueryDto } from './dto/phone-query.dto';
+import { CreatePhoneDto } from './dto/request/create-phone.dto';
+import { UpdatePhoneDto } from './dto/request/update-add.dto';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { PhoneQueryDto } from './dto/request/phone-query.dto';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { FindAllPhonesResponseDto } from './dto/response/findAllPhones.dto';
+import { FindPhoneDto } from './dto/response/findPhone.dto';
+import { CreatePhoneResponseDto } from './dto/response/creatPhone.dto';
+import { UpdatePhoneResponseDto } from './dto/response/updatePhone.dto';
 
 @ApiTags("Phones")
-@Controller('phones')
 @ApiBearerAuth()
+@Controller('phones')
 export class PhonesController {
 
     constructor(private readonly phonesService: PhonesService) { }
 
     @Get()
-    @ApiOperation({ summary: "get all user phones" })
-    // @ApiOkResponse({
-    //     type: FindAlLPhoneSchema
-    // })
-    async get(
+    @ApiOperation({ summary: "Find all user phones" })
+    @ApiFindAllResponse(FindAllPhonesResponseDto)
+    async findAll(
         @Query() phoneQueryDto: PhoneQueryDto,
         @User("id") userId: number
     ) {
@@ -34,14 +37,9 @@ export class PhonesController {
     }
 
     @Get(":id")
-    @ApiOperation({ summary: "get specific user phone" })
-    @ApiParam({
-        name: "id",
-        description: "Phone id",
-    })
-    // @ApiOkResponse({
-    //     type: PhoneSchema
-    // })
+    @ApiOperation({ summary: "Find phone by ID" })
+    @ApiParam({ name: "id", description: "Phone id" })
+    @ApiOkResponse({ type: FindPhoneDto })
     async getOne(
         @Param("id", ParseIntPipe) id: number,
         @User("id") userId: number
@@ -63,9 +61,7 @@ export class PhonesController {
 
     @Post()
     @ApiOperation({ summary: "create phone" })
-    // @ApiOkResponse({
-    //     type: PhoneSchema
-    // })
+    @ApiCreatedResponse({ type: CreatePhoneResponseDto })
     async create(@Body() createPhoneDto: CreatePhoneDto, @User("id") userId: number) {
         try {
 
@@ -81,13 +77,8 @@ export class PhonesController {
 
     @Put(":id")
     @ApiOperation({ summary: "update phone" })
-    @ApiParam({
-        name: "id",
-        description: "Phone id",
-    })
-    // @ApiOkResponse({
-    //     type: PhoneSchema
-    // })
+    @ApiParam({ name: "id", description: "Phone id" })
+    @ApiOkResponse({ type: UpdatePhoneResponseDto })
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updatePhoneDto: UpdatePhoneDto,

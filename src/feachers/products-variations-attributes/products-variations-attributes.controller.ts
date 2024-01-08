@@ -3,7 +3,9 @@ import { ProductVariationAttributesService } from './products-variations-attribu
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { CreateProductAttributesDto } from './dto/create-product_variation_attributes.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Products Attributes")
 @Controller('products-attributes')
 export class ProductVariationAttributesController {
 

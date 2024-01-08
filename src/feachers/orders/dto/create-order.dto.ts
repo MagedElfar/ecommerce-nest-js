@@ -3,9 +3,9 @@ import { Type } from "class-transformer";
 import { ArrayMinSize, IsEnum, IsInt, IsNotEmpty, IsOptional, ValidateNested, isInt } from "class-validator";
 import { OrderStatus } from "src/core/constants";
 import { NotEitherProperty } from "src/core/decorators/IsNotBothPropertiesPresent.decorator";
-import { CreateAddressDto } from "src/feachers/addresses/dto/create-address.dto";
+import { CreateAddressDto } from "src/feachers/addresses/dto/request/create-address.dto";
 import { CreateOrderItemDto } from "src/feachers/orders-items/dto/create-order-item.dto";
-import { CreatePhoneDto } from "src/feachers/phones/dto/create-phone.dto";
+import { CreatePhoneDto } from "src/feachers/phones/dto/request/create-phone.dto";
 
 export class CreateOrderDto {
 

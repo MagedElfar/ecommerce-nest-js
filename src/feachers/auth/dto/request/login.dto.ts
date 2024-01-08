@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, IsString } from "class-validator";
-import { UserDto } from "src/feachers/users/dto/user.dto";
+import { UserDto } from "src/feachers/users/dto/response/user.dto";
 
 export class LoginDto {
 
@@ -21,16 +21,4 @@ export class LoginDto {
     @IsString()
     readonly password: string;
 
-}
-
-export class LoginResponseDto {
-    @ApiPropertyOptional({
-        description: "User Data"
-    })
-    user: UserDto
-
-    @ApiPropertyOptional({
-        description: "Access token"
-    })
-    token: string
 }

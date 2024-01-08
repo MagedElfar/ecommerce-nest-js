@@ -1,13 +1,14 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { BrandsImageService } from '../services/brands-images.service';
-import { UploadImageDto } from '../dto/upload-image.dto';
+import { UploadImageDto } from '../dto/request/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("Brands Images")
 @Controller('brands-images')
+@ApiBearerAuth()
 export class BrandsImageController {
     constructor(private brandsImageService: BrandsImageService) { }
 

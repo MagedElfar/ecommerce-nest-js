@@ -3,7 +3,9 @@ import { Roles } from 'src/core/decorators/role.decorator';
 import { ProductsSubCategoriesService } from './products-sub-categories.service';
 import { Body, Controller, Delete, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Product Sub Category")
 @Controller('products-sub-categories')
 export class ProductsSubCategoriesController {
     constructor(private readonly productsSubCategoriesService: ProductsSubCategoriesService) { }

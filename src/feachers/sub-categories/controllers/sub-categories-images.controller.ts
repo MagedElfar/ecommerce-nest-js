@@ -3,7 +3,9 @@ import { SubCategoryImageService } from '../services/sub-categories-images.servi
 import { UploadImageDto } from '../dto/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Sub category Image")
 @Controller('sub-categories-images')
 export class SubCategoryImageController {
     constructor(private subCategoryImageService: SubCategoryImageService) { }

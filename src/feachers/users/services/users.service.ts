@@ -1,12 +1,12 @@
-import { UserQueryDto } from '../dto/userQuery.dto';
+import { UserQueryDto } from '../dto/request/userQuery.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from '../dto/createUserDto.dto';
+import { CreateUserDto } from '../dto/request/createUserDto.dto';
 import { User, UserScop } from '../user.entity';
 import { IUser } from '../users.interface';
 import { InjectModel } from '@nestjs/sequelize';
-import { UpdateUserDto } from '../dto/updateUserDto.dto';
+import { UpdateUserDto } from '../dto/request/updateUserDto.dto';
 import { Op } from 'sequelize';
-import { UpdateRoleDto } from '../dto/update-role.dto';
+import { UpdateRoleDto } from '../dto/request/update-role.dto';
 
 
 @Injectable()

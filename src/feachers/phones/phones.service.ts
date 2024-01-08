@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { Phone } from './phone.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreatePhoneDto } from './dto/create-phone.dto';
+import { CreatePhoneDto } from './dto/request/create-phone.dto';
 import { IPhone } from './phone.interface';
-import { UpdatePhoneDto } from './dto/update-add.dto';
-import { PhoneQueryDto } from './dto/phone-query.dto';
+import { UpdatePhoneDto } from './dto/request/update-add.dto';
+import { PhoneQueryDto } from './dto/request/phone-query.dto';
 
 @Injectable()
 export class PhonesService {
@@ -14,12 +14,12 @@ export class PhonesService {
     ) { }
 
 
-    async findAll(phoneQueryDto: PhoneQueryDto) {
+    async findAll(phoneQueryDto: PhoneQueryDto, scopes: string[] = []) {
         try {
 
             const { limit, page } = phoneQueryDto
 
-            const result = await this.phoneModel.findAndCountAll({
+            const result = await this.phoneModel.scope(scopes).findAndCountAll({
                 where: { userId: phoneQueryDto.userId },
                 limit,
                 offset: (page - 1) * limit
@@ -42,9 +42,9 @@ export class PhonesService {
         }
     }
 
-    async findOne(data: Partial<IPhone>): Promise<IPhone | null> {
+    async findOne(data: Partial<IPhone>, scopes: string[] = []): Promise<IPhone | null> {
         try {
-            const phone = await this.phoneModel.findOne({ where: data });
+            const phone = await this.phoneModel.scope(scopes).findOne({ where: data });
 
             if (!phone) return null
 
@@ -54,9 +54,9 @@ export class PhonesService {
         }
     }
 
-    async findOneById(id: number): Promise<IPhone | null> {
+    async findOneById(id: number, scopes: string[] = []): Promise<IPhone | null> {
         try {
-            const phone = await this.phoneModel.findByPk(id);
+            const phone = await this.phoneModel.scope(scopes).findByPk(id);
 
             if (!phone) return null
 

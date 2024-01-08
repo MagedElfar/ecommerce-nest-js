@@ -3,7 +3,9 @@ import { PaymentsMethodsService } from './payments-methods.service';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Payment Method")
 @Controller('payments-methods')
 export class PaymentsMethodsController {
 

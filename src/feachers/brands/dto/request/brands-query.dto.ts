@@ -10,7 +10,7 @@ export class BrandQueryDto extends QueryDto {
     @Transform((param) => transformLowerCase(param))
     @ApiPropertyOptional({
         description: "brand name",
-        example: "nike"
+        example: "samsung"
     })
     name: string = ""
 }

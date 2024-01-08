@@ -3,7 +3,9 @@ import { CategoryImageService } from '../services/categories-images.service';
 import { UploadImageDto } from './../dto/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Category Image")
 @Controller('categories-images')
 export class CategoryImageController {
     constructor(private categoryImageService: CategoryImageService) { }

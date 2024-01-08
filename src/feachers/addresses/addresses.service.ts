@@ -1,10 +1,10 @@
-import { UpdateAddressDto } from './dto/update-address.dto';
-import { CreateAddressDto } from './dto/create-address.dto';
+import { UpdateAddressDto } from './dto/request/update-address.dto';
+import { CreateAddressDto } from './dto/request/create-address.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from './address.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAddress } from './address.interface';
-import { AddressQueryDto } from './dto/address-query.dto';
+import { AddressQueryDto } from './dto/request/address-query.dto';
 
 @Injectable()
 export class AddressesService {
@@ -14,12 +14,12 @@ export class AddressesService {
         private readonly addressModel: typeof Address
     ) { }
 
-    async findAll(addressQueryDto: AddressQueryDto) {
+    async findAll(addressQueryDto: AddressQueryDto, scope: string[] = []) {
         try {
 
             const { limit, page } = addressQueryDto
 
-            const result = await this.addressModel.findAndCountAll({
+            const result = await this.addressModel.scope(scope).findAndCountAll({
                 where: { userId: addressQueryDto.userId },
                 limit,
                 offset: (page - 1) * limit
@@ -43,9 +43,9 @@ export class AddressesService {
         }
     }
 
-    async findOne(data: Partial<IAddress>): Promise<IAddress | null> {
+    async findOne(data: Partial<IAddress>, scope: string[] = []): Promise<IAddress | null> {
         try {
-            const address = await this.addressModel.findOne({ where: data });
+            const address = await this.addressModel.scope(scope).findOne({ where: data });
 
             if (!address) return null
 
@@ -55,9 +55,9 @@ export class AddressesService {
         }
     }
 
-    async findOneById(id: number): Promise<IAddress | null> {
+    async findOneById(id: number, scope: string[] = []): Promise<IAddress | null> {
         try {
-            const address = await this.addressModel.findByPk(id);
+            const address = await this.addressModel.scope(scope).findByPk(id);
 
             if (!address) return null
 

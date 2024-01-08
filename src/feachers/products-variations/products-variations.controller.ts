@@ -5,7 +5,9 @@ import { CreateProductVariationDto } from './dto/create-product-variations.dto';
 import { ProductVariationsService } from './products-variations.service';
 import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
 import { Public } from 'src/core/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Product Variations")
 @Controller('products-variations')
 export class ProductVariationsController {
 

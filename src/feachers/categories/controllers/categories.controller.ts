@@ -6,7 +6,9 @@ import { UserRole } from 'src/core/constants';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryQueryDto } from '../dto/category-query.dto';
 import { Public } from 'src/core/decorators/public.decorator';
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, OmitType } from '@nestjs/swagger';
+import { CategoryScope } from '../categories.entity';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
 
 @ApiTags("Category")
 @Controller('categories')
@@ -17,15 +19,14 @@ export class CategoriesController {
 
     @Get()
     @Public()
-    @ApiOperation({ summary: "get all categories" })
-    // @ApiOkResponse({
-    //     type: CategorySchema
-    // })
+    @ApiOperation({ summary: "find all categories" })
     async findAll(@Query() categoryQueryDto: CategoryQueryDto) {
         try {
-            const categories = await this.categoriesService.findAll(categoryQueryDto);
-            const count = await this.categoriesService.getCount(categoryQueryDto)
-            return { count, categories }
+            const categories = await this.categoriesService.findAll(categoryQueryDto, [
+                CategoryScope.WITH_IMAGE,
+                CategoryScope.WITH_EMPTY_PRODUCT
+            ]);
+            return categories
         } catch (error) {
             throw error
         }
@@ -34,9 +35,7 @@ export class CategoriesController {
     @Post()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "create new category" })
-    // @ApiCreatedResponse({
-    //     type: CategorySchema
-    // })
+
     async create(@Body() createCategoryDto: CreateCategoryDto) {
         try {
             const category = await this.categoriesService.create(createCategoryDto);
@@ -54,14 +53,17 @@ export class CategoriesController {
         name: "id",
         description: "category id"
     })
-    // @ApiOkResponse({
-    //     type: CategorySchema
-    // })
+
     async update(@Param("id", ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateCategoryDto) {
         try {
             const category = await this.categoriesService.update(id, updateCategoryDto);
 
-            return { category }
+            const attributes = this.categoriesService.mappedCategoryAttributes(category)
+
+            return {
+                ...category,
+                attributes
+            }
         } catch (error) {
             throw error
         }
@@ -74,16 +76,25 @@ export class CategoriesController {
         name: "id",
         description: "category id"
     })
-    // @ApiOkResponse({
-    //     type: CategorySchema
-    // })
+
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
-            const category = await this.categoriesService.findOne({ id });
+            const category = await this.categoriesService.findOneById(id, [
+                CategoryScope.WITH_EMPTY_PRODUCT,
+                CategoryScope.WITH_SUB_CATEGORY,
+                CategoryScope.WITH_IMAGE,
+                CategoryScope.WITH_BRAND,
+                CategoryScope.WITH_ATTRIBUTES
+            ]);
 
             if (!category) throw new NotFoundException()
 
-            return { category }
+            const attributes = this.categoriesService.mappedCategoryAttributes(category)
+
+            return {
+                ...category,
+                attributes
+            }
         } catch (error) {
             throw error
         }

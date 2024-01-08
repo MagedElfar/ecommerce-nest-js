@@ -2,7 +2,9 @@ import { CheckoutService } from './checkout.service';
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { CheckoutDto } from './dto/checkout.dto';
 import { User } from 'src/core/decorators/user.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("checkout")
 @Controller('checkout')
 export class CheckoutController {
 

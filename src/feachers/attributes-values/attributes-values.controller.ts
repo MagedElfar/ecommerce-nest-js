@@ -4,8 +4,7 @@ import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put } from '@nestj
 import { UserRole } from 'src/core/constants';
 import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
 import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, OmitType } from '@nestjs/swagger';
-import { AttributeValueDto } from './dto/attribute-value.dto';
+import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags("Attributes Values")
 @Controller('attributes-values')
@@ -16,15 +15,13 @@ export class AttributeValuesController {
     @Post()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "create new attribute value" })
-    @ApiCreatedResponse({
-        type: OmitType(AttributeValueDto, ["totalProducts"])
-    })
+
     async create(@Body() createAttributeValueDto: CreateAttributeValueDto) {
         try {
 
             const value = await this.attributeValuesService.create(createAttributeValueDto);
 
-            return { value }
+            return value
         } catch (error) {
             throw error
         }
@@ -36,9 +33,7 @@ export class AttributeValuesController {
     @ApiParam({
         name: "attribute value id"
     })
-    @ApiOkResponse({
-        type: OmitType(AttributeValueDto, ["totalProducts"])
-    })
+
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateAttributeValueDto: UpdateAttributeValueDto
@@ -46,7 +41,7 @@ export class AttributeValuesController {
         try {
             const value = await this.attributeValuesService.update(id, updateAttributeValueDto);
 
-            return { value }
+            return value
         } catch (error) {
             throw error
         }
@@ -62,7 +57,7 @@ export class AttributeValuesController {
         try {
             const value = await this.attributeValuesService.delete(id);
 
-            return { value }
+            return value
         } catch (error) {
             throw error
         }

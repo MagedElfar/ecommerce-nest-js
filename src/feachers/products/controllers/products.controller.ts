@@ -7,7 +7,9 @@ import { Roles } from 'src/core/decorators/role.decorator';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { ProductQueryDto } from '../dto/product-query.dto';
 import { Public } from 'src/core/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Products")
 @Controller('products')
 export class ProductsController {
 

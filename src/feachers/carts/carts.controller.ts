@@ -1,7 +1,9 @@
 import { Controller, Delete, Get } from '@nestjs/common';
 import { User } from 'src/core/decorators/user.decorator';
 import { CartsService } from './carts.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Carts")
 @Controller('carts')
 export class CartsController {
     constructor(private readonly cartsService: CartsService) { }

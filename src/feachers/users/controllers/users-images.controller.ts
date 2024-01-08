@@ -5,12 +5,11 @@ import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOkResponse,
 import { Express } from "express"
 import { memoryStorage } from 'multer';
 import { User } from 'src/core/decorators/user.decorator';
-import { UploadImageDto } from '../dto/upload.dto';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("User Image")
-@Controller('users-images')
 @ApiBearerAuth()
+@Controller('users-images')
 export class UsersImagesController {
 
     constructor(private usersImagesService: UsersImagesService) { }

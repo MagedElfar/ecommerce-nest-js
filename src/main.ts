@@ -14,7 +14,9 @@ async function bootstrap() {
 
   // Remove the default "default" path
   delete document.paths['/'];
-  SwaggerModule.setup('api-docs', app, document);
+  SwaggerModule.setup('api-docs', app, document, {
+    swaggerOptions: { defaultModelsExpandDepth: -1 }
+  });
 
   app.enableCors()
   app.setGlobalPrefix("api");

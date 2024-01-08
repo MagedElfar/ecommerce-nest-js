@@ -6,7 +6,9 @@ import { UserRole } from 'src/core/constants';
 import { UpdateSubCategoryDto } from '../dto/update-sub-category.dto';
 import { SubCategoryQueryDto } from '../dto/sub-categoryQuery.dto';
 import { Public } from 'src/core/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Sub category")
 @Controller('sub-categories')
 export class SubCategoriesController {
 

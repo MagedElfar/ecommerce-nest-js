@@ -55,10 +55,5 @@ export class CreateUserDto {
     lastName?: string;
 
 
-    // @IsEnum(Gender, {
-    //     message: 'gender must be either male or female',
-    // })
-    // readonly gender: Gender;
-
 }
 

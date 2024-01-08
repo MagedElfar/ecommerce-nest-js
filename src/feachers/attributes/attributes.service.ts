@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Attribute } from './attribute.entity';
-import { CreateAttributeDto } from './dto/create-attribute.dto';
+import { CreateAttributeDto } from './dto/request/create-attribute.dto';
 import { IAttribute } from './attribute.interface';
-import { UpdateAttributeDto } from './dto/update-attribute.dto';
+import { UpdateAttributeDto } from './dto/request/update-attribute.dto';
 
 @Injectable()
 export class AttributesService {

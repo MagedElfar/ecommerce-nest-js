@@ -1,7 +1,18 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, Model, Scopes, Table } from "sequelize-typescript";
 import { User } from "../users/user.entity";
-import { CartItem } from "../cart-items/cart-item-entity";
 
+export enum AddressScope {
+    WITH_USER = "with user"
+}
+
+@Scopes(() => ({
+    [AddressScope.WITH_USER]: {
+        include: [{
+            model: User,
+            attributes: ["id", "name", "email"]
+        }]
+    }
+}))
 @Table
 export class Address extends Model<Address> {
 

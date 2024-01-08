@@ -1,5 +1,5 @@
 import { MediaService } from 'src/feachers/media/media.service';
-import { UploadImageDto } from '../dto/upload.dto';
+import { UploadImageDto } from '../dto/request/upload.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { USERFolder } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';

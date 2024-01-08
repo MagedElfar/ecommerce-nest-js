@@ -3,7 +3,7 @@ import { IModel } from "src/core/interface/model.interface";
 
 export class BaseDto implements IModel {
 
-    @ApiPropertyOptional({ description: "record id" })
+    @ApiPropertyOptional({ description: "record id", example: 1 })
     id: number
 
     @ApiPropertyOptional({ description: "record created date" })

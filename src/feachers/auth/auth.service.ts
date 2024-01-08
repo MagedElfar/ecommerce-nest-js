@@ -1,5 +1,5 @@
-import { LoginDto } from './dto/login.dto';
-import { SignUpDto } from './dto/signup.dto';
+import { LoginDto } from './dto/request/login.dto';
+import { SignUpDto } from './dto/request/signup.dto';
 import { ConflictException, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/services/users.service';

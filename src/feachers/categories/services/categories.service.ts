@@ -1,19 +1,13 @@
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Category } from '../categories.entity';
+import { Category, CategoryScope } from '../categories.entity';
 import * as slugify from "slugify"
 import { ICategory } from '../categories.interface';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoryQueryDto } from '../dto/category-query.dto';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { SubCategory } from '../../sub-categories/sub-categories.entity';
-import { Product } from '../../products/products.entity';
-import { Brand } from '../../brands/brands.entity';
-import { AttributeValues } from '../../attributes-values/attributes-values.entity';
-import { Attribute } from '../../attributes/attribute.entity';
-import { Media } from '../../media/media.entity';
 import { MediaService } from 'src/feachers/media/media.service';
 
 @Injectable()
@@ -25,11 +19,11 @@ export class CategoriesService {
         private readonly mediaService: MediaService
     ) { }
 
-    async findAll(categoryQueryDto: CategoryQueryDto): Promise<ICategory[]> {
+    async findAll(categoryQueryDto: CategoryQueryDto, scopes: any[] = []): Promise<any> {
         try {
             const { limit, page, name } = categoryQueryDto;
 
-            const result = await this.categoryModel.findAll({
+            const rows = await this.categoryModel.scope(scopes).findAll({
                 where: {
                     name: { [Op.like]: `%${name}%` },
                 },
@@ -42,56 +36,28 @@ export class CategoriesService {
                     ]
                 },
 
-                include: [
-                    {
-                        model: Product,
-                        attributes: []
-                    },
-                    {
-                        model: Media,
-                        attributes: ["id", "url"]
-                    },
-                ],
                 group: ['category.id'],
                 subQuery: false,
                 limit,
                 offset: (page - 1) * limit
             });
 
-            const categories = result.map(item => item["dataValues"])
-
-            return categories
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async getCount(categoryQueryDto: CategoryQueryDto): Promise<number> {
-        try {
-
-            const { name } = categoryQueryDto;
             const count = await this.categoryModel.count({
                 where: {
                     name: { [Op.like]: `%${name}%` },
                 },
             });
 
-            return count
+            return { count, rows }
         } catch (error) {
             throw error
         }
     }
 
-    async findOneById(id: number): Promise<ICategory | null> {
+
+    async findOneById(id: number, scopes: any[] = []): Promise<ICategory | null> {
         try {
-            const category = await this.categoryModel.findByPk(id, {
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["id", "storageKey"]
-                    }
-                ],
-            })
+            const category = await this.categoryModel.scope(scopes).findByPk(id)
 
             if (!category) return null;
 
@@ -101,88 +67,16 @@ export class CategoriesService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICategory, "image" | "subCategories" | "parent">>): Promise<ICategory | null> {
+    async findOne(data: Partial<Omit<ICategory, "image" | "subCategories" | "parent">>, scopes: any[] = []): Promise<ICategory | null> {
         try {
-            const categoryId = data.id;
 
-            const category = await this.categoryModel.findOne({
-                where: { id: categoryId },
-                include: [
-                    {
-                        model: Product,
-                        attributes: [],
-                    },
-                    {
-                        model: Brand,
-                        attributes: ["id", "name", "imageId"],
-                        include: [{
-                            model: Media,
-                            attributes: ["id", "url"]
-                        }]
-                    },
-                    {
-                        model: Media,
-                        attributes: ["id", "url"],
-                    },
-                    {
-                        model: SubCategory,
-                        attributes: [
-                            "id",
-                            "name",
-                            "slug",
-                            "imageId",
-                            [
-                                this.sequelize.literal(
-                                    '(SELECT COUNT(*) FROM products_sub_categories WHERE products_sub_categories.subCategoryId = SubCategories.id)'
-                                ),
-                                'totalProducts',
-                            ],
-                        ],
-                        include: [
-                            {
-                                model: Media,
-                                attributes: ["id", "url"]
-                            }
-                        ]
-                    },
-                    {
-                        model: AttributeValues,
-                        attributes: ["id", "value"],
-                        as: 'attributes',
-                        through: { attributes: [], where: { categoryId: data.id } },
-                        include: [{ model: Attribute, attributes: ["id", "name"] }]
-                    }
-                ],
+            const category = await this.categoryModel.scope(scopes).findOne({
+                where: data
             });
 
             if (!category) return null;
 
-            const attributes = category["dataValues"].attributes.reduce((acc: any[], attr) => {
-
-                const name = attr.attribute.name
-                const index = acc.findIndex((item) => item.name === name)
-                if (index === -1) {
-                    acc.push({
-                        name,
-                        values: [{
-                            id: attr.id,
-                            value: attr.value,
-                        }],
-                    })
-                } else {
-                    acc[index].values.push({
-                        id: attr.id,
-                        value: attr.value,
-                    })
-                }
-
-                return acc;
-            }, []);
-
-            return {
-                ...category["dataValues"],
-                attributes
-            };
+            return category["dataValues"]
         } catch (error) {
             throw error;
         }
@@ -218,11 +112,15 @@ export class CategoriesService {
                 slug
             }, { where: { id } })
 
-            return {
-                ...category,
-                ...updateCategoryDto,
-                slug
-            }
+            category = await this.findOneById(id, [
+                CategoryScope.WITH_EMPTY_PRODUCT,
+                CategoryScope.WITH_SUB_CATEGORY,
+                CategoryScope.WITH_IMAGE,
+                CategoryScope.WITH_BRAND,
+                CategoryScope.WITH_ATTRIBUTES
+            ]);
+
+            return category
         } catch (error) {
             throw error
         }
@@ -253,6 +151,30 @@ export class CategoriesService {
             t.rollback()
             throw error
         }
+    }
+
+    mappedCategoryAttributes(category: ICategory) {
+        return category.attributes.reduce((acc: any[], attr) => {
+
+            const name = attr.attribute.name
+            const index = acc.findIndex((item) => item.name === name)
+            if (index === -1) {
+                acc.push({
+                    name,
+                    values: [{
+                        id: attr.id,
+                        value: attr.value,
+                    }],
+                })
+            } else {
+                acc[index].values.push({
+                    id: attr.id,
+                    value: attr.value,
+                })
+            }
+
+            return acc;
+        }, []);
     }
 }
 

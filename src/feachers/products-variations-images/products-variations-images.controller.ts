@@ -4,7 +4,9 @@ import { memoryStorage } from 'multer';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { ProductsVariationImageService } from './products-variations-images.service';
 import { Public } from 'src/core/decorators/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Products Variations Images")
 @Controller('variations-images')
 export class ProductsVariationsImageController {
     constructor(private productsVariationImageService: ProductsVariationImageService) { }

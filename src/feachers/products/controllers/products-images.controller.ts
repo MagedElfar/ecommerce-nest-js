@@ -3,7 +3,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ProductsImageService } from '../services/products-images.service';
 import { UploadImageDto } from '../dto/upload-image.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Product Image")
 @Controller('products-images')
 export class ProductsImageController {
     constructor(private productsImageService: ProductsImageService) { }

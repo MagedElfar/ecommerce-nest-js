@@ -3,7 +3,9 @@ import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put } from '@nestj
 import { User } from 'src/core/decorators/user.decorator';
 import { CreateItemDto } from './dto/create-item-dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Cart Items")
 @Controller('cart-items')
 export class CartItemsController {
 

@@ -3,7 +3,11 @@ import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { CategoriesAttributeService } from './categories-attributes.service';
 import { CreateCategoryAttributesDto } from './dto/create-category_attributes.dto';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CategoryAttributeDto } from './dto/categories-attributes.dto';
 
+@ApiTags("Categories Attribute")
+@ApiBearerAuth()
 @Controller('categories-attributes')
 export class CategoriesAttributesController {
 
@@ -11,6 +15,10 @@ export class CategoriesAttributesController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "assign attribute to category" })
+    @ApiCreatedResponse({
+        type: CategoryAttributeDto
+    })
     async create(@Body() createCategoryAttributesDto: CreateCategoryAttributesDto) {
         try {
 
@@ -25,6 +33,7 @@ export class CategoriesAttributesController {
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "unassign attribute to category" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
 

@@ -4,11 +4,11 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Brand, BrandScope } from '../brands.entity';
 import * as slugify from "slugify"
 import { IBrand } from '../brands.interface';
-import { BrandQueryDto } from '../dto/brands-query.dto';
+import { BrandQueryDto } from '../dto/request/brands-query.dto';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { CreateBrandDto } from '../dto/create-brands.dto';
-import { UpdateBrandDto } from '../dto/update-brand.dto';
+import { CreateBrandDto } from '../dto/request/create-brands.dto';
+import { UpdateBrandDto } from '../dto/request/update-brand.dto';
 
 @Injectable()
 export class BrandsService {

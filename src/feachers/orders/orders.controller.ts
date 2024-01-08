@@ -8,7 +8,9 @@ import { OrdersQueryDto } from './dto/order-query.dto';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Orders")
 @Controller('orders')
 export class OrdersController {
     constructor(private readonly ordersService: OrdersService) { }
