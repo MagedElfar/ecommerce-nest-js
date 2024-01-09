@@ -3,10 +3,11 @@ import { CategoryImageService } from '../services/categories-images.service';
 import { UploadImageDto } from '../dto/request/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("Category Image")
+@ApiBearerAuth()
 @Controller('categories-images')
 export class CategoryImageController {
     constructor(private categoryImageService: CategoryImageService) { }

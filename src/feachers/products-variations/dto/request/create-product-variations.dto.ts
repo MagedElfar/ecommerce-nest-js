@@ -1,7 +1,7 @@
 import { OmitType } from "@nestjs/swagger"
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer"
-import { IsNotEmpty, Min, IsInt, IsString, ValidateNested, IsOptional, IsArray, ArrayMinSize, ValidatorConstraintInterface } from "class-validator"
+import { IsNotEmpty, Min, IsInt, IsString, ValidateNested, IsOptional, IsArray, ArrayMinSize, ValidatorConstraintInterface, IsNumber } from "class-validator"
 import { CreateProductAttributesDto } from "src/feachers/products-variations-attributes/dto/request/create-product_variation_attributes.dto";
 
 // Custom validator for nested array elements
@@ -59,7 +59,7 @@ export class CreateProductVariationDto {
         example: 10
     })
     @IsOptional()
-    @IsString()
+    @IsNumber()
     price: number
 
     @ApiPropertyOptional({

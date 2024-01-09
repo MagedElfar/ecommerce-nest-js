@@ -23,9 +23,9 @@ export class SubCategoryImageController {
     @ApiBody({
         schema: {
             type: 'object',
-            required: ["file", "brandId"],
+            required: ["file", "subCategoryId"],
             properties: {
-                brandId: { type: 'integer', description: "user id" },
+                subCategoryId: { type: 'integer', description: "subCategory id" },
                 file: {
                     type: 'file',
                     description: "file to upload"

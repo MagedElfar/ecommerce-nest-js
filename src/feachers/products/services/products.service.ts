@@ -156,6 +156,7 @@ export class ProductsService {
                 }
             )
 
+
             //4-create new product variations if exist
             if (ProVariations && ProVariations.length > 0) {
 
@@ -170,6 +171,8 @@ export class ProductsService {
                 }))
 
             }
+
+
 
             //add product sub categories if exist
             if (subCategories && subCategories.length > 0) {
@@ -186,9 +189,12 @@ export class ProductsService {
                 )
             }
 
+            console.log("cat ...")
+
+
             await transaction.commit();
 
-            return this.fullData(product["dataValues"].id)
+            return await this.fullData(product["dataValues"].id)
         } catch (error) {
             console.log(error)
             await transaction.rollback()

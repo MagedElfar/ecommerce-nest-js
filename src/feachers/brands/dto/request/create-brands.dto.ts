@@ -14,13 +14,4 @@ export class CreateBrandDto {
         example: "samsung"
     })
     name: string
-
-    @IsOptional()
-    @IsInt()
-    @ApiProperty({
-        description: "category id for brand",
-        uniqueItems: true,
-        example: 1
-    })
-    categoryId: number
 }

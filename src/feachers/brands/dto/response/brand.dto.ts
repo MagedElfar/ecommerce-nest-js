@@ -19,12 +19,6 @@ export class BrandDto extends BaseDto {
     slug: string
 
     @ApiProperty({
-        description: "category id",
-        example: 1
-    })
-    categoryId: number
-
-    @ApiProperty({
         description: "image id",
         example: 1
     })

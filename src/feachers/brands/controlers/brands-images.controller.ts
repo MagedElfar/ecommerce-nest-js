@@ -25,7 +25,7 @@ export class BrandsImageController {
             type: 'object',
             required: ["file", "brandId"],
             properties: {
-                brandId: { type: 'integer', description: "user id" },
+                brandId: { type: 'integer', description: "brand id" },
                 file: {
                     type: 'file',
                     description: "file to upload"

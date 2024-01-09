@@ -74,11 +74,14 @@ export class ProductsSubCategoriesService {
 
 
             //create new record
-            productSubCategory = await this.productsSubCategoryModel.create(createProductSubCategoryDto)
+            productSubCategory = await this.productsSubCategoryModel.create(
+                createProductSubCategoryDto,
+                { transaction }
+            )
 
             if (!t) await transaction.commit()
 
-            return t ? productSubCategory : productSubCategory["dataValues"];
+            return productSubCategory["dataValues"];
 
         } catch (error) {
 

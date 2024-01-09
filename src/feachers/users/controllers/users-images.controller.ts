@@ -25,9 +25,8 @@ export class UsersImagesController {
     @ApiBody({
         schema: {
             type: 'object',
-            required: ["file", "userId"],
+            required: ["file"],
             properties: {
-                userId: { type: 'integer', description: "user id" },
                 file: {
                     type: 'file',
                     description: "file to upload"
