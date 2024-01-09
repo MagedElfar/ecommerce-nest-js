@@ -13,7 +13,7 @@ import { MediaModule } from '../media/media.module';
   imports: [
     SequelizeModule.forFeature([Product]),
     forwardRef(() => ProductVariationsModule),
-    ProductsSubCategoriesModule,
+    forwardRef(() => ProductsSubCategoriesModule),
     MediaModule
   ],
   providers: [ProductsService, ProductsImageService],

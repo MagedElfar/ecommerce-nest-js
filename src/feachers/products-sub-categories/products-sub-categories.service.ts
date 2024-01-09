@@ -1,46 +1,41 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductSubCategory } from './products-sub-categories.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
-import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.dto';
+import { CreateProductSubCategoryDto } from './dto/request/create-product-sub-category.dto';
 import { IProductSubCategory } from './products-sub-categories.interface';
 import { Sequelize } from 'sequelize-typescript';
-import { Product } from '../products/products.entity';
-import { SubCategory } from '../sub-categories/sub-categories.entity';
+import { SubCategoriesService } from '../sub-categories/services/sub-categories.service';
+import { ProductsService } from '../products/services/products.service';
 
 @Injectable()
 export class ProductsSubCategoriesService {
     constructor(
         @InjectModel(ProductSubCategory)
         private readonly productsSubCategoryModel: typeof ProductSubCategory,
+        private readonly subCategoryService: SubCategoriesService,
+        @Inject(forwardRef(() => ProductsService))
+        private readonly productsService: ProductsService,
         private sequelize: Sequelize,
     ) { }
 
 
 
     async findOne(
-        data: Partial<Omit<IProductSubCategory, "product" | "subCategory">>,
-        t?: Transaction
-
+        data: Partial<Omit<IProductSubCategory, "product" | "subCategory">>
     ): Promise<IProductSubCategory | null> {
-
-        const transaction = t || await this.sequelize.transaction();
 
         try {
 
             const productSubCategory = await this.productsSubCategoryModel.findOne({
                 where: data,
-                transaction
             });
 
             if (!productSubCategory) return null;
 
-            if (!t) await transaction.commit()
-
-            return t ? productSubCategory : productSubCategory["dataValues"];
+            return productSubCategory["dataValues"];
 
         } catch (error) {
-            if (!t) await transaction.rollback()
             throw error
         }
     }
@@ -57,38 +52,29 @@ export class ProductsSubCategoriesService {
 
             const { subCategoryId, productId } = createProductSubCategoryDto;
 
+            if (!t) {
+                const product = await this.productsService.findOneById(productId);
+
+                if (!product) throw new NotFoundException("Product not found")
+            }
+
+            const subCategory = await this.subCategoryService.findOneById(subCategoryId);
+
+            if (!subCategory) throw new NotFoundException(`sub category with id = ${subCategory} not exist`)
+
             //check if attribute already assign to that variant
             let productSubCategory = await this.findOne(
                 {
                     subCategoryId,
                     productId
                 },
-                transaction
             )
 
             if (productSubCategory) throw new BadRequestException("product shouldn't has duplicate attributes")
 
 
             //create new record
-            productSubCategory = await this.productsSubCategoryModel.create<ProductSubCategory>(
-                {
-                    productId,
-                    subCategoryId
-                },
-                {
-                    include: [
-                        {
-                            model: Product,
-                            attributes: ["id", "name"]
-                        },
-                        {
-                            model: SubCategory,
-                            attributes: ["id", "name"]
-                        }
-                    ],
-                    transaction
-                }
-            )
+            productSubCategory = await this.productsSubCategoryModel.create(createProductSubCategoryDto)
 
             if (!t) await transaction.commit()
 

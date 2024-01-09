@@ -1,25 +1,28 @@
 import { CategoriesService } from '../services/categories.service';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
-import { CreateCategoryDto } from '../dto/create-category.dto';
+import { CreateCategoryDto } from '../dto/request/create-category.dto';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
-import { CategoryQueryDto } from '../dto/category-query.dto';
+import { UpdateCategoryDto } from '../dto/request/update-category.dto';
+import { CategoryQueryDto } from '../dto/request/category-query.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, OmitType } from '@nestjs/swagger';
 import { CategoryScope } from '../categories.entity';
 import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { FindCategoriesDto } from '../dto/response/findCategories.dto';
+import { CreateCategoryResponse } from '../dto/response/create.dto';
+import { CategoryDto } from '../dto/response/category.dto';
 
 @ApiTags("Category")
 @Controller('categories')
-@ApiBearerAuth()
 export class CategoriesController {
 
     constructor(private categoriesService: CategoriesService) { }
 
     @Get()
     @Public()
-    @ApiOperation({ summary: "find all categories" })
+    @ApiOperation({ summary: "Find all categories", security: [] })
+    @ApiFindAllResponse(FindCategoriesDto)
     async findAll(@Query() categoryQueryDto: CategoryQueryDto) {
         try {
             const categories = await this.categoriesService.findAll(categoryQueryDto, [
@@ -34,8 +37,9 @@ export class CategoriesController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiBearerAuth()
     @ApiOperation({ summary: "create new category" })
-
+    @ApiCreatedResponse({ type: CreateCategoryResponse })
     async create(@Body() createCategoryDto: CreateCategoryDto) {
         try {
             const category = await this.categoriesService.create(createCategoryDto);
@@ -49,21 +53,18 @@ export class CategoriesController {
     @Put(":id")
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "update category" })
+    @ApiBearerAuth()
     @ApiParam({
         name: "id",
         description: "category id"
     })
-
+    @ApiOkResponse({ type: CategoryDto })
     async update(@Param("id", ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateCategoryDto) {
         try {
             const category = await this.categoriesService.update(id, updateCategoryDto);
 
-            const attributes = this.categoriesService.mappedCategoryAttributes(category)
 
-            return {
-                ...category,
-                attributes
-            }
+            return category
         } catch (error) {
             throw error
         }
@@ -71,12 +72,12 @@ export class CategoriesController {
 
     @Get(":id")
     @Public()
-    @ApiOperation({ summary: "get specific category" })
+    @ApiOperation({ summary: "Find category by Id", security: [] })
     @ApiParam({
         name: "id",
         description: "category id"
     })
-
+    @ApiOkResponse({ type: CategoryDto })
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
             const category = await this.categoriesService.findOneById(id, [
@@ -104,6 +105,7 @@ export class CategoriesController {
     @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: "delete category" })
+    @ApiBearerAuth()
     @ApiParam({
         name: "id",
         description: "category id"

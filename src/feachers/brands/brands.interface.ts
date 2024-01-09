@@ -10,5 +10,5 @@ export interface IBrand extends IModel {
     image?: Media
     products?: Product[]
     categoryId?: number
-    category: Category
+    categories: Category[]
 }

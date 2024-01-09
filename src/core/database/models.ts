@@ -5,6 +5,7 @@ import { Brand } from "src/feachers/brands/brands.entity";
 import { CartItem } from 'src/feachers/cart-items/cart-item-entity';
 import { Cart } from 'src/feachers/carts/carts.entity';
 import { CategoriesAttribute } from 'src/feachers/categories-attributes/categories-attributes.entity';
+import { CategoryBrand } from "src/feachers/categories-brands/categories-brand.entity";
 import { Category } from "src/feachers/categories/categories.entity";
 import { Media } from "src/feachers/media/media.entity";
 import { OrderCancelReason } from "src/feachers/orders-cancel-reasons/order-cancel-reason.entity";
@@ -43,5 +44,6 @@ export const models: any[] = [
     OrderItem,
     OrderCancelReason,
     Payment,
-    PaymentMethod
+    PaymentMethod,
+    CategoryBrand
 ]

@@ -16,7 +16,6 @@ import { FindOneBrandResponseDto } from '../dto/response/findBrand.dto';
 
 @ApiTags("Brands")
 @Controller('brands')
-@ApiBearerAuth()
 export class BrandsController {
 
     constructor(private brandsService: BrandsService) { }
@@ -36,6 +35,7 @@ export class BrandsController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiBearerAuth()
     @ApiOperation({ summary: "create new brand" })
     @ApiCreatedResponse({
         type: CreateBrandResponseDto
@@ -52,6 +52,7 @@ export class BrandsController {
 
     @Put(":id")
     @Roles([UserRole.ADMIN])
+    @ApiBearerAuth()
     @ApiOperation({ summary: "update brand" })
     @ApiParam({ name: "id", description: "brandId" })
     @ApiOkResponse({
@@ -89,6 +90,7 @@ export class BrandsController {
     @Delete(":id")
     @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)
+    @ApiBearerAuth()
     @ApiOperation({ summary: "delete brand" })
     @ApiParam({ name: "id", description: "brandId" })
     async delete(@Param("id", ParseIntPipe) id: number) {

@@ -1,4 +1,4 @@
-import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
+import { BelongsTo, BelongsToMany, Column, DataType, ForeignKey, HasMany, HasOne, Model, Scopes, Table } from "sequelize-typescript";
 import { User } from "../users/user.entity";
 import { Category } from "../categories/categories.entity";
 import { Brand } from "../brands/brands.entity";
@@ -7,7 +7,69 @@ import { ProductSubCategory } from "../products-sub-categories/products-sub-cate
 import { ProductVariations } from "../products-variations/products-variations.entity";
 import { CartItem } from "../cart-items/cart-item-entity";
 import { Media } from "../media/media.entity";
+import { AttributeValues } from "../attributes-values/attributes-values.entity";
+import { Attribute } from "../attributes/attribute.entity";
 
+export enum ProductScop {
+    WITH_CATEGORY = "with category",
+    WITH_MEDIA = "with media",
+    WITH_SUB_CATEGORIES = "with sub categories",
+    WITH_BRAND = "with brand",
+    WITH_VARIATION = "with variation"
+}
+
+@Scopes(() => ({
+    [ProductScop.WITH_MEDIA]: {
+        include: [{
+            model: Media,
+            attributes: {
+                exclude: ["createdAt", "updatedAt"]
+            }
+        }]
+    },
+
+    [ProductScop.WITH_CATEGORY]: {
+        include: [{
+            model: Category,
+        }]
+    },
+    [ProductScop.WITH_SUB_CATEGORIES]: {
+        include: [{
+            model: SubCategory,
+            through: { attributes: ["id"] }
+        }]
+    },
+    [ProductScop.WITH_BRAND]: {
+        include: [{
+            model: Brand,
+            attributes: ["id", "name"],
+        },]
+    },
+    [ProductScop.WITH_VARIATION]: {
+        include: [{
+            model: ProductVariations,
+            include: [
+                {
+                    model: Media,
+                    attributes: ["id", "url"],
+                    through: { attributes: ["id"] }
+                },
+                {
+                    model: AttributeValues,
+                    attributes: ["value", "id"],
+                    through: { attributes: ["id"] },
+                    include: [
+                        {
+                            model: Attribute,
+                            attributes: ["id", "name"],
+
+                        }
+                    ]
+                }
+            ]
+        }]
+    }
+}))
 @Table({
     indexes: [
         {

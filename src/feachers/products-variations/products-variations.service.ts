@@ -1,7 +1,7 @@
-import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
-import { CreateProductVariationDto } from './dto/create-product-variations.dto';
+import { UpdateProductVariationDto } from './dto/request/update-product-variations.dto';
+import { CreateProductVariationDto } from './dto/request/create-product-variations.dto';
 import { ConflictException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
-import { ProductVariations } from './products-variations.entity';
+import { ProductVariations, VariationScope } from './products-variations.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductsService } from '../products/services/products.service';
 import { Sequelize } from 'sequelize-typescript';
@@ -96,10 +96,10 @@ export class ProductVariationsService {
 
             if (!t) {
                 await transaction.commit();
-                return await this.findOneFullData({ id: variant["dataValues"].id })
+                return await this.findOneById(variant["dataValues"].id, Object.values(VariationScope))
             }
 
-            return variant;
+            return variant["dataValues"];
 
         } catch (error) {
             if (!t) await transaction.rollback()
@@ -109,86 +109,32 @@ export class ProductVariationsService {
 
     async findOneById(
         id: number,
-        t?: Transaction
+        scopes: string[] = []
     ): Promise<ProductVariations | null> {
-
-        const transaction = t || await this.sequelize.transaction();
 
         try {
 
-            const productVariant = await this.productVariationModel.findByPk(
-                id,
-
-                {
-                    include: [
-                        {
-                            model: Product,
-                            attributes: ["id", "price", "name"],
-                        },
-                        {
-                            model: Media,
-                            attributes: ["id", "storageKey"],
-                            through: { attributes: [] }
-                        }
-                    ],
-                    transaction
-                }
-            );
+            const productVariant = await this.productVariationModel.scope(scopes).findByPk(id);
 
             if (!productVariant) return null
 
-            if (!t) await transaction.commit();
 
             return productVariant["dataValues"];
 
         } catch (error) {
-            await transaction.rollback();
             throw error
         }
     }
 
-    async findOne(data: Partial<Omit<ProductVariations, "attributes">>): Promise<ProductVariations | null> {
+    async findOne(
+        data: Partial<Omit<ProductVariations, "attributes">>,
+        scopes: string[] = []
+    ): Promise<ProductVariations | null> {
         try {
 
-            const productVariant = await this.productVariationModel.findOne({
-                where: data,
-            });
+            const productVariant = await this.productVariationModel.scope(scopes).findOne({ where: data });
 
             if (!productVariant) return null;
-
-            return productVariant["dataValues"]
-        } catch (error) {
-            throw error
-        }
-    }
-
-
-    async findOneFullData(data: Partial<Omit<ProductVariations, "attributes">>): Promise<ProductVariations | null> {
-        try {
-
-            const productVariant = await this.productVariationModel.findOne({
-                where: data,
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["id", "url"],
-                        through: { attributes: ["id"] }
-                    },
-                    {
-                        model: AttributeValues,
-                        attributes: ["value", "id"],
-                        through: { attributes: ["id"] },
-                        include: [
-                            {
-                                model: Attribute,
-                                attributes: ["id", "name"],
-                            }
-                        ]
-                    }
-                ],
-            });
-
-            if (!productVariant) throw new NotFoundException()
 
             return productVariant["dataValues"]
         } catch (error) {
@@ -214,10 +160,7 @@ export class ProductVariationsService {
 
 
             if (!t) await transaction.commit()
-            return {
-                ...variant,
-                ...updateProductVariationDto
-            }
+            return await this.findOneById(id, Object.values(VariationScope))
         } catch (error) {
             if (!t) await transaction.rollback()
             throw error

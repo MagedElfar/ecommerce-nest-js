@@ -1,20 +1,16 @@
 import { MediaService } from 'src/feachers/media/media.service';
-import { UpdateProductDto } from '../dto/update-product.dto';
-import { CreateProductDto } from '../dto/create-product.dto';
+import { UpdateProductDto } from '../dto/request/update-product.dto';
+import { CreateProductDto } from '../dto/request/create-product.dto';
 import { ConflictException, HttpException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Product } from '../products.entity';
+import { Product, ProductScop } from '../products.entity';
 import { IProduct } from '../products.interface';
 import * as slugify from "slugify"
 import { Sequelize } from 'sequelize-typescript';
-import { Attribute } from '../../attributes/attribute.entity';
-import { Category } from '../../categories/categories.entity';
-import { Brand } from '../../brands/brands.entity';
 import { SubCategory } from '../../sub-categories/sub-categories.entity';
 import { ProductsSubCategoriesService } from '../../products-sub-categories/products-sub-categories.service';
 import { Includeable, Op, WhereOptions, where } from 'sequelize';
-import { ProductQueryDto } from '../dto/product-query.dto';
-import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
+import { ProductQueryDto } from '../dto/request/product-query.dto';
 import { AttributeValues } from '../../attributes-values/attributes-values.entity';
 import { ProductVariations } from '../../products-variations/products-variations.entity';
 import { ProductVariationsService } from '../../products-variations/products-variations.service';
@@ -27,6 +23,7 @@ export class ProductsService {
         private readonly productModel: typeof Product,
         @Inject(forwardRef(() => ProductVariationsService))
         private productVariationsService: ProductVariationsService,
+        @Inject(forwardRef(() => ProductsSubCategoriesService))
         private readonly productsSubCategoriesService: ProductsSubCategoriesService,
         private sequelize: Sequelize,
         private mediaService: MediaService
@@ -39,7 +36,9 @@ export class ProductsService {
 
         const where: WhereOptions<Product> = {}
 
-        const include: Includeable[] = []
+        const include: Includeable[] = [{
+            model: Media
+        }]
 
 
         //filler by name if exist in query
@@ -83,12 +82,14 @@ export class ProductsService {
                 model: ProductVariations,
                 attributes: [],
                 where: {},
-                include: [{
-                    model: AttributeValues,
-                    where: { id: { [Op.in]: filterOptions.attributes } },
-                    attributes: [],
-                    through: { where: { attrId: { [Op.in]: filterOptions.attributes } } }
-                }],
+                include: [
+                    {
+                        model: AttributeValues,
+                        where: { id: { [Op.in]: filterOptions.attributes } },
+                        attributes: [],
+                        through: { where: { attrId: { [Op.in]: filterOptions.attributes } } }
+                    }
+                ],
             });
         }
         return {
@@ -113,8 +114,6 @@ export class ProductsService {
 
             });
 
-            // const products = result.map(item => item["dataValues"])
-
             return result
         } catch (error) {
             throw error
@@ -128,7 +127,11 @@ export class ProductsService {
         const transaction = await this.sequelize.transaction()
 
         try {
-            const { variations: ProVariations, subCategories = [], ...productDto } = createProductDto;
+            const {
+                variations: ProVariations,
+                subCategories = [],
+                ...productDto
+            } = createProductDto;
 
             //1-check if product exist
             const isProduct = await this.findOne({ name: createProductDto.name })
@@ -141,7 +144,7 @@ export class ProductsService {
                 trim: true
             })
 
-            //3-create new product in data base
+            //3-create new product in database
             const product = await this.productModel.create<Product>(
                 {
                     ...productDto,
@@ -156,7 +159,7 @@ export class ProductsService {
             //4-create new product variations if exist
             if (ProVariations && ProVariations.length > 0) {
 
-                const variations = await Promise.all(ProVariations.map(async variant => {
+                await Promise.all(ProVariations.map(async variant => {
                     return await this.productVariationsService.create(
                         {
                             ...variant,
@@ -185,13 +188,39 @@ export class ProductsService {
 
             await transaction.commit();
 
-            return this.findOneFullData({ id: product["dataValues"].id })
+            return this.fullData(product["dataValues"].id)
         } catch (error) {
             console.log(error)
             await transaction.rollback()
 
             if (error instanceof HttpException) throw error
 
+            throw error
+        }
+    }
+
+    async findOneById(id: number, scopes: string[] = []): Promise<IProduct | null> {
+        try {
+
+            const product = await this.productModel.scope(scopes).findByPk(id)
+
+            if (!product) throw new NotFoundException()
+
+            return product["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOne(data: Partial<Omit<Product, "variations" | "subCategories">>, scopes: string[] = []): Promise<IProduct | null> {
+        try {
+
+            const product = await this.productModel.scope(scopes).findOne({ where: data })
+
+            if (!product) return null
+
+            return product["dataValues"]
+        } catch (error) {
             throw error
         }
     }
@@ -213,10 +242,7 @@ export class ProductsService {
 
             await this.productModel.update(updateProductDto, { where: { id } })
 
-            return {
-                ...product,
-                ...updateProductDto
-            }
+            return await this.fullData(id)
 
         } catch (error) {
             throw error
@@ -227,7 +253,9 @@ export class ProductsService {
         const transaction = await this.sequelize.transaction()
         try {
 
-            const product = await this.findOneById(id);
+            const product = await this.findOneById(id, [
+                ProductScop.WITH_MEDIA, ProductScop.WITH_VARIATION
+            ]);
 
             if (!product) throw new NotFoundException("product not found");
 
@@ -263,124 +291,51 @@ export class ProductsService {
         }
     }
 
-    async findOneFullData(data: Partial<Omit<Product, "variations" | "subCategories">>): Promise<IProduct | null> {
+    async fullData(id: number) {
         try {
-            const product = await this.productModel.findOne({
-                where: data,
-                include: [
-                    {
-                        model: Media,
-                        attributes: ["url", "id"]
-                    },
-                    {
-                        model: SubCategory,
-                        attributes: ["name", "id"],
-                        through: { attributes: [] },
-                    },
-                    {
-                        model: Category,
-                        attributes: ["id", "name"],
-                    },
-                    {
-                        model: Brand,
-                        attributes: ["id", "name"],
-                    },
-                    {
-                        model: ProductVariations,
-                        include: [
-                            {
-                                model: Media,
-                                attributes: ["id", "url"],
-                                through: { attributes: [] }
-                            },
-                            {
-                                model: AttributeValues,
-                                attributes: ["value", "id"],
-                                through: { attributes: [] },
-                                include: [
-                                    {
-                                        model: Attribute,
-                                        attributes: ["id", "name"],
+            const product = await this.findOneById(id, Object.values(ProductScop));
 
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+            if (!product) throw new NotFoundException("Product not exist")
 
-            })
+            const attributes = this.mappedProductAttributes(product)
 
-            if (!product) throw new NotFoundException();
-
-            const attributes = product["variations"]
-                .flatMap((variation: any) => variation['attributes'])
-                .filter((attribute: any) => attribute['value'])
-                .reduce((acc: Record<string, string[]>, attribute: any) => {
-                    const attributeName = attribute['attribute']['name'];
-                    const attributeValue = attribute['value'];
-
-                    if (!acc[attributeName]) {
-                        acc[attributeName] = [];
-                    }
-
-                    if (!acc[attributeName].includes(attributeValue)) {
-                        acc[attributeName].push(attributeValue);
-                    }
-
-                    return acc;
-                }, {});
-
-            return { ...product["dataValues"], attributes }
+            return {
+                ...product,
+                attributes
+            }
         } catch (error) {
             throw error
         }
     }
 
-    async findOneById(id: number): Promise<IProduct | null> {
-        try {
+    private mappedProductAttributes(product: IProduct) {
 
-            const product = await this.productModel.findByPk(
-                id,
-                {
-                    include: [
-                        {
-                            model: Media,
-                            attributes: ["id", "storageKey"]
-                        },
-                        {
-                            model: ProductVariations,
-                            attributes: ["id"],
-                            include: [
-                                {
-                                    model: Media,
-                                    attributes: ["id", "url"],
-                                    through: { attributes: [] }
-                                },
-                            ]
-                        }
-                    ]
+        return product["variations"]
+            .flatMap((variation: any) => variation['attributes'])
+            .filter((attribute: any) => attribute['value']).reduce((acc: any[], attr: any) => {
+
+                const name = attr.attribute.name
+                const index = acc.findIndex((item) => item.name === name)
+
+                if (index === -1) {
+                    acc.push({
+                        name,
+                        values: [{
+                            id: attr.id,
+                            value: attr.value,
+                            // categoryAttribute: attr.CategoriesAttribute
+                        }],
+                    })
+                } else {
+                    acc[index].values.push({
+                        id: attr.id,
+                        value: attr.value,
+                        // categoryAttribute: attr.CategoriesAttribute
+                    })
                 }
-            )
 
-            if (!product) throw new NotFoundException()
+                return acc;
+            }, []);
 
-            return product["dataValues"]
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async findOne(data: Partial<Omit<Product, "variations" | "subCategories">>): Promise<IProduct | null> {
-        try {
-
-            const product = await this.productModel.findOne({ where: data })
-
-            if (!product) return null
-
-            return product["dataValues"]
-        } catch (error) {
-            throw error
-        }
     }
 }

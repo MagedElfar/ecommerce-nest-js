@@ -1,9 +1,10 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CategoryImageService } from '../services/categories-images.service';
-import { UploadImageDto } from './../dto/upload-image.dto';
+import { UploadImageDto } from '../dto/request/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("Category Image")
 @Controller('categories-images')
@@ -16,6 +17,24 @@ export class CategoryImageController {
             storage: memoryStorage(),
         }),
     )
+    @ApiOperation({ summary: "upload category image" })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ["file", "categoryId"],
+            properties: {
+                categoryId: { type: 'integer', description: "category id" },
+                file: {
+                    type: 'file',
+                    description: "file to upload"
+                },
+            },
+        },
+    })
+    @ApiCreatedResponse({
+        type: MediaDto
+    })
     async upload(
         @UploadedFile() file: Express.Multer.File,
         @Body() uploadCategoryImageDto: UploadImageDto
@@ -26,7 +45,7 @@ export class CategoryImageController {
                 file
             })
 
-            return { image }
+            return image
         } catch (error) {
             throw error
         }

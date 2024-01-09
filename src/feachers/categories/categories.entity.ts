@@ -6,6 +6,7 @@ import { AttributeValues } from '../attributes-values/attributes-values.entity';
 import { CategoriesAttribute } from '../categories-attributes/categories-attributes.entity';
 import { Media } from '../media/media.entity';
 import { Attribute } from '../attributes/attribute.entity';
+import { CategoryBrand } from '../categories-brands/categories-brand.entity';
 
 export enum CategoryScope {
     WITH_EMPTY_PRODUCT = "with empty product",
@@ -53,6 +54,7 @@ export enum CategoryScope {
         include: [{
             model: Brand,
             attributes: ["id", "name", "slug"],
+            through: { attributes: ["id"] },
             include: [{
                 model: Media,
                 attributes: ["id", "url"]
@@ -67,7 +69,7 @@ export enum CategoryScope {
                 model: AttributeValues,
                 attributes: ["id", "value"],
                 as: 'attributes',
-                through: { attributes: [] },
+                through: { attributes: ["id"] },
                 include: [{ model: Attribute, attributes: ["id", "name"] }]
             }
         ]
@@ -107,11 +109,11 @@ export class Category extends Model<Category> {
     @HasMany(() => Product)
     products: Product[]
 
-    @HasMany(() => Brand)
-    brands: Brand[]
-
     @BelongsToMany(() => AttributeValues, () => CategoriesAttribute)
     attributes: AttributeValues[];
+
+    @BelongsToMany(() => Brand, () => CategoryBrand)
+    brands: Brand[];
 
     @HasMany(() => CategoriesAttribute)
     categoriesAttribute: CategoriesAttribute[]

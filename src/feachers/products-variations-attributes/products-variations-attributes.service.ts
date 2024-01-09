@@ -2,7 +2,7 @@ import { BadRequestException, Inject, Injectable, InternalServerErrorException, 
 import { ProductVariationAttribute } from './products-variations-attributes.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IProductVariationAttributes } from './products-variations-attributes.interface';
-import { CreateProductAttributesDto } from './dto/create-product_variation_attributes.dto';
+import { CreateProductAttributesDto } from './dto/request/create-product_variation_attributes.dto';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { AttributeValuesService } from '../attributes-values/attributes-values.service';
@@ -63,7 +63,6 @@ export class ProductVariationAttributesService {
             if (!t) {
                 const variant = await this.productVariationsService.findOneById(
                     productVariationId,
-                    transaction
                 );
                 if (!variant) throw new NotFoundException("variant not found");
             }

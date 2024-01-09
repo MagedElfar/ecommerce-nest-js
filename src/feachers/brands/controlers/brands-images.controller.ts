@@ -46,7 +46,7 @@ export class BrandsImageController {
                 file
             })
 
-            return { image }
+            return image
         } catch (error) {
             throw error
         }

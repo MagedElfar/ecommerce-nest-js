@@ -2,16 +2,20 @@ import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { ProductsSubCategoriesService } from './products-sub-categories.service';
 import { Body, Controller, Delete, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { CreateProductSubCategoryDto } from './dto/request/create-product-sub-category.dto';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ProductSubCategoryDto } from './dto/response/productSubCategory.dto';
 
 @ApiTags("Product Sub Category")
+@ApiBearerAuth()
 @Controller('products-sub-categories')
 export class ProductsSubCategoriesController {
     constructor(private readonly productsSubCategoriesService: ProductsSubCategoriesService) { }
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "assign subcategory to product" })
+    @ApiCreatedResponse({ type: ProductSubCategoryDto })
     async create(@Body() createProductSubCategoryDto: CreateProductSubCategoryDto) {
         try {
 
@@ -19,7 +23,7 @@ export class ProductsSubCategoriesController {
                 this.productsSubCategoriesService
                     .create(createProductSubCategoryDto)
 
-            return { productSubCategory }
+            return productSubCategory
         } catch (error) {
             throw error
         }
@@ -27,6 +31,8 @@ export class ProductsSubCategoriesController {
 
     @Delete(":id")
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "unassign subcategory to product" })
+    @ApiParam({ name: "id", description: "assign id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
 

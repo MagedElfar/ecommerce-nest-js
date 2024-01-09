@@ -1,7 +1,8 @@
-import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo, Scopes } from 'sequelize-typescript';
+import { Category } from 'src/feachers/categories/categories.entity';
+import { Table, Column, Model, DataType, HasMany, ForeignKey, BelongsTo, Scopes, BelongsToMany } from 'sequelize-typescript';
 import { Product } from '../products/products.entity';
-import { Category } from '../categories/categories.entity';
 import { Media } from '../media/media.entity';
+import { CategoryBrand } from '../categories-brands/categories-brand.entity';
 
 export enum BrandScope {
     WITH_IMAGE = "with imaged"
@@ -38,13 +39,6 @@ export class Brand extends Model<Brand> {
     })
     slug: string;
 
-    @ForeignKey(() => Category)
-    @Column({ allowNull: true })
-    categoryId: number
-
-    @BelongsTo(() => Category, { onDelete: "SET NULL" })
-    category: Category
-
     @HasMany(() => Product)
     products: Product[]
 
@@ -54,4 +48,7 @@ export class Brand extends Model<Brand> {
 
     @BelongsTo(() => Media, { onDelete: "SET NULL" })
     image: Media
+
+    @BelongsToMany(() => Category, () => CategoryBrand)
+    categories: Category[];
 }

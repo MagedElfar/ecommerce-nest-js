@@ -15,7 +15,6 @@ import { FindAttributesDto } from './dto/response/findAttributes.dto';
 
 @ApiTags("Attributes")
 @Controller('attributes')
-@ApiBearerAuth()
 export class AttributesController {
 
     constructor(private readonly attributesService: AttributesService) { }
@@ -35,6 +34,7 @@ export class AttributesController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiBearerAuth()
     @ApiOperation({ summary: "create new attribute" })
     @ApiCreatedResponse({ type: CreateAttributeResponseDto })
     async create(@Body() createAttributeDto: CreateAttributeDto) {
@@ -49,6 +49,7 @@ export class AttributesController {
 
     @Put(":id")
     @Roles([UserRole.ADMIN])
+    @ApiBearerAuth()
     @ApiParam({ name: "id", description: "attribute id" })
     @ApiOperation({ summary: "update attribute" })
     @ApiOkResponse({ type: UpdateAttributeResponseDto })
@@ -65,6 +66,7 @@ export class AttributesController {
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
     @Roles([UserRole.ADMIN])
+    @ApiBearerAuth()
     @ApiParam({ name: "id", description: "attribute id" })
     @ApiOperation({ summary: "delete attribute" })
     async delete(@Param("id", ParseIntPipe) id: number) {

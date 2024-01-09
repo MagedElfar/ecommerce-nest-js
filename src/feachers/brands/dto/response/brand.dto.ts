@@ -35,5 +35,4 @@ export class BrandDto extends BaseDto {
         uniqueItems: true,
     })
     image: MediaDto
-
 }

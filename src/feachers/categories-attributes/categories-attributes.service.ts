@@ -1,3 +1,4 @@
+import { CategoriesService } from './../categories/services/categories.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
@@ -6,14 +7,16 @@ import { Product } from '../products/products.entity';
 import { SubCategory } from '../sub-categories/sub-categories.entity';
 import { CategoriesAttribute } from './categories-attributes.entity';
 import { ICategoryAttribute } from './categories-attributes.interface';
-import { CreateCategoryAttributesDto } from './dto/create-category_attributes.dto';
+import { CreateCategoryAttributesDto } from './dto/request/create-category_attributes.dto';
+import { AttributeValuesService } from '../attributes-values/attributes-values.service';
 
 @Injectable()
 export class CategoriesAttributeService {
     constructor(
         @InjectModel(CategoriesAttribute)
         private readonly CategoryAttributeModelModel: typeof CategoriesAttribute,
-        private sequelize: Sequelize,
+        private readonly categoriesService: CategoriesService,
+        private readonly attributeValuesService: AttributeValuesService,
     ) { }
 
 
@@ -47,6 +50,16 @@ export class CategoriesAttributeService {
         try {
 
             const { attributeId, categoryId } = createCategoryAttributesDto;
+
+            const category = await this.categoriesService.findOneById(categoryId)
+
+            if (!category)
+                throw new NotFoundException("category not exist")
+
+            const value = await this.attributeValuesService.findOneById(attributeId)
+
+            if (!value)
+                throw new NotFoundException("attribute value not exist")
 
             //check if attribute already assign to that variant
             let categoryAttribute = await this.findOne(

@@ -41,7 +41,7 @@ export class SubCategoriesController {
         try {
             const subCategory = await this.subCategoriesService.create(createCategoryDto);
 
-            return { subCategory }
+            return subCategory
         } catch (error) {
             throw error
         }
@@ -56,7 +56,7 @@ export class SubCategoriesController {
         try {
             const subCategory = await this.subCategoriesService.update(id, updateCategoryDto);
 
-            return { subCategory }
+            return subCategory
         } catch (error) {
             throw error
         }
@@ -73,7 +73,7 @@ export class SubCategoriesController {
 
             if (!subCategory) throw new NotFoundException()
 
-            return { subCategory }
+            return subCategory
         } catch (error) {
             throw error
         }

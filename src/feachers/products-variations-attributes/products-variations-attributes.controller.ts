@@ -2,8 +2,9 @@ import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Po
 import { ProductVariationAttributesService } from './products-variations-attributes.service';
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
-import { CreateProductAttributesDto } from './dto/create-product_variation_attributes.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { CreateProductAttributesDto } from './dto/request/create-product_variation_attributes.dto';
+import { ApiCreatedResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ProductAttributeDto } from './dto/response/productAttribute.dto';
 
 @ApiTags("Products Attributes")
 @Controller('products-attributes')
@@ -13,12 +14,14 @@ export class ProductVariationAttributesController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "assign attribute value to product variation" })
+    @ApiCreatedResponse({ type: ProductAttributeDto })
     async create(@Body() createProductAttributesDto: CreateProductAttributesDto) {
         try {
 
             const productAttribute = await this.productVariationAttributesService.create(createProductAttributesDto)
 
-            return { productAttribute }
+            return productAttribute
         } catch (error) {
             throw error
         }
@@ -27,6 +30,8 @@ export class ProductVariationAttributesController {
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "unassign attribute value from product variation" })
+    @ApiParam({ name: "id", description: "assign id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
 

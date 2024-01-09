@@ -1,11 +1,11 @@
-import { CreateCategoryDto } from '../dto/create-category.dto';
+import { CreateCategoryDto } from '../dto/request/create-category.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Category, CategoryScope } from '../categories.entity';
 import * as slugify from "slugify"
 import { ICategory } from '../categories.interface';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
-import { CategoryQueryDto } from '../dto/category-query.dto';
+import { UpdateCategoryDto } from '../dto/request/update-category.dto';
+import { CategoryQueryDto } from '../dto/request/category-query.dto';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { MediaService } from 'src/feachers/media/media.service';
@@ -120,7 +120,9 @@ export class CategoriesService {
                 CategoryScope.WITH_ATTRIBUTES
             ]);
 
-            return category
+            const attributes = this.mappedCategoryAttributes(category)
+
+            return { ...category, attributes }
         } catch (error) {
             throw error
         }
@@ -154,22 +156,25 @@ export class CategoriesService {
     }
 
     mappedCategoryAttributes(category: ICategory) {
-        return category.attributes.reduce((acc: any[], attr) => {
+        return category.attributes.reduce((acc: any[], attr: any) => {
 
             const name = attr.attribute.name
             const index = acc.findIndex((item) => item.name === name)
+
             if (index === -1) {
                 acc.push({
                     name,
                     values: [{
                         id: attr.id,
                         value: attr.value,
+                        categoryAttribute: attr.CategoriesAttribute
                     }],
                 })
             } else {
                 acc[index].values.push({
                     id: attr.id,
                     value: attr.value,
+                    categoryAttribute: attr.CategoriesAttribute
                 })
             }
 

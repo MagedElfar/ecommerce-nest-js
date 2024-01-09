@@ -41,6 +41,7 @@ import { StripeModule } from './utility/stripe/stripe.module';
 import { CheckoutModule } from './feachers/checkout/checkout.module';
 import { RawBodyMiddleware } from './core/middleware/raw-body.middleware';
 import { StockModule } from './feachers/stock/stock.module';
+import { CategoriesBrandsModule } from './feachers/categories-brands/categories-brands.module';
 
 @Module({
   imports: [
@@ -104,6 +105,7 @@ import { StockModule } from './feachers/stock/stock.module';
     StripeModule,
     CheckoutModule,
     StockModule,
+    CategoriesBrandsModule,
   ],
   controllers: [AppController],
   providers: [

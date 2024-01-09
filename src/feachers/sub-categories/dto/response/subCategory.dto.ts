@@ -33,4 +33,9 @@ export class SubCategoryDto extends BaseDto {
     })
     image: MediaDto
 
+    @ApiProperty({
+        description: "number of products belong to the sub category",
+        example: 1
+    })
+    totalProducts: Number;
 }

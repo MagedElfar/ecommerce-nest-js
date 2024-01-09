@@ -4,7 +4,8 @@ import { memoryStorage } from 'multer';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { ProductsVariationImageService } from './products-variations-images.service';
 import { Public } from 'src/core/decorators/public.decorator';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { MediaDto } from '../media/dto/media.dto';
 
 @ApiTags("Products Variations Images")
 @Controller('variations-images')
@@ -17,6 +18,26 @@ export class ProductsVariationsImageController {
             storage: memoryStorage(),
         }),
     )
+    @ApiOperation({ summary: "upload category image" })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ["files", "variationId"],
+            properties: {
+                variationId: { type: 'integer', description: "variation id" },
+                file: {
+                    type: 'files',
+                    description: "file to upload",
+                    maxItems: 10
+                },
+            },
+        },
+    })
+    @ApiCreatedResponse({
+        type: MediaDto,
+        isArray: true
+    })
     async upload(
         @UploadedFiles() files: Express.Multer.File[],
         @Body() uploadImageDto: UploadImageDto
@@ -35,7 +56,7 @@ export class ProductsVariationsImageController {
                 })
             );
 
-            return { images }
+            return images
         } catch (error) {
             throw error
         }
