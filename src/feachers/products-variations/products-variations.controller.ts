@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { CreateProductVariationDto } from './dto/request/create-product-variations.dto';
@@ -8,12 +8,35 @@ import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { VariationScope } from './products-variations.entity';
 import { VariationDto } from './dto/response/variation.dto';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { VariationQueryDto } from './dto/request/product-variation-query.dto';
 
 @ApiTags("Product Variations")
 @Controller('products-variations')
 export class ProductVariationsController {
 
     constructor(private productVariationsService: ProductVariationsService) { }
+
+    @Get()
+    @Public()
+    @ApiOperation({ summary: "Find all variations" })
+    @ApiFindAllResponse(VariationDto)
+    async findAll(
+        @Query() variationQueryDto: VariationQueryDto
+    ) {
+        try {
+
+            const productVariation = await this.productVariationsService.findAll(variationQueryDto, [
+                VariationScope.WITH_MEDIA,
+                VariationScope.WITH_PRODUCT
+            ])
+
+
+            return productVariation
+        } catch (error) {
+            throw error
+        }
+    }
 
     @Post()
     @Roles([UserRole.ADMIN])
@@ -65,7 +88,11 @@ export class ProductVariationsController {
     ) {
         try {
 
-            const productVariation = await this.productVariationsService.findOneById(id, Object.values(VariationScope))
+            const productVariation = await this.productVariationsService.findOneById(id, [
+                VariationScope.WITH_PRODUCT,
+                VariationScope.WITH_MEDIA,
+                VariationScope.WITH_ATTRIBUTES
+            ])
 
 
             return productVariation

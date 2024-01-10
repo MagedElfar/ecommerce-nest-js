@@ -1,21 +1,25 @@
 import { Injectable } from "@nestjs/common";
 import { IOrderItem } from "../orders-items/order-item.interface";
 import { ProductsService } from "../products/services/products.service";
+import { IProductVariation } from "../products-variations/products-variations.interface";
 
 @Injectable()
 export class OrdersHelper {
 
-    constructor(private readonly productsService: ProductsService) { }
 
-    async calculateOrderTotal(items: IOrderItem[]): Promise<number> {
+    calculateOrderTotal(items: IOrderItem[], variants: IProductVariation[]): number {
         let sum = 0
 
-        await Promise.all(items.map(async item => {
-            const product = await this.productsService.findOne({ id: item.productId });
-            sum += parseFloat(`${item.quantity * product.price}`)
+        variants.forEach(async variant => {
+            const item = items.find(item => item.variantId === variant.id)
+
+            const price = variant.price || variant.product.price
+            const quantity = item.quantity
+
+            sum += parseFloat(`${quantity * price}`)
 
             sum = parseFloat(sum.toFixed(2))
-        }))
+        })
 
         return sum
 

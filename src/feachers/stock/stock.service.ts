@@ -3,6 +3,7 @@ import { ProductVariationsService } from '../products-variations/products-variat
 import { Sequelize } from 'sequelize-typescript';
 import { IOrderItem } from '../orders-items/order-item.interface';
 import { Transaction } from 'sequelize';
+import { IProductVariation } from '../products-variations/products-variations.interface';
 
 @Injectable()
 export class StockService {
@@ -11,8 +12,23 @@ export class StockService {
         private readonly sequelize: Sequelize,
     ) { }
 
+    checkSyncQuantity(items: IOrderItem[], variants: IProductVariation[]) {
+        variants.forEach(variant => {
+            const item = items.find(item => item.variantId === variant.id)
+
+            if (item.quantity > variant.quantity)
+                throw new BadRequestException(
+                    `quantity is not available for product with sku "${variant.sku}"`
+                )
+
+            return
+        })
+    }
+
     async checkQuantity(items: IOrderItem[]): Promise<void> {
         try {
+
+
             await Promise.all(items.map(async item => {
                 const variant = await this.productVariationsService.findOneById(item.variantId)
 
@@ -20,7 +36,7 @@ export class StockService {
 
                 if (item.quantity > variant.quantity)
                     throw new BadRequestException(
-                        `quantity is not available for product "${item.product.name}"`
+                        `quantity is not available for product with sku "${variant.sku}"`
                     )
 
                 return
@@ -32,30 +48,50 @@ export class StockService {
         }
     }
 
-    async removeFromStock(variantId: number, quantity: number, transaction: Transaction): Promise<void> {
+    async removeFromStock(variantId: number, quantity: number, t?: Transaction): Promise<void> {
+        const transaction = t || await this.sequelize.transaction()
         try {
             const variant = await this.productVariationsService.findOneById(variantId)
 
             if (!variant) throw new NotFoundException("variant not found")
 
-            await this.productVariationsService.update(variantId, { quantity: variant.quantity - quantity })
+            await this.productVariationsService.update(
+                variantId,
+                { quantity: variant.quantity - quantity },
+                transaction
+            )
+
+            if (!t) await transaction.commit()
 
             return
         } catch (error) {
+
+            if (!t) await transaction.rollback()
+
             throw error
         }
     }
 
-    async addToStock(variantId: number, quantity: number, transaction: Transaction): Promise<void> {
+    async addToStock(variantId: number, quantity: number, t?: Transaction): Promise<void> {
+        const transaction = t || await this.sequelize.transaction()
+
         try {
             const variant = await this.productVariationsService.findOneById(variantId)
 
             if (!variant) throw new NotFoundException("variant not found")
 
-            await this.productVariationsService.update(variantId, { quantity: variant.quantity + quantity })
+            await this.productVariationsService.update(
+                variantId,
+                { quantity: variant.quantity + quantity },
+                transaction
+            )
+
+            if (!t) await transaction.commit()
 
             return
         } catch (error) {
+            if (!t) await transaction.rollback()
+
             throw error
         }
     }

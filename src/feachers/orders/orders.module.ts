@@ -26,7 +26,8 @@ import { ProductsModule } from '../products/products.module';
     OrdersItemsModule,
     CartItemsModule,
     OrdersCancelReasonsModule,
-    StockModule
+    StockModule,
+    ProductVariationsModule
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersHelper],

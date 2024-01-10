@@ -24,13 +24,17 @@ export class StripeService {
         try {
 
             const line_items = order.items.map(item => {
+
+                const variant = item.variant
+                const price = variant.price || variant.product.price
+                const name = variant.name || variant.product.name
                 return {
                     quantity: item.quantity,
                     price_data: {
                         currency: "EGP",
-                        unit_amount: item.product.price * 100,
+                        unit_amount: price * 100,
                         product_data: {
-                            name: item.product.name
+                            name
                         }
                     }
                 }
@@ -92,9 +96,10 @@ export class StripeService {
     private async checkoutSessionCompletedEvent(event: Stripe.CheckoutSessionCompletedEvent) {
         try {
             const orderNumber = event.data.object.client_reference_id
-            const order = await this.ordersService.findOneByOrderNumber(orderNumber);
+            const order = await this.ordersService.findOne({
+                orderNumber
+            });
 
-            console.log(event.data.object)
             if (event.data.object.payment_status === "paid" && order) {
                 await this.ordersService.update(order.id, {
                     status: OrderStatus.CONFIRMED

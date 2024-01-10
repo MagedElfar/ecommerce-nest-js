@@ -3,12 +3,8 @@ import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef }
 import { InjectModel } from '@nestjs/sequelize';
 import { Cart } from './carts.entity';
 import { CreateCartDto } from './dto/create-cart-dto';
-import { ICart } from './carts.interface';
-import { CartItem } from '../cart-items/cart-item-entity';
-import { ProductVariations } from '../products-variations/products-variations.entity';
-import { Product } from '../products/products.entity';
+import { ICart } from './carts.interface'
 import { CartItemsService } from '../cart-items/cart-items.service';
-import { Media } from '../media/media.entity';
 
 @Injectable()
 export class CartsService {
@@ -30,31 +26,10 @@ export class CartsService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICart, "user" | "items">>): Promise<ICart | null> {
+    async findOne(data: Partial<Omit<ICart, "user" | "items">>, scopes: string[] = []): Promise<ICart | null> {
         try {
 
-            const cart = await this.cartModel.findOne(
-                {
-                    where: data,
-                    include: [{
-                        model: CartItem,
-                        include: [
-                            {
-                                model: ProductVariations,
-                                attributes: ["id", "sku", "quantity", "name"],
-                            },
-                            {
-                                model: Product,
-                                attributes: ["id", "price", "name"],
-                                include: [{
-                                    model: Media,
-                                    attributes: ["id", "url"]
-                                }]
-                            }
-                        ]
-                    }]
-                }
-            )
+            const cart = await this.cartModel.scope(scopes).findOne({ where: data })
 
             if (!cart) return null
 
@@ -64,10 +39,10 @@ export class CartsService {
         }
     }
 
-    async findOneById(id: number): Promise<ICart> {
+    async findOneById(id: number, scopes: string[] = []): Promise<ICart> {
         try {
 
-            const cart = await this.cartModel.findByPk(id)
+            const cart = await this.cartModel.scope(scopes).findByPk(id)
 
             return cart["dataValues"]
         } catch (error) {

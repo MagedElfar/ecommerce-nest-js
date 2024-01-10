@@ -18,10 +18,6 @@ export interface ICartItem extends IModel {
 
     cart?: ICart;
 
-    productId?: number
-
-    product?: IProduct;
-
     variantId?: number
 
     variant?: IProductVariation;

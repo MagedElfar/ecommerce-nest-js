@@ -3,21 +3,26 @@ import { PaymentsMethodsService } from './payments-methods.service';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { PaymentMethodDto } from './dto/paymentMethod.dto';
 
 @ApiTags("Payment Method")
+@ApiBearerAuth()
 @Controller('payments-methods')
 export class PaymentsMethodsController {
 
     constructor(private readonly paymentsMethodsService: PaymentsMethodsService) { }
 
     @Get()
+    @ApiOperation({ summary: "Find all payment methods" })
+    @ApiFindAllResponse(PaymentMethodDto)
     async get() {
         try {
 
             const methods = await this.paymentsMethodsService.findAll()
 
-            return { methods }
+            return methods
         } catch (error) {
             throw error
         }
@@ -25,6 +30,8 @@ export class PaymentsMethodsController {
 
     @Post()
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "create payment method" })
+    @ApiCreatedResponse({ type: PaymentMethodDto })
     async create(@Body() createPaymentMethodDto: CreatePaymentMethodDto) {
         try {
 

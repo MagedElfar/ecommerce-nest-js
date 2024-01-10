@@ -137,7 +137,4 @@ export class Product extends Model<Product> {
         onDelete: "CASCADE"
     })
     subCategories?: SubCategory[];
-
-    @HasMany(() => CartItem)
-    items: CartItem[]
 } 

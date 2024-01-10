@@ -1,17 +1,15 @@
-import { UpdateItemDto } from './dto/update-item.dto';
-import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
-import { CartItem } from './cart-item-entity';
+import { UpdateItemDto } from './dto/request/update-item.dto';
+import { ConflictException, ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { CartItem, CartItemScope } from './cart-item-entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductVariationsService } from '../products-variations/products-variations.service';
 import { CartsService } from '../carts/carts.service';
-import { CreateItemDto } from './dto/create-item-dto';
+import { CreateItemDto } from './dto/request/create-item-dto';
 import { ICartItem } from './cart-items-interface';
-import { ProductVariations } from '../products-variations/products-variations.entity';
-import { Product } from '../products/products.entity';
-import { Cart } from '../carts/carts.entity';
-import { Media } from '../media/media.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
+import { VariationScope } from '../products-variations/products-variations.entity';
+import { IProductVariation } from '../products-variations/products-variations.interface';
 
 @Injectable()
 export class CartItemsService {
@@ -24,6 +22,14 @@ export class CartItemsService {
         private readonly sequelize: Sequelize,
     ) { }
 
+    private calculateTotal(variant: IProductVariation, quantity: number) {
+        const product = variant.product
+
+        const price = variant.price || product.price
+
+        return quantity * price
+    }
+
     async create(createItemDto: CreateItemDto): Promise<ICartItem> {
         try {
             const { userId, ...itemDto } = createItemDto
@@ -32,36 +38,45 @@ export class CartItemsService {
             //check if user has cart and create new one if doesn't have 
             if (!cart) cart = await this.cartServices.create({ userId });
 
-            const variant = await this.variationServices.findOneById(createItemDto.variantId);
+            const variant = await this.variationServices.findOneById(createItemDto.variantId, [
+                VariationScope.WITH_MEDIA,
+                VariationScope.WITH_PRODUCT_MAIN_INFO
+            ]);
 
             if (!variant) throw new NotFoundException("product not found")
 
-            const total = createItemDto.quantity * variant.product.price;
+            //check if cart has item
+            const cartItem = await this.findOne({
+                cartId: cart.id,
+                variantId: createItemDto.variantId
+            })
+
+            if (cartItem) throw new ConflictException("item already exist you can delete or update it")
+
+            const total = this.calculateTotal(variant, createItemDto.quantity);
 
             const item = await this.cartItemModel.create(
                 {
                     ...itemDto,
                     cartId: cart.id,
-                    productId: variant.product.id,
                     total
-                },
-                {
-                    include: [
-                        {
-                            model: ProductVariations,
-                            attributes: ["id", "name"],
-                        },
-                        {
-                            model: Product,
-                            attributes: ["id", "price", "name"],
-                            include: [{
-                                model: Media,
-                                attributes: ["id", "url"]
-                            }]
-                        }
-                    ]
                 }
             )
+
+            return await this.findOneById(item["dataValues"].id, [
+                CartItemScope.WITH_PRODUCT
+            ])
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOneById(id: number, scopes: string[] = []): Promise<ICartItem> {
+        try {
+
+            const item = await this.cartItemModel.scope(scopes).findByPk(id)
+
+            if (!item) return null;
 
             return item["dataValues"]
         } catch (error) {
@@ -69,24 +84,10 @@ export class CartItemsService {
         }
     }
 
-    async findOneById(id: number): Promise<ICartItem> {
+    async findOne(data: Partial<Omit<ICartItem, "cart" | "variant">>, scopes: string[] = []): Promise<ICartItem> {
         try {
 
-            const item = await this.cartItemModel.findByPk(
-                id,
-                {
-                    include: [
-                        {
-                            model: Cart,
-                            attributes: ["id", "userId"]
-                        },
-                        {
-                            model: Product,
-                            attributes: ["price"]
-                        }
-                    ]
-                }
-            )
+            const item = await this.cartItemModel.scope(scopes).findOne({ where: data })
 
             if (!item) return null;
 
@@ -101,21 +102,20 @@ export class CartItemsService {
 
             const { quantity, userId } = updateItemDto
 
-            const item = await this.findOneById(id)
+            const item = await this.findOneById(id, [
+                CartItemScope.WITH_PRODUCT,
+                CartItemScope.WITH_CART
+            ])
 
             if (!item) throw new NotFoundException();
 
             if (item.cart.userId !== userId) throw new ForbiddenException();
 
-            const total = updateItemDto.quantity * item.product.price;
+            const total = this.calculateTotal(item.variant, quantity)
 
             await this.cartItemModel.update({ quantity, total }, { where: { id } });
 
-            return {
-                ...item,
-                quantity,
-                total
-            }
+            return await this.findOneById(id)
         } catch (error) {
             throw error
         }
@@ -125,14 +125,14 @@ export class CartItemsService {
         try {
 
 
-            const item = await this.findOneById(id)
+            const item = await this.findOneById(id, [CartItemScope.WITH_CART])
 
             if (!item) throw new NotFoundException();
 
             if (item.cart.userId !== userId) throw new ForbiddenException();
 
 
-            const isDeleted = await this.cartItemModel.destroy({ where: { id } });
+            await this.cartItemModel.destroy({ where: { id } });
 
             return
         } catch (error) {

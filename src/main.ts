@@ -15,7 +15,10 @@ async function bootstrap() {
   // Remove the default "default" path
   delete document.paths['/'];
   SwaggerModule.setup('api-docs', app, document, {
-    swaggerOptions: { defaultModelsExpandDepth: -1 }
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+      tagsSorter: "alpha"
+    }
   });
 
   app.enableCors()
@@ -34,3 +37,4 @@ async function bootstrap() {
 bootstrap();
 
 // eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzA0ODMzODkzLCJleHAiOjE3MDUwMDY2OTN9.4ie2icZ_G9qmnO0UiQE8dxOniaeGGctDoAtJA2G4y4c
+

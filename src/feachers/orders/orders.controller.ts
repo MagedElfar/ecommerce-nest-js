@@ -4,18 +4,25 @@ import { OrdersService } from './orders.service';
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { IUser } from '../users/users.interface';
 import { QueryDto } from 'src/core/dto/query.dto';
-import { OrdersQueryDto } from './dto/order-query.dto';
+import { OrdersQueryDto, UserOrdersQueryDto } from './dto/order-query.dto';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { OrderDto } from './dto/order.dto';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
 
 @ApiTags("Orders")
+@ApiBearerAuth()
 @Controller('orders')
 export class OrdersController {
     constructor(private readonly ordersService: OrdersService) { }
 
     @Post()
+    @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "create new order" })
+    @ApiParam({ name: "id", description: "order id" })
+    @ApiCreatedResponse({ type: OrderDto })
     async create(
         @Body() createOrderDto: CreateOrderDto,
         @User("id") userId: number
@@ -32,6 +39,9 @@ export class OrdersController {
 
     @Put(":id")
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "update order" })
+    @ApiParam({ name: "id", description: "order id" })
+    @ApiOkResponse({ type: OrderDto })
     async update(
         @Body() updateOrderDto: UpdateOrderDto,
         @Param("id", ParseIntPipe) id: number
@@ -48,6 +58,8 @@ export class OrdersController {
 
     @Get("")
     @Roles([UserRole.ADMIN])
+    @ApiOperation({ summary: "Find all orders" })
+    @ApiFindAllResponse(OrderDto)
     async getAll(
         @Query() ordersQueryDto: OrdersQueryDto,
     ) {
@@ -62,8 +74,10 @@ export class OrdersController {
     }
 
     @Get("user")
+    @ApiOperation({ summary: "Find user orders" })
+    @ApiFindAllResponse(OrderDto)
     async getUserOrder(
-        @Query() ordersQueryDto: OrdersQueryDto,
+        @Query() ordersQueryDto: UserOrdersQueryDto,
         @User("id") userId: number,
     ) {
         try {
@@ -78,13 +92,15 @@ export class OrdersController {
     }
 
     @Get(":id")
+    @ApiOperation({ summary: "Find order by id" })
+    @ApiParam({ name: "id", description: "order id" })
     async getOrder(
         @User() user: IUser,
         @Param("id", ParseIntPipe) id: number
     ) {
         try {
 
-            const order = await this.ordersService.findOne({ id }, user)
+            const order = await this.ordersService.findOrder(id, user)
 
             return { order }
         } catch (error) {

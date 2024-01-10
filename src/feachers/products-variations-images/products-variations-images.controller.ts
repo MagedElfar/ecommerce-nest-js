@@ -26,10 +26,13 @@ export class ProductsVariationsImageController {
             required: ["files", "variationId"],
             properties: {
                 variationId: { type: 'integer', description: "variation id" },
-                file: {
-                    type: 'files',
-                    description: "file to upload",
-                    maxItems: 10
+                files: {
+                    type: 'array',
+                    items: {
+                        type: 'string',
+                        format: 'binary',
+                    },
+                    description: "files to upload",
                 },
             },
         },

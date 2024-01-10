@@ -6,6 +6,9 @@ import { PaymentMethod } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { CartItemsService } from '../cart-items/cart-items.service';
 import { CartsService } from '../carts/carts.service';
+import { PaymentStrategyService } from 'src/utility/payment-strategy/payment-strategy.service';
+import { OrderScope } from '../orders/order.entity';
+import { CartScop } from '../carts/carts.entity';
 
 @Injectable()
 export class CheckoutService {
@@ -14,6 +17,7 @@ export class CheckoutService {
         private readonly ordersService: OrdersService,
         private readonly cartsService: CartsService,
         private readonly cartItemService: CartItemsService,
+        private readonly paymentStrategyService: PaymentStrategyService,
         private readonly sequelize: Sequelize,
     ) { }
 
@@ -21,16 +25,18 @@ export class CheckoutService {
 
         const transaction = await this.sequelize.transaction()
 
+
         try {
 
             //1-get user cart
-            const cart = await this.cartsService.findOne({ userId: checkoutDto.userId });
+            const cart = await this.cartsService.findOne({ userId: checkoutDto.userId }, [
+                CartScop.WITH_ITEMS
+            ]);
 
             //2-check if cart has items
             if (!cart || cart.items.length <= 0) throw new BadRequestException("cart is empty");
 
             checkoutDto.items = cart.items.map(item => ({
-                productId: item.productId,
                 variantId: item.variantId,
                 quantity: item.quantity
             }))
@@ -41,15 +47,9 @@ export class CheckoutService {
             //11-empty user cart
             await this.cartItemService.deleteCartItems(cart.id, transaction)
 
-            let session = null
-
-            if (order.paymentMethod.name === PaymentMethod.STRIPE) {
-                session = await this.stripeService.createCheckoutSession(order);
-            }
-
             await transaction.commit()
 
-            return { order, session }
+            return await this.paymentStrategyService.processPayment(order.paymentMethod.name, order)
         } catch (error) {
             await transaction.rollback()
             throw error
@@ -59,11 +59,13 @@ export class CheckoutService {
     async checkoutOrder(orderId: number) {
 
         try {
-            const order = await this.ordersService.findById(orderId)
+            const order = await this.ordersService.findById(orderId, [
+                OrderScope.WITH_ITEMS,
+                OrderScope.WITH_PAYMENT_METHOD
+            ])
 
-            const session = await this.stripeService.createCheckoutSession(order);
+            return await this.paymentStrategyService.processPayment(order.paymentMethod.name, order);
 
-            return session
         } catch (error) {
             throw error
         }

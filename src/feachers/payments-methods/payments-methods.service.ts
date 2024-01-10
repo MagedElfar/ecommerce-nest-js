@@ -1,5 +1,5 @@
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -24,6 +24,17 @@ export class PaymentsMethodsService {
         }
     }
 
+    async delete(id: number): Promise<void> {
+        try {
+
+            const isDeleted = await this.paymentMethodModel.destroy({ where: { id } })
+
+            if (!isDeleted) throw new NotFoundException()
+            return
+        } catch (error) {
+            throw error
+        }
+    }
     async findOne(data: Partial<IPaymentMethod>): Promise<IPaymentMethod> {
         try {
 

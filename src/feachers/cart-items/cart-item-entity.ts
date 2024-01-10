@@ -1,8 +1,34 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, Model, Scopes, Table } from "sequelize-typescript";
 import { Cart } from "../carts/carts.entity";
 import { Product } from "../products/products.entity";
 import { ProductVariations } from "../products-variations/products-variations.entity";
+import { Media } from "../media/media.entity";
 
+export enum CartItemScope {
+    WITH_CART = "with cart",
+    WITH_PRODUCT = "with product"
+}
+
+@Scopes(() => ({
+    [CartItemScope.WITH_CART]: {
+        include: Cart
+    },
+    [CartItemScope.WITH_PRODUCT]: {
+        include: [{
+            model: ProductVariations,
+            include: [
+                {
+                    model: Media,
+                    attributes: ["url"]
+                },
+                {
+                    model: Product,
+                    attributes: ["id", "price", "name"]
+                }
+            ]
+        }]
+    }
+}))
 @Table({
     tableName: "carts_items"
 })
@@ -30,15 +56,6 @@ export class CartItem extends Model<CartItem> {
 
     @BelongsTo(() => Cart, { onDelete: "CASCADE" })
     cart: Cart;
-
-    @ForeignKey(() => Product)
-    @Column({
-        allowNull: false
-    })
-    productId: number
-
-    @BelongsTo(() => Product, { onDelete: "CASCADE" })
-    product: Product;
 
     @ForeignKey(() => ProductVariations)
     @Column({

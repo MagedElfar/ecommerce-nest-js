@@ -1,6 +1,4 @@
 import { BelongsTo, Column, DataType, ForeignKey, Model, Table } from "sequelize-typescript";
-import { Cart } from "../carts/carts.entity";
-import { Product } from "../products/products.entity";
 import { ProductVariations } from "../products-variations/products-variations.entity";
 import { Order } from "../orders/order.entity";
 
@@ -24,15 +22,6 @@ export class OrderItem extends Model<OrderItem> {
 
     @BelongsTo(() => Order, { onDelete: "CASCADE" })
     order: Order;
-
-    @ForeignKey(() => Product)
-    @Column({
-        allowNull: false
-    })
-    productId: number
-
-    @BelongsTo(() => Product, { onDelete: "CASCADE" })
-    product: Product;
 
     @ForeignKey(() => ProductVariations)
     @Column({

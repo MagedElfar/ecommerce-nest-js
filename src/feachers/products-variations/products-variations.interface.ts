@@ -17,4 +17,8 @@ export interface IProductVariation extends IModel {
 
     image?: Media[]
 
+    name?: string,
+
+    price?: number
+
 }

@@ -6,6 +6,7 @@ interface IProperties {
     name: string
 }
 export function NotEitherProperty(properties: IProperties, validationOptions?: ValidationOptions) {
+
     return function (object: Object, propertyName: string) {
         registerDecorator({
             name: properties.name,
@@ -17,6 +18,8 @@ export function NotEitherProperty(properties: IProperties, validationOptions?: V
                 validate(value: any, args: ValidationArguments) {
                     const prop1 = args.object[properties.property1];
                     const prop2 = args.object[properties.property2];
+
+                    console.log("prop1 = ", prop1)
 
                     if ((prop1 && !prop2) || (!prop1 && prop2)) {
                         return true;

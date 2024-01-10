@@ -10,7 +10,9 @@ import { ProductVariationImage } from "../products-variations-images/products-va
 export enum VariationScope {
     WITH_MEDIA = "with media",
     WITH_PRODUCT = "with product",
-    WITH_ATTRIBUTES = "with attributes"
+    WITH_ATTRIBUTES = "with attributes",
+    WITH_PRODUCT_MAIN_INFO = "with product main info",
+    FOR_ORDER = "for order"
 }
 
 @Scopes(() => ({
@@ -22,7 +24,26 @@ export enum VariationScope {
     },
     [VariationScope.WITH_PRODUCT]: {
         include: [{
-            model: Product
+            model: Product,
+            include: [{
+                model: Media
+            }]
+        }]
+    },
+    [VariationScope.WITH_PRODUCT_MAIN_INFO]: {
+        include: [{
+            model: Product,
+            attributes: ["id", "price", "name"],
+            include: [{
+                model: Media,
+                attributes: ["url"]
+            }]
+        }]
+    },
+    [VariationScope.FOR_ORDER]: {
+        include: [{
+            model: Product,
+            attributes: ["id", "price", "name"]
         }]
     },
     [VariationScope.WITH_ATTRIBUTES]: {

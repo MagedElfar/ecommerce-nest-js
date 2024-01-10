@@ -8,10 +8,6 @@ export interface IOrderItem extends IModel {
 
     orderId?: number
 
-    productId?: number
-
-    product?: IProduct;
-
     variantId?: number
 
     variant?: ProductVariations;

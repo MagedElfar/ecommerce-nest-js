@@ -1,4 +1,4 @@
-import { Table, Column, Model, DataType, HasOne, BelongsTo, ForeignKey, HasMany } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne, BelongsTo, ForeignKey, HasMany, Scopes } from 'sequelize-typescript';
 import { Address } from '../addresses/address.entity';
 import { Phone } from '../phones/phone.entity';
 import { User } from '../users/user.entity';
@@ -8,7 +8,66 @@ import { OrderStatus } from 'src/core/constants';
 import { PaymentMethod } from '../payments-methods/payment-method.entity';
 import { OrderCancelReason } from '../orders-cancel-reasons/order-cancel-reason.entity';
 import { Payment } from '../payments/payment.entity';
+import { ProductVariations } from '../products-variations/products-variations.entity';
+import { Product } from '../products/products.entity';
 
+export enum OrderScope {
+    WITH_USER = "with user",
+    WITH_ADDRESS = "with address",
+    WITH_ITEMS = "with items",
+    WITH_CANCEL = "with cancel",
+    WITH_PAYMENT_METHOD = "with payment method",
+    WITH_PAYMENT = "with payment"
+}
+
+@Scopes(() => ({
+    [OrderScope.WITH_USER]: {
+        include: [{
+            model: User,
+            attributes: { exclude: ["updatedAt", "createdAt"] },
+        }]
+    },
+    [OrderScope.WITH_ADDRESS]: {
+        include: [{
+            model: Address,
+            attributes: { exclude: ["updatedAt", "createdAt"] }
+        },]
+    },
+    [OrderScope.WITH_ITEMS]: {
+        include: [{
+            model: OrderItem,
+            attributes: { exclude: ["updatedAt", "createdAt"] },
+            include: [
+                {
+                    model: ProductVariations,
+                    attributes: { exclude: ["updatedAt", "createdAt"] },
+                    include: [{
+                        model: Product,
+                        attributes: ["id", "name", "price"]
+                    }]
+                },
+            ]
+        },]
+    },
+    [OrderScope.WITH_CANCEL]: {
+        include: [{
+            model: OrderCancelReason,
+            attributes: { exclude: ["updatedAt", "createdAt"] },
+        }]
+    },
+    [OrderScope.WITH_PAYMENT_METHOD]: {
+        include: [{
+            model: PaymentMethod,
+            attributes: { exclude: ["updatedAt", "createdAt"] }
+        },]
+    },
+    [OrderScope.WITH_PAYMENT]: {
+        include: [{
+            model: Payment,
+            attributes: { exclude: ["updatedAt", "createdAt"] }
+        }]
+    },
+}))
 @Table({
     indexes: [{
         unique: true,

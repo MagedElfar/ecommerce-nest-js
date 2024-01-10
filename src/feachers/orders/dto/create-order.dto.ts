@@ -1,4 +1,5 @@
 import { PartialType, OmitType } from "@nestjs/mapped-types";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { ArrayMinSize, IsEnum, IsInt, IsNotEmpty, IsOptional, ValidateNested, isInt } from "class-validator";
 import { OrderStatus } from "src/core/constants";
@@ -9,37 +10,59 @@ import { CreatePhoneDto } from "src/feachers/phones/dto/request/create-phone.dto
 
 export class CreateOrderDto {
 
+    @ApiProperty({
+        description: "user id"
+    })
     @IsNotEmpty()
     @IsInt()
     userId: number
 
+    @ApiPropertyOptional({
+        description: "user status",
+        enum: OrderStatus
+    })
     @IsOptional()
     @IsEnum(OrderStatus)
     status?: OrderStatus
 
+    @ApiPropertyOptional({
+        description: "user address id not allowed if address provided",
+    })
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
     addressId?: number
 
+    @ApiPropertyOptional({
+        description: "user address not allowed if addressId provided",
+    })
     @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => PartialType(OmitType(CreateAddressDto, ['userId'])))
     address?: CreateAddressDto
 
+    @ApiPropertyOptional({
+        description: "user phone id not allowed if phone provided",
+    })
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
     phoneId?: number
 
-    @IsNotEmpty()
-    @IsInt()
-    paymentMethodId?: number
-
+    @ApiPropertyOptional({
+        description: "user phone  not allowed if phoneId provided",
+    })
     @IsOptional()
     @ValidateNested({ each: true })
     @Type(() => PartialType(OmitType(CreatePhoneDto, ['userId'])))
     phone?: CreatePhoneDto
+
+    @ApiPropertyOptional({
+        description: "payment method id",
+    })
+    @IsNotEmpty()
+    @IsInt()
+    paymentMethodId?: number
 
     @NotEitherProperty({
         property1: "phone",
@@ -56,6 +79,10 @@ export class CreateOrderDto {
     addressAndAddressId?: boolean
 
 
+    @ApiProperty({
+        description: "order items",
+        isArray: true
+    })
     @ArrayMinSize(1)
     @ValidateNested({ each: true })
     @Type(() => CreateOrderItemDto)

@@ -5,7 +5,7 @@ import { ProductVariations, VariationScope } from './products-variations.entity'
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductsService } from '../products/services/products.service';
 import { Sequelize } from 'sequelize-typescript';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { Attribute } from '../attributes/attribute.entity';
 import { AttributeValues } from '../attributes-values/attributes-values.entity';
 import { ProductVariationAttributesService } from '../products-variations-attributes/products-variations-attributes.service';
@@ -14,6 +14,7 @@ import { Product } from '../products/products.entity';
 import { Media } from '../media/media.entity';
 import { MediaService } from '../media/media.service';
 import { IProductVariation } from './products-variations.interface';
+import { VariationQueryDto } from './dto/request/product-variation-query.dto';
 
 @Injectable()
 export class ProductVariationsService {
@@ -28,6 +29,29 @@ export class ProductVariationsService {
         private sequelize: Sequelize,
         private readonly mediaService: MediaService
     ) { }
+
+
+    async findAll(variationQueryDto: VariationQueryDto, scopes: string[] = []) {
+        try {
+            const { limit, page, searchTerm } = variationQueryDto;
+
+            const variations = await this.productVariationModel.scope(scopes).findAndCountAll({
+                where: {
+                    [Op.or]: [
+                        { name: { [Op.like]: `%${searchTerm}%` } },
+                        { sku: { [Op.like]: `%${searchTerm}%` } },
+                    ],
+                },
+                limit,
+                offset: (page - 1) * limit
+            });
+
+            return variations
+
+        } catch (error) {
+            throw error
+        }
+    }
 
     async create(
         createProductVariationDto: CreateProductVariationDto,
@@ -96,7 +120,11 @@ export class ProductVariationsService {
 
             if (!t) {
                 await transaction.commit();
-                return await this.findOneById(variant["dataValues"].id, Object.values(VariationScope))
+                return await this.findOneById(variant["dataValues"].id, [
+                    VariationScope.WITH_PRODUCT,
+                    VariationScope.WITH_MEDIA,
+                    VariationScope.WITH_ATTRIBUTES
+                ])
             }
 
             return variant["dataValues"];
@@ -160,7 +188,11 @@ export class ProductVariationsService {
 
 
             if (!t) await transaction.commit()
-            return await this.findOneById(id, Object.values(VariationScope))
+            return await this.findOneById(id, [
+                VariationScope.WITH_PRODUCT,
+                VariationScope.WITH_MEDIA,
+                VariationScope.WITH_ATTRIBUTES
+            ])
         } catch (error) {
             if (!t) await transaction.rollback()
             throw error

@@ -1,6 +1,6 @@
 import { OrdersHelper } from './orders.helper';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Order } from './order.entity';
+import { Order, OrderScope } from './order.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -9,24 +9,19 @@ import { AddressesService } from '../addresses/addresses.service';
 import { OrdersItemsService } from '../orders-items/orders-items.service';
 import { PaymentsMethodsService } from '../payments-methods/payments-methods.service';
 import { IOrder } from './order-interface';
-import { Address } from '../addresses/address.entity';
 import { User } from '../users/user.entity';
-import { Phone } from '../phones/phone.entity';
-import { OrderItem } from '../orders-items/order-item-entity';
-import { ProductVariations } from '../products-variations/products-variations.entity';
-import { Product } from '../products/products.entity';
+
+import { VariationScope } from '../products-variations/products-variations.entity';
 import { IUser } from '../users/users.interface';
 import { OrderStatus, UserRole } from 'src/core/constants';
-import { PaymentMethod } from '../payments-methods/payment-method.entity';
-import { OrdersQueryDto } from './dto/order-query.dto';
+import { OrdersQueryDto, UserOrdersQueryDto } from './dto/order-query.dto';
 import { Op } from 'sequelize';
-import { OrderCancelReason } from '../orders-cancel-reasons/order-cancel-reason.entity';
 import { OrdersCancelReasonsService } from '../orders-cancel-reasons/orders-cancel-reasons.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Transaction } from 'sequelize';
-import { Payment } from '../payments/payment.entity';
 import { StockService } from '../stock/stock.service';
-import moment from 'moment';
+import * as moment from 'moment';
+import { ProductVariationsService } from '../products-variations/products-variations.service';
 
 @Injectable()
 export class OrdersService {
@@ -39,6 +34,7 @@ export class OrdersService {
         private readonly paymentsMethodsService: PaymentsMethodsService,
         private readonly ordersItemsService: OrdersItemsService,
         private readonly ordersCancelReasonsService: OrdersCancelReasonsService,
+        private readonly productVariationsService: ProductVariationsService,
         private readonly stockService: StockService,
         private readonly sequelize: Sequelize,
     ) { }
@@ -46,17 +42,32 @@ export class OrdersService {
     async create(createOrderDto: CreateOrderDto, t?: Transaction): Promise<IOrder> {
         const transaction = t || await this.sequelize.transaction()
         try {
-            const { userId, addressAndAddressId, phoneAndPhoneId } = createOrderDto;
+            const { userId, items: orderItems, addressAndAddressId, phoneAndPhoneId } = createOrderDto;
+
+            const variants = await Promise.all(orderItems.map(async item => {
+                const variant = await this.productVariationsService.findOneById(item.variantId, [
+                    VariationScope.FOR_ORDER
+                ])
+
+                if (!variant) throw new NotFoundException("product not found")
+
+                return variant
+            }))
 
             //1-check quantity availability
-            await this.stockService.checkQuantity(createOrderDto.items)
+            this.stockService.checkSyncQuantity(orderItems, variants)
 
             //2-calculate order total
-            const total = await this.ordersHelper.calculateOrderTotal(createOrderDto.items);
+            const total = this.ordersHelper.calculateOrderTotal(orderItems, variants);
+
+            console.log("total =", total)
 
             //3-check if there are phone or create new one if not
             if (createOrderDto.phoneId) {
-                const phone = await this.phoneServices.findOneById(createOrderDto.phoneId);
+                const phone = await this.phoneServices.findOne({
+                    id: createOrderDto.phoneId,
+                    userId
+                });
                 if (!phone) throw new NotFoundException("user phone not found")
             } else {
                 const phone = await this.phoneServices.create({
@@ -69,7 +80,10 @@ export class OrdersService {
 
             //4-check if there are address or create new one if not
             if (createOrderDto.addressId) {
-                const address = await this.addressesService.findOneById(createOrderDto.addressId);
+                const address = await this.addressesService.findOne({
+                    id: createOrderDto.addressId,
+                    userId
+                });
                 if (!address) throw new NotFoundException("user address not found")
             } else {
                 const address = await this.addressesService.create({
@@ -84,7 +98,6 @@ export class OrdersService {
             const paymentMethod = await this.paymentsMethodsService.findOdeById(createOrderDto.paymentMethodId)
 
             if (!paymentMethod) throw new NotFoundException("paymentMethod not found")
-
 
             //6-create order method
             const order = await this.orderModel.create(
@@ -109,13 +122,13 @@ export class OrdersService {
                 return await this.ordersItemsService.create({
                     quantity: item.quantity,
                     orderId: order["dataValues"].id,
-                    productId: item.productId,
                     variantId: item.variantId
                 }, transaction)
             }))
 
             if (!t) await transaction.commit()
-            return await this.findById(order.id)
+
+            return await this.findById(order.id, Object.values(OrderScope))
 
         } catch (error) {
             if (!t) await transaction.rollback()
@@ -126,7 +139,7 @@ export class OrdersService {
     async findAll(orderQueryDto: OrdersQueryDto): Promise<any> {
         try {
 
-            const { limit, page, userName, orderNumber, ...query } = orderQueryDto
+            const { limit, page, userName = "", orderNumber, ...query } = orderQueryDto
             const orders = await this.orderModel.findAndCountAll({
                 where: {
                     orderNumber: { [Op.like]: `%${orderNumber}%` },
@@ -153,66 +166,14 @@ export class OrdersService {
         }
     }
 
-    async findOneByOrderNumber(orderNumber: string): Promise<IOrder> {
+    async findOne(
+        data: Partial<Omit<IOrder, "phone" | "address" | "items" | "paymentMethod" | "cancelReasons">>,
+        scopes: string[] = []
+    ): Promise<IOrder | null> {
         try {
+            const order = await this.orderModel.scope(scopes).findOne({ where: data })
 
-            const orders = await this.orderModel.findOne({ where: { orderNumber } })
-
-            return orders
-        } catch (error) {
-            throw error
-        }
-    }
-
-    async findOne(data: Partial<Omit<IOrder, "phone" | "address" | "items" | "paymentMethod" | "cancelReasons">>, user?: IUser): Promise<IOrder> {
-        try {
-            const order = await this.orderModel.findOne({
-                where: data,
-                include: [
-                    {
-                        model: User,
-                        attributes: { exclude: ["updatedAt", "createdAt"] }
-                    },
-                    {
-                        model: Address,
-                        attributes: { exclude: ["updatedAt", "createdAt"] }
-                    },
-                    {
-                        model: Phone,
-                        attributes: { exclude: ["updatedAt", "createdAt"] }
-                    },
-                    {
-                        model: OrderItem,
-                        attributes: { exclude: ["updatedAt", "createdAt"] },
-                        include: [
-                            {
-                                model: ProductVariations,
-                                attributes: { exclude: ["updatedAt", "createdAt"] },
-                            },
-                            {
-                                model: Product,
-                                attributes: { exclude: ["updatedAt", "createdAt"] },
-                            }
-                        ]
-                    },
-                    {
-                        model: OrderCancelReason,
-                        attributes: { exclude: ["updatedAt", "createdAt"] },
-                    },
-                    {
-                        model: PaymentMethod,
-                        attributes: { exclude: ["updatedAt", "createdAt"] }
-                    },
-                    {
-                        model: Payment,
-                        attributes: { exclude: ["updatedAt", "createdAt"] }
-                    },
-                ]
-            })
-
-            if (!order) throw new NotFoundException()
-
-            if (user && order.userId !== user.id && user.role !== UserRole.ADMIN) throw new ForbiddenException()
+            if (!order) return null
 
             return order["dataValues"]
         } catch (error) {
@@ -220,34 +181,9 @@ export class OrdersService {
         }
     }
 
-    async findById(id: number): Promise<IOrder | null> {
+    async findById(id: number, scopes: string[] = []): Promise<IOrder | null> {
         try {
-            const order = await this.orderModel.findByPk(id, {
-                include: [
-                    {
-                        model: User,
-                        attributes: { exclude: ["updatedAt", "createdAt"] },
-                    },
-                    {
-                        model: PaymentMethod,
-                        attributes: ["name"]
-                    },
-                    {
-                        model: OrderItem,
-                        attributes: { exclude: ["updatedAt", "createdAt"] },
-                        include: [
-                            {
-                                model: ProductVariations,
-                                attributes: ["quantity"]
-                            },
-                            {
-                                model: Product,
-                                attributes: ["name", "price"]
-                            }
-                        ]
-                    }
-                ]
-            })
+            const order = await this.orderModel.scope(scopes).findByPk(id)
 
             if (!order) null;
 
@@ -261,7 +197,9 @@ export class OrdersService {
         const transaction = await this.sequelize.transaction()
 
         try {
-            const order = await this.findById(id)
+            const order = await this.findById(id, [
+                OrderScope.WITH_ITEMS
+            ])
 
             if (!order) throw new NotFoundException();
 
@@ -288,7 +226,9 @@ export class OrdersService {
             }
 
             if (updateOrderDto.status === OrderStatus.COMPLETED) {
-                updateOrderDto.deliveredAt = moment(Date.now()).format("YYYY-mm-dd HH:mm:ss")
+
+                console.log(moment().format("YYYY-mm-dd HH:mm:ss"))
+                updateOrderDto.deliveredAt = moment().toDate()
             }
 
             await this.orderModel.update(updateOrderDto, {
@@ -298,12 +238,25 @@ export class OrdersService {
 
             await transaction.commit()
 
-            return await this.findOne({ id })
+            return await this.findById(id)
         } catch (error) {
             await transaction.rollback()
             throw error
         }
     }
 
+    async findOrder(id: number, user?: IUser): Promise<IOrder> {
+        try {
+            const order = await this.findById(id, Object.values(OrderScope))
+
+            if (!order) throw new NotFoundException()
+
+            if (user && order.userId !== user.id && user.role !== UserRole.ADMIN) throw new ForbiddenException()
+
+            return order["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
 
 }

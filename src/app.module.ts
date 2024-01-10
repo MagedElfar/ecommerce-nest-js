@@ -42,6 +42,7 @@ import { CheckoutModule } from './feachers/checkout/checkout.module';
 import { RawBodyMiddleware } from './core/middleware/raw-body.middleware';
 import { StockModule } from './feachers/stock/stock.module';
 import { CategoriesBrandsModule } from './feachers/categories-brands/categories-brands.module';
+import { PaymentStrategyModule } from './utility/payment-strategy/payment-strategy.module';
 
 @Module({
   imports: [
@@ -106,6 +107,7 @@ import { CategoriesBrandsModule } from './feachers/categories-brands/categories-
     CheckoutModule,
     StockModule,
     CategoriesBrandsModule,
+    PaymentStrategyModule,
   ],
   controllers: [AppController],
   providers: [
