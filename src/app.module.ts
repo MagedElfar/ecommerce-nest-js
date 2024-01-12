@@ -43,6 +43,7 @@ import { RawBodyMiddleware } from './core/middleware/raw-body.middleware';
 import { StockModule } from './feachers/stock/stock.module';
 import { CategoriesBrandsModule } from './feachers/categories-brands/categories-brands.module';
 import { PaymentStrategyModule } from './utility/payment-strategy/payment-strategy.module';
+import { DatabaseModule } from './core/database/database.module';
 
 @Module({
   imports: [
@@ -55,28 +56,7 @@ import { PaymentStrategyModule } from './utility/payment-strategy/payment-strate
       isGlobal: true,
       load: [configuration]
     }),
-
-    // DatabaseModule,
-    SequelizeModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        dialect: 'mysql',
-        host: configService.get<string>('database.host'),
-        port: configService.get<number>('database.port'),
-        username: configService.get<string>('database.username'),
-        password: configService.get<string>('database.password'),
-        database: configService.get<string>('database.database'),
-        models,
-        retryAttempts: 1,
-        logging: false,
-        sync: {
-          alter: false,
-          force: false
-        },
-        autoLoadModels: true
-      }),
-    }),
+    DatabaseModule,
     LoggerModule,
     CloudinaryModule,
     AuthModule,
