@@ -38,6 +38,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             message = exception["parent"]["sqlMessage"];
             // message = 'Duplicate entry error: This record already exists.';
             error = "Conflict"
+        } else if (exception["parent"] && exception["parent"]["code"] === "23505") {
+            statusCode = HttpStatus.CONFLICT
+            message = exception["parent"]["detail"];
         } else if (
             exception["parent"] && exception["parent"]["code"] === 'ER_NO_REFERENCED_ROW_2'
         ) {
