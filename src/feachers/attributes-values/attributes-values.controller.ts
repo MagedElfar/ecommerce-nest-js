@@ -4,11 +4,12 @@ import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put } from '@nestj
 import { UserRole } from 'src/core/constants';
 import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
 import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { CreateAttributeValueResponseDto } from './dto/response/createAttribueValue.dto';
 import { UpdateAttributeValueResponseDto } from './dto/response/updateAttribueValue.dto';
 
 @ApiTags("Attributes Values")
+@ApiBearerAuth()
 @Controller('attributes-values')
 export class AttributeValuesController {
 
