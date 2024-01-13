@@ -14,6 +14,7 @@ export enum PhoneScope {
     }
 }))
 @Table({
+    tableName: "phones",
     indexes: [{
         unique: true,
         fields: ["phone"]

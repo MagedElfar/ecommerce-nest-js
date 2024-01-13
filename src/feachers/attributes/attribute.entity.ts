@@ -40,6 +40,7 @@ export enum AttributeScopes {
         }
     ]
 })
+@Table({ tableName: "attributes" })
 export class Attribute extends Model<Attribute> {
     @Column({
         type: DataType.STRING,

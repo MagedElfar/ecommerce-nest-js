@@ -30,6 +30,7 @@ export enum CartScop {
     }
 }))
 @Table({
+    tableName: "carts",
     indexes: [
         {
             unique: true,

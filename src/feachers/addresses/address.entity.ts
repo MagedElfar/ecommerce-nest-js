@@ -13,7 +13,7 @@ export enum AddressScope {
         }]
     }
 }))
-@Table
+@Table({ tableName: "addresses" })
 export class Address extends Model<Address> {
 
     @Column({

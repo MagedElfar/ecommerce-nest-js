@@ -19,6 +19,7 @@ export enum BrandScope {
     }
 }))
 @Table({
+    tableName: "brands",
     indexes: [
         {
             unique: true,

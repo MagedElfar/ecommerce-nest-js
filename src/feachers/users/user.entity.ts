@@ -43,6 +43,7 @@ export enum UserScop {
     }
 }))
 @Table({
+    tableName: "users",
     indexes: [
         {
             unique: true,

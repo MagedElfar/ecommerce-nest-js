@@ -71,6 +71,7 @@ export enum ProductScop {
     }
 }))
 @Table({
+    tableName: "products",
     indexes: [
         {
 

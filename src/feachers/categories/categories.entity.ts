@@ -76,6 +76,7 @@ export enum CategoryScope {
     }
 }))
 @Table({
+    tableName: "categories",
     indexes: [
         {
             unique: true,

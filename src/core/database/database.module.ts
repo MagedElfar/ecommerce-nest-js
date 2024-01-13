@@ -25,7 +25,7 @@ import { Dialect } from 'sequelize';
                     alter: false,
                     force: false
                 },
-                autoLoadModels: true,
+                autoLoadModels: false,
                 migrations: ["src/core/database/migrations"]
             }),
         }),

@@ -69,6 +69,7 @@ export enum OrderScope {
     },
 }))
 @Table({
+    tableName: "orders",
     indexes: [{
         unique: true,
         fields: ["orderNumber"]
