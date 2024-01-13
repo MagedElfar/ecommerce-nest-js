@@ -79,6 +79,8 @@ export class ProductsSubCategoriesService {
                 { transaction }
             )
 
+
+
             if (!t) await transaction.commit()
 
             return productSubCategory["dataValues"];

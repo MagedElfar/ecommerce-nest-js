@@ -6,18 +6,18 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('products_variations_images', {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
 
-      productVariationId: {
-        type: DataTypes.INTEGER.UNSIGNED,
+      variationId: {
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
 
       imageId: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: false,
       },
 
@@ -35,7 +35,7 @@ module.exports = {
     await queryInterface.addConstraint('products_variations_images', {
       type: 'foreign key',
       name: "products_var_image_pro_var_fk",
-      fields: ['productVariationId'],
+      fields: ['variationId'],
       references: {
         table: 'products_variations',
         field: 'id',

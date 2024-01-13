@@ -6,7 +6,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('seb_categories', {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },
@@ -20,8 +20,12 @@ module.exports = {
         allowNull: false,
         unique: true
       },
+      categoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       imageId: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
       createdAt: {
@@ -45,7 +49,19 @@ module.exports = {
       onDelete: 'SET NULL',
       onUpdate: 'SET NULL'
     });
+
+    await queryInterface.addConstraint('seb_categories', {
+      type: 'foreign key',
+      fields: ['categoryId'],
+      references: {
+        table: 'categories',
+        field: 'id',
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'SET NULL'
+    });
   },
+
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('seb_categories');

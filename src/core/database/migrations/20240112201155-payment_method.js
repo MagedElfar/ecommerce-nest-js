@@ -8,7 +8,7 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('payments_methods', {
       id: {
-        type: DataTypes.INTEGER.UNSIGNED,
+        type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
       },

@@ -174,6 +174,7 @@ export class ProductsService {
 
 
 
+
             //add product sub categories if exist
             if (subCategories && subCategories.length > 0) {
                 await Promise.all(
@@ -193,6 +194,8 @@ export class ProductsService {
 
 
             await transaction.commit();
+
+            console.log("cat ...")
 
             return await this.fullData(product["dataValues"].id)
         } catch (error) {
