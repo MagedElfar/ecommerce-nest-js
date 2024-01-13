@@ -1,6 +1,8 @@
 import { Column, DataType, HasMany, Model, Scopes, Sequelize, Table } from "sequelize-typescript";
 import { AttributeValues } from "../attributes-values/attributes-values.entity";
-
+import { ConfigService } from "@nestjs/config";
+import { col, fn } from "sequelize";
+import { ProductVariationAttribute } from "../products-variations-attributes/products-variations-attributes.entity";
 
 export enum AttributeScopes {
     VALUE = "attribute value",
@@ -19,20 +21,27 @@ export enum AttributeScopes {
     [AttributeScopes.VALUE_WITH_TOTAL]: {
         include: [{
             model: AttributeValues,
+
             attributes: [
                 "id", "value",
-                [
-                    Sequelize.literal(
-                        '(SELECT COUNT(*) FROM products_variations_attributes WHERE products_variations_attributes.attrId = values.id)'
-                    ),
-                    'totalProducts'
-                ]
-            ],
+                process.env.DB_DIALECT === "mysql" ?
+                    [
+                        Sequelize.literal(
 
+                            '(SELECT COUNT(*) FROM products_variations_attributes WHERE products_variations_attributes.attrId = values.id)'
+                        ),
+                        'totalProducts'
+                    ] :
+                    [
+                        Sequelize.literal('(SELECT COUNT(*) FROM "public"."products_variations_attributes" WHERE "public"."products_variations_attributes"."attrId" = "values"."id")'),
+                        'totalProducts'
+                    ]
+            ],
         }]
     }
 }))
 @Table({
+    tableName: "attributes",
     indexes: [
         {
             unique: true,
@@ -40,7 +49,6 @@ export enum AttributeScopes {
         }
     ]
 })
-@Table({ tableName: "attributes" })
 export class Attribute extends Model<Attribute> {
     @Column({
         type: DataType.STRING,
