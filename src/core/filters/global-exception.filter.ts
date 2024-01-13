@@ -49,6 +49,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             message = exception["parent"]["sqlMessage"];
             // message = 'Foreign key constraint error: Referenced record not found.';
             error = "Bad Request"
+        } else if (exception["parent"] && exception["parent"]["code"] === "23503") {
+            statusCode = HttpStatus.NOT_FOUND
+            message = exception["parent"]["detail"];
         } else if (exception["parent"]) {
             console.log(exception["parent"])
             statusCode = HttpStatus.INTERNAL_SERVER_ERROR
