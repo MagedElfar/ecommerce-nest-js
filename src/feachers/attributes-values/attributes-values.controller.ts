@@ -30,7 +30,7 @@ export class AttributeValuesController {
         }
     }
 
-    @Put()
+    @Put(":id")
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "update attribute value" })
     @ApiParam({ name: "id", description: "attribute value id" })
@@ -40,6 +40,7 @@ export class AttributeValuesController {
         @Body() updateAttributeValueDto: UpdateAttributeValueDto
     ) {
         try {
+
             const value = await this.attributeValuesService.update(id, updateAttributeValueDto);
 
             return value
@@ -48,7 +49,7 @@ export class AttributeValuesController {
         }
     }
 
-    @Delete()
+    @Delete(":id")
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "delete attribute value" })
     @ApiParam({ name: "id", description: "attribute value id" })

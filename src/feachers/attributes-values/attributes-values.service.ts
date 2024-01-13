@@ -3,7 +3,6 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { AttributeValues } from './attributes-values.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAttributeValue } from './attributes-values.interface';
-import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
 
@@ -45,20 +44,14 @@ export class AttributeValuesService {
 
     async findOneById(
         id: number,
-        t?: Transaction
     ): Promise<IAttributeValue | null> {
-        const transaction = t || await this.sequelize.transaction()
         try {
-            const value = await this.attributeValueModel.findByPk(id, { transaction: t });
+            const value = await this.attributeValueModel.findByPk(id);
 
             if (!value) return null;
 
-            return t ? value : value["dataValues"];
         } catch (error) {
-            await transaction.rollback()
             throw error
-        } finally {
-            if (!t) await transaction.commit()
         }
     }
 
@@ -81,6 +74,7 @@ export class AttributeValuesService {
 
             await this.attributeValueModel.update<AttributeValues>(updateAttributeValueDto, { where: { id } })
 
+            console.log("mmmmmmmm")
             return {
                 ...value,
                 ...updateAttributeValueDto,
