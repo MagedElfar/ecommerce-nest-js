@@ -95,6 +95,31 @@ export class CategoriesController {
         }
     }
 
+    @Get("slug/:slug")
+    @Public()
+    @ApiOperation({ summary: "Find category by slug", security: [] })
+    @ApiParam({
+        name: "slug",
+        description: "category slug"
+    })
+    @ApiOkResponse({ type: CategoryDto })
+    async findOneBySlug(@Param("slug") slug: string) {
+        try {
+            const category = await this.categoriesService.findOne({ slug }, Object.values(CategoryScope));
+
+            if (!category) throw new NotFoundException()
+
+            const attributes = this.categoriesService.mappedCategoryAttributes(category)
+
+            return {
+                ...category,
+                attributes
+            }
+        } catch (error) {
+            throw error
+        }
+    }
+
     @Delete(":id")
     @Roles([UserRole.ADMIN])
     @HttpCode(HttpStatus.NO_CONTENT)

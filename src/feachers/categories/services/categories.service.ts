@@ -105,9 +105,8 @@ export class CategoriesService {
 
             category = await this.findOneById(id);
 
-            const attributes = this.mappedCategoryAttributes(category)
 
-            return { ...category, attributes }
+            return category
         } catch (error) {
             throw error
         }
