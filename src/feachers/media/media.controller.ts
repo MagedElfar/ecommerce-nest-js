@@ -19,8 +19,8 @@ export class MediaController {
     @ApiFindAllResponse(MediaDto)
     async get(@Query() mediaQueryDto: MediaQueryDto) {
         try {
-            await this.mediaService.findAll(mediaQueryDto);
-            return
+            return await this.mediaService.findAll(mediaQueryDto);
+
         } catch (error) {
             throw error
         }
