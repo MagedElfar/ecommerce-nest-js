@@ -126,12 +126,12 @@ export class BrandsService {
             if (!isDeleted) throw new NotFoundException();
 
             if (brand.imageId)
-                await this.mediaService.delete(brand.imageId)
+                await this.mediaService.delete(brand.imageId, t)
 
-            t.commit()
+            await t.commit()
             return;
         } catch (error) {
-            t.rollback()
+            await t.rollback()
             throw error
         }
     }
