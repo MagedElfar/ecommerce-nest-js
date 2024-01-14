@@ -7,7 +7,6 @@ export class CreateBrandDto {
 
     @IsString()
     @IsNotEmpty()
-    @Transform((param) => transformLowerCase(param))
     @ApiProperty({
         description: "brand name",
         uniqueItems: true,

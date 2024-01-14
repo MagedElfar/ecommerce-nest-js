@@ -7,7 +7,6 @@ import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
 export class BrandQueryDto extends QueryDto {
     @IsOptional()
     @IsString()
-    @Transform((param) => transformLowerCase(param))
     @ApiPropertyOptional({
         description: "brand name",
         example: "samsung"
