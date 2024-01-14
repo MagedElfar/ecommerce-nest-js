@@ -81,7 +81,8 @@ export class CreateOrderDto {
 
     @ApiProperty({
         description: "order items",
-        isArray: true
+        isArray: true,
+        type: CreateOrderItemDto
     })
     @ArrayMinSize(1)
     @ValidateNested({ each: true })
