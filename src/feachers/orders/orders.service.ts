@@ -253,7 +253,7 @@ export class OrdersService {
 
             if (user && order.userId !== user.id && user.role !== UserRole.ADMIN) throw new ForbiddenException()
 
-            return order["dataValues"]
+            return order
         } catch (error) {
             throw error
         }

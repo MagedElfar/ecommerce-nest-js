@@ -101,7 +101,7 @@ export class OrdersController {
 
             const order = await this.ordersService.findOrder(id, user)
 
-            return { order }
+            return order
         } catch (error) {
             throw error
         }
