@@ -10,37 +10,37 @@ API Link [https://nest-ecommerce-app.onrender.com/api](https://nest-ecommerce-ap
 
 ## Features:
 
-# Product Variations:
+### Product Variations:
 
 - Enable merchants to create products with multiple variations such as size, color, material, and more.
 - Each variation can have its own set of attributes, providing granular control over product details.
 
-# Category Management:
+### Category Management:
 
 - Categorize products for efficient organization.
 - Each product is assigned to a specific category, streamlining navigation for customers.
 
-# Subcategory Support:
+### Subcategory Support:
 
 - Products may belong to multiple subcategories for refined categorization.
 - Subcategories enable more precise navigation and targeted product searches.
 
-# Attribute Management:
+### Attribute Management:
 
 - Define and manage a wide range of attributes for each product variation.
 - Attributes can include size, color, weight, dimensions, and any other relevant specifications.
 
-# Brands and Attributes:
+### Brands and Attributes:
 
 - Products within a category are associated with specific brands.
 - Define attributes unique to each category, enhancing product information.
 
-# Payment Methods
+### Payment Methods
 
 - Facilitate Cash on Delivery as an alternative payment method.
 -
 
-# Search and Filtering:
+### Search and Filtering:
 
 - Implement powerful search and filtering capabilities to help customers easily find products based on specific attributes , categories , product name and brands.
 
