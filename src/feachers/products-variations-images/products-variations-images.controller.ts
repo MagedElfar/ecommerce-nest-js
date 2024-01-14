@@ -4,10 +4,11 @@ import { memoryStorage } from 'multer';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { ProductsVariationImageService } from './products-variations-images.service';
 import { Public } from 'src/core/decorators/public.decorator';
-import { ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from '../media/dto/media.dto';
 
 @ApiTags("Products Variations Images")
+@ApiBearerAuth()
 @Controller('variations-images')
 export class ProductsVariationsImageController {
     constructor(private productsVariationImageService: ProductsVariationImageService) { }
