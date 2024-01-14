@@ -88,7 +88,7 @@ export class ProductVariations extends Model<ProductVariations>{
     productId: number
 
     @BelongsToMany(() => Media, () => ProductVariationImage)
-    images?: AttributeValues[];
+    images?: ProductVariationImage[];
 
     @BelongsTo(() => Product, { onDelete: "CASCADE" })
     product?: Product
@@ -99,4 +99,4 @@ export class ProductVariations extends Model<ProductVariations>{
     @HasMany(() => CartItem)
     items: CartItem[]
 
-}    
+}     

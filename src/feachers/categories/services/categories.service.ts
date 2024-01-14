@@ -27,16 +27,7 @@ export class CategoriesService {
                 where: {
                     name: { [Op.like]: `%${name}%` },
                 },
-                attributes: {
-                    include: [
-                        [
-                            this.sequelize.fn('COUNT', this.sequelize.col('products.id')),
-                            'totalProducts'
-                        ]
-                    ]
-                },
-
-                group: ['category.id'],
+                group: ['Category.id', "image.id"],
                 subQuery: false,
                 limit,
                 offset: (page - 1) * limit
@@ -112,13 +103,7 @@ export class CategoriesService {
                 slug
             }, { where: { id } })
 
-            category = await this.findOneById(id, [
-                CategoryScope.WITH_EMPTY_PRODUCT,
-                CategoryScope.WITH_SUB_CATEGORY,
-                CategoryScope.WITH_IMAGE,
-                CategoryScope.WITH_BRAND,
-                CategoryScope.WITH_ATTRIBUTES
-            ]);
+            category = await this.findOneById(id);
 
             const attributes = this.mappedCategoryAttributes(category)
 

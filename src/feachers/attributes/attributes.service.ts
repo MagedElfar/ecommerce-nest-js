@@ -16,7 +16,7 @@ export class AttributesService {
         try {
 
             const rows = await this.attributeModel.scope(scopes).findAll({
-                group: ['values.id'],
+                group: ['Attribute.id', 'values.id'],
             });
 
             const count = await this.attributeModel.count();

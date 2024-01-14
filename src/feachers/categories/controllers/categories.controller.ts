@@ -27,7 +27,7 @@ export class CategoriesController {
         try {
             const categories = await this.categoriesService.findAll(categoryQueryDto, [
                 CategoryScope.WITH_IMAGE,
-                CategoryScope.WITH_EMPTY_PRODUCT
+                CategoryScope.WITH_EMPTY_PRODUCT,
             ]);
             return categories
         } catch (error) {
@@ -80,13 +80,7 @@ export class CategoriesController {
     @ApiOkResponse({ type: CategoryDto })
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
-            const category = await this.categoriesService.findOneById(id, [
-                CategoryScope.WITH_EMPTY_PRODUCT,
-                CategoryScope.WITH_SUB_CATEGORY,
-                CategoryScope.WITH_IMAGE,
-                CategoryScope.WITH_BRAND,
-                CategoryScope.WITH_ATTRIBUTES
-            ]);
+            const category = await this.categoriesService.findOneById(id, Object.values(CategoryScope));
 
             if (!category) throw new NotFoundException()
 

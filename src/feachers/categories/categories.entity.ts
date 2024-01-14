@@ -13,7 +13,8 @@ export enum CategoryScope {
     WITH_IMAGE = "with image",
     WITH_SUB_CATEGORY = "with sub category",
     WITH_BRAND = "with brand",
-    WITH_ATTRIBUTES = "with attributes"
+    WITH_ATTRIBUTES = "with attributes",
+    WITH_GROUP = "with group"
 }
 
 @Scopes(() => ({
@@ -26,7 +27,15 @@ export enum CategoryScope {
             attributes: {
                 exclude: ["createdAt", "updatedAt"]
             }
-        }]
+        }],
+        attributes: {
+            include: [
+                [
+                    Sequelize.fn('COUNT', Sequelize.col('products.id')),
+                    'totalProducts'
+                ]
+            ]
+        },
     },
     [CategoryScope.WITH_SUB_CATEGORY]: {
         include: [{
@@ -35,20 +44,10 @@ export enum CategoryScope {
                 "id",
                 "name",
                 "slug",
-                process.env.DB_DIALECT === "mysql" ?
-                    [
-                        Sequelize.literal(
-                            '(SELECT COUNT(*) FROM products_sub_categories WHERE products_sub_categories.subCategoryId = SubCategories.id)'
-                        ),
-                        'totalProducts',
-                    ]
-                    :
-                    [
-                        Sequelize.literal(
-                            '(SELECT COUNT(*) FROM  "public"."products_sub_categories" WHERE  "public".:products_sub_categories"."subCategoryId" = SubCategories.id)'
-                        ),
-                        'totalProducts',
-                    ],
+                [
+                    Sequelize.fn('COUNT', Sequelize.col('products.id')),
+                    'totalProducts'
+                ]
             ],
             include: [
                 {
@@ -81,6 +80,20 @@ export enum CategoryScope {
                 include: [{ model: Attribute, attributes: ["id", "name"] }]
             }
         ]
+    },
+
+    [CategoryScope.WITH_GROUP]: {
+        attributes: {
+            include: [
+                [
+                    Sequelize.fn('COUNT', Sequelize.col('products.id')),
+                    'totalProducts'
+                ]
+            ]
+        },
+        subQuery: false,
+        group: ['Category.id', "image.id", "subCategories.id", "subCategories->image.id", "brands.id", "brands->CategoryBrand.id", "brands->image.id", "attributes.id", "attributes->CategoriesAttribute.id", "attributes->attribute.id"]
+
     }
 }))
 @Table({

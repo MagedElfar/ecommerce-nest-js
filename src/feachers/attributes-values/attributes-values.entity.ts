@@ -25,8 +25,8 @@ export class AttributeValues extends Model<AttributeValues>{
     @BelongsToMany(() => ProductVariations, () => ProductVariationAttribute)
     productVariations: ProductVariations[];
 
-    @HasMany(() => ProductVariationAttribute)
-    productVariationAttribute: ProductVariationAttribute[]
+    // @HasMany(() => ProductVariationAttribute)
+    // productVariationAttribute: ProductVariationAttribute[]
 
     @BelongsToMany(() => Category, () => CategoriesAttribute)
     categories: Category[];

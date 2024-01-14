@@ -5,7 +5,7 @@ import { Product } from '../products/products.entity';
 import { Media } from '../media/media.entity';
 
 export enum SubCategoryScope {
-    WITH_IMAGE = "with image"
+    WITH_IMAGE = "with image",
 }
 
 @Scopes(() => ({
