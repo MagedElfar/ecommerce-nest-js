@@ -7,7 +7,6 @@ import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
 export class CategoryQueryDto extends QueryDto {
     @ApiPropertyOptional({
         description: "category name",
-        example: "clothes"
     })
     @IsOptional()
     @IsString()
