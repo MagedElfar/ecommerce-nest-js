@@ -27,6 +27,14 @@ export class CategoriesService {
                 where: {
                     name: { [Op.iLike]: `%${name}%` },
                 },
+                attributes: {
+                    include: [
+                        [
+                            Sequelize.fn('COUNT', Sequelize.col('products.id')),
+                            'totalProducts'
+                        ]
+                    ]
+                },
                 group: ['Category.id', "image.id"],
                 subQuery: false,
                 limit,

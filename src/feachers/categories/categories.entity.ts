@@ -27,15 +27,7 @@ export enum CategoryScope {
             attributes: {
                 exclude: ["createdAt", "updatedAt"]
             }
-        }],
-        attributes: {
-            include: [
-                [
-                    Sequelize.fn('COUNT', Sequelize.col('products.id')),
-                    'totalProducts'
-                ]
-            ]
-        },
+        }]
     },
     [CategoryScope.WITH_SUB_CATEGORY]: {
         include: [{
@@ -44,10 +36,21 @@ export enum CategoryScope {
                 "id",
                 "name",
                 "slug",
-                [
-                    Sequelize.fn('COUNT', Sequelize.col('products.id')),
-                    'totalProducts'
-                ]
+
+                process.env.DB_DIALECT === "mysql" ?
+                    [
+                        Sequelize.literal(
+                            '(SELECT COUNT(*) FROM products_sub_categories WHERE products_sub_categories.subCategoryId = subCategories.id)'
+                        ),
+                        'totalProducts',
+                    ]
+                    :
+                    [
+                        Sequelize.literal(
+                            '(SELECT COUNT(*) FROM  "public"."products_sub_categories" WHERE  "public"."products_sub_categories"."subCategoryId" = "subCategories"."id")'
+                        ),
+                        'totalProducts',
+                    ],
             ],
             include: [
                 {
@@ -81,7 +84,6 @@ export enum CategoryScope {
             }
         ]
     },
-
     [CategoryScope.WITH_GROUP]: {
         attributes: {
             include: [
