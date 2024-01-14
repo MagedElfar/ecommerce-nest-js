@@ -35,12 +35,20 @@ export enum CategoryScope {
                 "id",
                 "name",
                 "slug",
-                [
-                    Sequelize.literal(
-                        '(SELECT COUNT(*) FROM products_sub_categories WHERE products_sub_categories.subCategoryId = SubCategories.id)'
-                    ),
-                    'totalProducts',
-                ],
+                process.env.DB_DIALECT === "mysql" ?
+                    [
+                        Sequelize.literal(
+                            '(SELECT COUNT(*) FROM products_sub_categories WHERE products_sub_categories.subCategoryId = SubCategories.id)'
+                        ),
+                        'totalProducts',
+                    ]
+                    :
+                    [
+                        Sequelize.literal(
+                            '(SELECT COUNT(*) FROM  "public"."products_sub_categories" WHERE  "public".:products_sub_categories"."subCategoryId" = SubCategories.id)'
+                        ),
+                        'totalProducts',
+                    ],
             ],
             include: [
                 {
