@@ -72,12 +72,6 @@ export class ProductVariationsService {
                 if (!product) throw new NotFoundException("product not found");
             }
 
-            //2-check if variation name exist
-            if (createProductVariationDto.name) {
-                const variant = await this.findOne({ name: createProductVariationDto.name })
-
-                if (variant) throw new ConflictException(`variant with name "${createProductVariationDto.name}" already exist`);
-            }
 
             //3-check if variation sku exist
             let variant = await this.findOne({ sku: createProductVariationDto.sku })
