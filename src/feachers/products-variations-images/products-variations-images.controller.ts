@@ -6,6 +6,7 @@ import { ProductsVariationImageService } from './products-variations-images.serv
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from '../media/dto/media.dto';
+import { AssignImageDto } from './dto/assignImage.dto';
 
 @ApiTags("Products Variations Images")
 @ApiBearerAuth()
@@ -61,6 +62,19 @@ export class ProductsVariationsImageController {
             );
 
             return images
+        } catch (error) {
+            throw error
+        }
+    }
+
+    @Post("assign")
+    @ApiOperation({ summary: "assign exist image to specific product variation" })
+    @ApiBody({ type: AssignImageDto })
+    async assign(
+        @Body() assignImageDto: AssignImageDto
+    ) {
+        try {
+            return await this.productsVariationImageService.assign(assignImageDto)
         } catch (error) {
             throw error
         }

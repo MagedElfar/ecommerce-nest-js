@@ -8,6 +8,7 @@ import { IProductVariationImage } from './products-variations-images.interface';
 import { MediaService } from '../media/media.service';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { IMedia } from '../media/media.interface';
+import { AssignImageDto } from './dto/assignImage.dto';
 
 @Injectable()
 export class ProductsVariationImageService {
@@ -35,6 +36,32 @@ export class ProductsVariationImageService {
 
             const variantImage = await this.productVariationImageModel.create({
                 variationId: uploadImageDto.variationId,
+                imageId: image.id
+            })
+
+            return {
+                ...variantImage["dataValues"],
+                image
+            }
+
+        } catch (error) {
+            throw error
+        }
+
+    }
+
+    async assign(assignImageDto: AssignImageDto): Promise<IProductVariationImage> {
+
+        try {
+
+            const product = await this.productVariationsService.findOneById(assignImageDto.variationId);
+
+            if (!product) throw new NotFoundException("product not found")
+
+            const image = await this.mediaService.findById(assignImageDto.imageId)
+
+            const variantImage = await this.productVariationImageModel.create({
+                variationId: assignImageDto.variationId,
                 imageId: image.id
             })
 

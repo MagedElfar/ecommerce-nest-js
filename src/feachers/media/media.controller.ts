@@ -1,8 +1,11 @@
 import { MediaService } from 'src/feachers/media/media.service';
-import { Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { MediaDto } from './dto/media.dto';
+import { MediaQueryDto } from './dto/media.query.dto';
 
 @ApiTags("Media")
 @ApiBearerAuth()
@@ -10,6 +13,18 @@ import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 export class MediaController {
 
     constructor(private readonly mediaService: MediaService) { }
+
+    @Get()
+    @Roles([UserRole.ADMIN])
+    @ApiFindAllResponse(MediaDto)
+    async get(@Query() mediaQueryDto: MediaQueryDto) {
+        try {
+            await this.mediaService.findAll(mediaQueryDto);
+            return
+        } catch (error) {
+            throw error
+        }
+    }
 
     @Delete(":id")
     @Roles([UserRole.ADMIN])

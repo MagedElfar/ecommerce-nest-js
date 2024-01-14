@@ -6,6 +6,7 @@ import { IMedia } from './media.interface';
 import { UploadMediaDto } from './dto/uploadMedia.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
+import { MediaQueryDto } from './dto/media.query.dto';
 
 @Injectable()
 export class MediaService {
@@ -16,6 +17,21 @@ export class MediaService {
         private sequelize: Sequelize,
     ) { }
 
+    async findAll(mediaQueryDto: MediaQueryDto, scope: string[] = []) {
+        try {
+
+            const { limit, page } = mediaQueryDto
+
+            const result = await this.mediaModel.scope(scope).findAndCountAll({
+                limit,
+                offset: (page - 1) * limit
+            });
+
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
     async create(uploadMediaDto: UploadMediaDto): Promise<IMedia> {
         let storageKey: string = "";
         let url: string = ""

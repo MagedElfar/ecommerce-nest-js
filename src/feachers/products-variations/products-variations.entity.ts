@@ -58,7 +58,7 @@ export enum VariationScope {
     indexes: [
         {
             unique: true,
-            fields: ["sku", "name"]
+            fields: ["sku"]
         }
     ]
 })
