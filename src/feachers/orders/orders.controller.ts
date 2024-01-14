@@ -21,7 +21,6 @@ export class OrdersController {
     @Post()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "create new order" })
-    @ApiParam({ name: "id", description: "order id" })
     @ApiCreatedResponse({ type: OrderDto })
     async create(
         @Body() createOrderDto: CreateOrderDto,
