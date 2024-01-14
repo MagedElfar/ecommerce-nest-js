@@ -25,7 +25,7 @@ export class CategoriesService {
 
             const rows = await this.categoryModel.scope(scopes).findAll({
                 where: {
-                    name: { [Op.like]: `%${name}%` },
+                    name: { [Op.iLike]: `%${name}%` },
                 },
                 group: ['Category.id', "image.id"],
                 subQuery: false,

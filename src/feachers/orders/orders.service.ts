@@ -142,7 +142,7 @@ export class OrdersService {
             const { limit, page, userName = "", orderNumber, ...query } = orderQueryDto
             const orders = await this.orderModel.findAndCountAll({
                 where: {
-                    orderNumber: { [Op.like]: `%${orderNumber}%` },
+                    orderNumber: { [Op.iLike]: `%${orderNumber}%` },
                     ...query
                 },
                 include: [{
@@ -150,9 +150,9 @@ export class OrdersService {
                     attributes: [],
                     where: {
                         [Op.or]: [
-                            { name: { [Op.like]: `%${userName}%` } },
-                            { lastName: { [Op.like]: `%${userName}%` } },
-                            { firstName: { [Op.like]: `%${userName}%` }, }
+                            { name: { [Op.iLike]: `%${userName}%` } },
+                            { lastName: { [Op.iLike]: `%${userName}%` } },
+                            { firstName: { [Op.iLike]: `%${userName}%` }, }
                         ]
                     }
                 }],

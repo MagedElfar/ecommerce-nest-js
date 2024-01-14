@@ -42,7 +42,7 @@ export class ProductsService {
 
 
         //filler by name if exist in query
-        if (filterOptions.name) where.name = { [Op.like]: `%${filterOptions.name}%` };
+        if (filterOptions.name) where.name = { [Op.iLike]: `%${filterOptions.name}%` };
 
         //filler by categoryId if exist in query
         if (filterOptions.categoryId) where.categoryId = filterOptions.categoryId;

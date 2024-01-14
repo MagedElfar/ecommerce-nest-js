@@ -26,7 +26,7 @@ export class BrandsService {
 
             const brands = await this.brandModel.scope(scopes).findAndCountAll({
                 where: {
-                    name: { [Op.like]: `%${name}%` },
+                    name: { [Op.iLike]: `%${name}%` },
                 },
                 limit,
                 offset: (page - 1) * limit

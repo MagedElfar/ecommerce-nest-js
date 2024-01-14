@@ -38,8 +38,8 @@ export class ProductVariationsService {
             const variations = await this.productVariationModel.scope(scopes).findAndCountAll({
                 where: {
                     [Op.or]: [
-                        { name: { [Op.like]: `%${searchTerm}%` } },
-                        { sku: { [Op.like]: `%${searchTerm}%` } },
+                        { name: { [Op.iLike]: `%${searchTerm}%` } },
+                        { sku: { [Op.iLike]: `%${searchTerm}%` } },
                     ],
                 },
                 limit,

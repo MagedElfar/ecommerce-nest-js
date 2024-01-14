@@ -24,7 +24,7 @@ export class UsersService {
 
             const result = await this.userModel.scope(scope).findAndCountAll({
                 where: {
-                    name: { [Op.like]: `%${name}%` }
+                    name: { [Op.iLike]: `%${name}%` }
                 },
                 limit,
                 offset: (page - 1) * limit

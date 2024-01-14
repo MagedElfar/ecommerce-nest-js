@@ -9,7 +9,6 @@ export class BrandQueryDto extends QueryDto {
     @IsString()
     @ApiPropertyOptional({
         description: "brand name",
-        example: "samsung"
     })
     name: string = ""
 }
