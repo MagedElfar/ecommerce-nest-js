@@ -1,10 +1,10 @@
-import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { AttributeValues } from './attributes-values.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { IAttributeValue } from './attributes-values.interface';
 import { Sequelize } from 'sequelize-typescript';
-import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
+import { CreateAttributeValueDto } from './dto/request/create-attribute-value.dto';
+import { UpdateAttributeValueDto } from './dto/request/update-attribute-value.dto';
 
 @Injectable()
 export class AttributeValuesService {
@@ -32,6 +32,7 @@ export class AttributeValuesService {
 
     async findOne(data: Partial<Omit<IAttributeValue, "attribute">>): Promise<IAttributeValue | null> {
         try {
+
             const value = await this.attributeValueModel.findOne({ where: data });
 
             if (!value) return null;
@@ -50,6 +51,7 @@ export class AttributeValuesService {
 
             if (!value) return null;
 
+            return value["dataValues"]
         } catch (error) {
             throw error
         }
@@ -70,11 +72,14 @@ export class AttributeValuesService {
 
             let value = await this.findOneById(id);
 
+            console.log("value = ", value)
+            console.log("id = ", id)
+
+
             if (!value) throw new NotFoundException();
 
             await this.attributeValueModel.update<AttributeValues>(updateAttributeValueDto, { where: { id } })
 
-            console.log("mmmmmmmm")
             return {
                 ...value,
                 ...updateAttributeValueDto,

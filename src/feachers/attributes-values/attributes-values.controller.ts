@@ -2,11 +2,10 @@ import { Roles } from 'src/core/decorators/role.decorator';
 import { AttributeValuesService } from './attributes-values.service';
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { UserRole } from 'src/core/constants';
-import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
-import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { CreateAttributeValueResponseDto } from './dto/response/createAttribueValue.dto';
-import { UpdateAttributeValueResponseDto } from './dto/response/updateAttribueValue.dto';
+import { CreateAttributeValueDto } from './dto/request/create-attribute-value.dto';
+import { UpdateAttributeValueDto } from './dto/request/update-attribute-value.dto';
+import { AttributeValueDto } from './dto/response/attributeValue.dto';
 
 @ApiTags("Attributes Values")
 @ApiBearerAuth()
@@ -18,7 +17,7 @@ export class AttributeValuesController {
     @Post()
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "create new attribute value" })
-    @ApiCreatedResponse({ type: CreateAttributeValueResponseDto })
+    @ApiCreatedResponse({ type: AttributeValueDto })
     async create(@Body() createAttributeValueDto: CreateAttributeValueDto) {
         try {
 
@@ -34,7 +33,7 @@ export class AttributeValuesController {
     @Roles([UserRole.ADMIN])
     @ApiOperation({ summary: "update attribute value" })
     @ApiParam({ name: "id", description: "attribute value id" })
-    @ApiOkResponse({ type: UpdateAttributeValueResponseDto })
+    @ApiOkResponse({ type: AttributeValueDto })
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateAttributeValueDto: UpdateAttributeValueDto
