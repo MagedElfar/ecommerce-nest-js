@@ -1,6 +1,7 @@
 import { Address } from "src/feachers/addresses/address.entity";
 import { AttributeValues } from "src/feachers/attributes-values/attributes-values.entity";
 import { Attribute } from "src/feachers/attributes/attribute.entity";
+import { RestToken } from "src/feachers/auth/reset-token.entity";
 import { Brand } from "src/feachers/brands/brands.entity";
 import { CartItem } from 'src/feachers/cart-items/cart-item-entity';
 import { Cart } from 'src/feachers/carts/carts.entity';
@@ -45,5 +46,6 @@ export const models: any[] = [
     OrderCancelReason,
     Payment,
     PaymentMethod,
-    CategoryBrand
+    CategoryBrand,
+    RestToken
 ]

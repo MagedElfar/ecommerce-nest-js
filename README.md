@@ -65,6 +65,8 @@ $ npm run start:prod
 
 ## Migration
 
+[migration folder](https://github.com/MagedElfar/ecommerce-nest-js/tree/main/src/core/database/migrations)
+
 ```bash
 # create new migration
 $ npx sequelize-cli migration:generate --name file-name

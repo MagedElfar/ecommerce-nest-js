@@ -1,17 +1,18 @@
 import { LoginDto } from './dto/request/login.dto';
 import { SignUpDto } from './dto/request/signup.dto';
 import { ConflictException, Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/services/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { IUser } from 'src/feachers/users/users.interface';
 import { UserScop } from '../users/user.entity';
+import { PasswordService } from './password.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
+        private readonly passwordService: PasswordService
     ) { };
 
     public async login(user: Partial<IUser>) {
@@ -42,7 +43,7 @@ export class AuthService {
         if (user) throw new ConflictException('This email already exist');
 
         // hash the password
-        const pass = await this.hashPassword(signUpDto.password);
+        const pass = await this.passwordService.hashPassword(signUpDto.password);
 
         // create the user
         const newUser = await this.usersService.create({ ...signUpDto, password: pass });
@@ -65,7 +66,7 @@ export class AuthService {
             if (!user) return null
 
             // find if user password match
-            const match = await this.comparePassword(loginDto.password, user.password);
+            const match = await this.passwordService.comparePassword(loginDto.password, user.password);
 
             if (!match) {
                 return null;
@@ -85,15 +86,4 @@ export class AuthService {
         const token = await this.jwtService.signAsync(user);
         return token;
     }
-
-    private async hashPassword(password: string) {
-        const hash = await bcrypt.hash(password, 10);
-        return hash;
-    }
-
-    private async comparePassword(enteredPassword: string, dbPassword: string) {
-        const match = await bcrypt.compare(enteredPassword, dbPassword);
-        return match;
-    }
-
 }

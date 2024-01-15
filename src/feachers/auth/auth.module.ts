@@ -4,14 +4,20 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/feachers/users/users.module';
 import { LocalStrategy } from './local.strategy';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { ConfigService } from '@nestjs/config';
+import { PasswordService } from './password.service';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { RestToken } from './reset-token.entity';
+import { MailModule } from 'src/utility/mail/mail.module';
 
 @Module({
   imports: [
+    SequelizeModule.forFeature([RestToken]),
     PassportModule,
     UsersModule,
+    MailModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
@@ -25,7 +31,8 @@ import { ConfigService } from '@nestjs/config';
   providers: [
     AuthService,
     LocalStrategy,
-    JwtStrategy
+    JwtStrategy,
+    PasswordService
   ],
 })
 export class AuthModule { }

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Transform } from "class-transformer";
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 import { transformLowerCase } from "src/core/pipes/toLowerCase.pipe";
 
 export class CreateUserDto {
@@ -20,6 +20,8 @@ export class CreateUserDto {
     })
     @IsString()
     @IsNotEmpty()
+    @MinLength(8)
+    @MaxLength(20)
     readonly password: string;
 
     @ApiProperty({

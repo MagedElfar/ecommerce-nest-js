@@ -1,5 +1,8 @@
 export default () => ({
     port: parseInt(process.env.PORT, 10) || 3000,
+
+    uiLink: "http://http://localhost:3000",
+
     database: {
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
@@ -22,5 +25,9 @@ export default () => ({
         webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
         successUrl: "http://localhost:3000/api",
         cancelUrl: "http://localhost:3000/api"
+    },
+    nodemailer: {
+        user: process.env.GOOGLE_USER,
+        password: process.env.GOOGLE_PASSWORD
     }
 });

@@ -44,6 +44,7 @@ import { StockModule } from './feachers/stock/stock.module';
 import { CategoriesBrandsModule } from './feachers/categories-brands/categories-brands.module';
 import { PaymentStrategyModule } from './utility/payment-strategy/payment-strategy.module';
 import { DatabaseModule } from './core/database/database.module';
+import { MailModule } from './utility/mail/mail.module';
 
 @Module({
   imports: [
@@ -88,6 +89,7 @@ import { DatabaseModule } from './core/database/database.module';
     StockModule,
     CategoriesBrandsModule,
     PaymentStrategyModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
