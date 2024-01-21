@@ -210,7 +210,7 @@ export class OrdersService {
 
                 await Promise.all(order.items.map(async item => {
                     //update product quantity
-                    await this.stockService["stock"](item.variantId, item.quantity, transaction)
+                    await this.stockService[stock](item.variantId, item.quantity, transaction)
                 }))
             }
 

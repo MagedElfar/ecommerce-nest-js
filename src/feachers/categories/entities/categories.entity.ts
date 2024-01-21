@@ -94,7 +94,7 @@ export enum CategoryScope {
             ]
         },
         subQuery: false,
-        group: ['Category.id', "image.id", "subCategories.id", "subCategories->image.id", "brands.id", "brands->CategoryBrand.id", "brands->image.id", "attributes.id", "attributes->CategoriesAttribute.id", "attributes->attribute.id"]
+        group: ['Category.id', "image.id", "subCategories.id", "subCategories->image.id", "brands.id", "brands->CategoryBrand.id", "attributes->CategoryAttribute.id", "brands->image.id", "attributes.id", "attributes->attribute.id"]
 
     }
 }))
