@@ -34,7 +34,7 @@ export class CheckoutController {
 
     @Post(":orderId")
     @UseGuards(OwnerShipGuard)
-    @ApiParam({ name: "id", description: "order id" })
+    @ApiParam({ name: "orderId", description: "order id" })
     @ApiOperation({ summary: "place specific order" })
     async checkoutOrder(
         @Param("orderId") orderId: number
