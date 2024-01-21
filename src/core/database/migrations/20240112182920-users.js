@@ -38,9 +38,9 @@ module.exports = {
       },
 
       role: {
-        type: DataTypes.ENUM(["admin", "user", "vendor"]),
+        type: DataTypes.ENUM(["admin", "manager", "customer"]),
         allowNull: false,
-        defaultValue: "user"
+        defaultValue: "customer"
       },
 
       imageId: {

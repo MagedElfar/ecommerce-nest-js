@@ -36,7 +36,7 @@ export class OrdersController {
             createOrderDto.userId = userId
             const order = await this.ordersService.create(createOrderDto)
 
-            return { order }
+            return order
         } catch (error) {
             throw error
         }
