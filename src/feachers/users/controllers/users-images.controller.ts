@@ -7,7 +7,7 @@ import { memoryStorage } from 'multer';
 import { User } from 'src/core/decorators/user.decorator';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
-@ApiTags("User Image")
+@ApiTags("User")
 @ApiBearerAuth()
 @Controller('users/images')
 export class UsersImagesController {
