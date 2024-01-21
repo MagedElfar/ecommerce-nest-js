@@ -1,12 +1,16 @@
 import { CheckoutService } from './checkout.service';
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Param, Post, UseGuards } from '@nestjs/common';
 import { CheckoutDto } from './dto/checkout.dto';
 import { User } from 'src/core/decorators/user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { OrdersService } from '../orders/orders.service';
+import { Permissions } from "./../../core/decorators/permissions.decorator";
+import { OwnerShipGuard } from 'src/core/guards/owner-ship.guard';
 
 @ApiTags("checkout")
 @ApiBearerAuth()
 @Controller('checkout')
+@Permissions(OrdersService)
 export class CheckoutController {
 
     constructor(private readonly checkoutService: CheckoutService) { }
@@ -29,6 +33,7 @@ export class CheckoutController {
     }
 
     @Post(":orderId")
+    @UseGuards(OwnerShipGuard)
     @ApiParam({ name: "id", description: "order id" })
     @ApiOperation({ summary: "place specific order" })
     async checkoutOrder(

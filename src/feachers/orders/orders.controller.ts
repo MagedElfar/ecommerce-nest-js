@@ -30,10 +30,9 @@ export class OrdersController {
     @ApiCreatedResponse({ type: OrderDto })
     async create(
         @Body() createOrderDto: CreateOrderDto,
-        @User("id") userId: number
     ) {
         try {
-            createOrderDto.userId = userId
+
             const order = await this.ordersService.create(createOrderDto)
 
             return order

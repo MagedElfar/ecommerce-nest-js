@@ -16,6 +16,7 @@ export class CreateOrderDto {
     })
     @IsNotEmpty()
     @IsInt()
+    @Min(1)
     userId: number
 
     @ApiPropertyOptional({
@@ -61,6 +62,8 @@ export class CreateOrderDto {
     @IsInt()
     @Min(1)
     phoneId?: number
+
+
 
     @ApiPropertyOptional({
         description: "user phone  not allowed if phoneId provided",
