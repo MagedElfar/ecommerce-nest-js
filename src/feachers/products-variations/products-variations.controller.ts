@@ -11,7 +11,7 @@ import { VariationDto } from './dto/variation.dto';
 import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
 import { VariationQueryDto } from './dto/product-variation-query.dto';
 
-@ApiTags("Product Variations")
+@ApiTags("Products Variations")
 @Controller('products-variations')
 export class ProductVariationsController {
 
