@@ -6,7 +6,7 @@ import { CreateProductAttributesDto } from './dto/request/create-product_variati
 import { ApiCreatedResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ProductAttributeDto } from './dto/response/productAttribute.dto';
 
-@ApiTags("Products Attributes")
+@ApiTags("Products Variations Attributes")
 @Controller('products-attributes')
 export class ProductVariationAttributesController {
 

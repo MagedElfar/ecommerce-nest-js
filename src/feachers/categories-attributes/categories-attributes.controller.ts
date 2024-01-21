@@ -6,7 +6,7 @@ import { CreateCategoryAttributesDto } from './dto/create-category_attributes.dt
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CategoryAttributeDto } from './dto/categoryAttribute.dto';
 
-@ApiTags("Categories Attribute")
+@ApiTags("Category Attribute")
 @ApiBearerAuth()
 @Controller('categories-attributes')
 export class CategoriesAttributesController {

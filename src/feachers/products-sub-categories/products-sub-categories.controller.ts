@@ -6,7 +6,7 @@ import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.d
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ProductSubCategoryDto } from './dto/productSubCategory.dto';
 
-@ApiTags("Product Sub Category")
+@ApiTags("Products Sub Category")
 @ApiBearerAuth()
 @Controller('products-sub-categories')
 export class ProductsSubCategoriesController {
