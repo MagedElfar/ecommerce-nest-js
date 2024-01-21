@@ -3,14 +3,15 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { UploadImageDto } from './dto/upload-image.dto';
 import { ProductsVariationImageService } from './products-variations-images.service';
-import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from '../media/dto/media.dto';
 import { AssignImageDto } from './dto/assignImage.dto';
+import { Roles } from 'src/core/decorators/role.decorator';
+import { UserRole } from 'src/core/constants';
 
-@ApiTags("Products Variations Images")
+@ApiTags("Products Variations")
 @ApiBearerAuth()
-@Controller('variations-images')
+@Controller('products-variations/images')
 export class ProductsVariationsImageController {
     constructor(private productsVariationImageService: ProductsVariationImageService) { }
 
@@ -20,7 +21,11 @@ export class ProductsVariationsImageController {
             storage: memoryStorage(),
         }),
     )
-    @ApiOperation({ summary: "upload category image" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "upload category image",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {

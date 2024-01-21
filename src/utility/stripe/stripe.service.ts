@@ -2,10 +2,10 @@ import { OrdersService } from './../../feachers/orders/orders.service';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
-import { IOrder } from 'src/feachers/orders/order-interface';
 import { OrderStatus, PaymentStatus } from 'src/core/constants';
 import { PaymentsService } from 'src/feachers/payments/payments.service';
 import { OrdersCancelReasonsService } from 'src/feachers/orders-cancel-reasons/orders-cancel-reasons.service';
+import { IOrder } from 'src/feachers/orders/interfaces/order.interface';
 
 @Injectable()
 export class StripeService {

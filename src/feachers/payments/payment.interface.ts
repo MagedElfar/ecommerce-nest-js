@@ -1,7 +1,6 @@
 import { PaymentStatus } from "src/core/constants";
 import { IModel } from "src/core/interface/model.interface";
-import { PaymentMethod } from "../payments-methods/payment-method.entity";
-import { Order } from "../orders/order.entity";
+import { PaymentMethod } from "../payments-methods/entities/payment-method.entity";
 
 export interface IPayment extends IModel {
 
@@ -21,5 +20,5 @@ export interface IPayment extends IModel {
 
     orderId?: number
 
-    order?: Order
+    order?: any
 }

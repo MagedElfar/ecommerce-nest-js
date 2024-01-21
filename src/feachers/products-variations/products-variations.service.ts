@@ -1,20 +1,20 @@
-import { UpdateProductVariationDto } from './dto/request/update-product-variations.dto';
-import { CreateProductVariationDto } from './dto/request/create-product-variations.dto';
+import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
+import { CreateProductVariationDto } from './dto/create-product-variations.dto';
 import { ConflictException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
-import { ProductVariations, VariationScope } from './products-variations.entity';
+import { ProductVariations, VariationScope } from './entities/products-variations.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductsService } from '../products/services/products.service';
 import { Sequelize } from 'sequelize-typescript';
 import { Op, Transaction } from 'sequelize';
-import { Attribute } from '../attributes/attribute.entity';
-import { AttributeValues } from '../attributes-values/attributes-values.entity';
+import { Attribute } from '../attributes/entities/attribute.entity';
+import { AttributeValue } from '../attributes-values/entities/attribute-value.entity';
 import { ProductVariationAttributesService } from '../products-variations-attributes/products-variations-attributes.service';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
-import { Product } from '../products/products.entity';
-import { Media } from '../media/media.entity';
+import { Product } from '../products/entities/products.entity';
+import { Media } from '../media/entities/media.entity';
 import { MediaService } from '../media/media.service';
-import { IProductVariation } from './products-variations.interface';
-import { VariationQueryDto } from './dto/request/product-variation-query.dto';
+import { IProductVariation } from './interfaces/products-variations.interface';
+import { VariationQueryDto } from './dto/product-variation-query.dto';
 
 @Injectable()
 export class ProductVariationsService {
@@ -84,7 +84,7 @@ export class ProductVariationsService {
                 {
                     transaction,
                     include: [{
-                        model: AttributeValues,
+                        model: AttributeValue,
                         attributes: ["value", "id"],
                         through: { attributes: [] },
                         include: [
@@ -149,7 +149,7 @@ export class ProductVariationsService {
     }
 
     async findOne(
-        data: Partial<Omit<ProductVariations, "attributes">>,
+        data: Omit<IProductVariation, "product">,
         scopes: string[] = []
     ): Promise<ProductVariations | null> {
         try {
@@ -182,11 +182,8 @@ export class ProductVariationsService {
 
 
             if (!t) await transaction.commit()
-            return await this.findOneById(id, [
-                VariationScope.WITH_PRODUCT,
-                VariationScope.WITH_MEDIA,
-                VariationScope.WITH_ATTRIBUTES
-            ])
+
+            return await this.findOneById(id)
         } catch (error) {
             if (!t) await transaction.rollback()
             throw error

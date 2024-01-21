@@ -1,9 +1,9 @@
 import { BrandsService } from './brands.service';
 import { MediaService } from '../../media/media.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UploadImageDto } from '../dto/request/upload-image.dto';
-import { BrandsFolder, CategoryFolder } from 'src/core/constants';
-import { IMedia } from 'src/feachers/media/media.interface';
+import { UploadImageDto } from '../dto/upload-image.dto';
+import { BrandsFolder } from 'src/core/constants';
+import { Media } from 'src/feachers/media/entities/media.entity';
 
 @Injectable()
 export class BrandsImageService {
@@ -12,7 +12,7 @@ export class BrandsImageService {
         private readonly mediaService: MediaService
     ) { }
 
-    async upload(uploadImageDto: UploadImageDto): Promise<IMedia> {
+    async upload(uploadImageDto: UploadImageDto): Promise<Media> {
 
         try {
 

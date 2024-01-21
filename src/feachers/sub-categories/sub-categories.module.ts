@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SubCategoriesService } from './services/sub-categories.service';
-import { SubCategory } from './sub-categories.entity';
+import { SubCategory } from './enities/sub-categories.entity';
 import { SubCategoriesController } from './controllers/sub-categories.controller';
 import { MediaModule } from '../media/media.module';
 import { SubCategoryImageController } from './controllers/sub-categories-images.controller';

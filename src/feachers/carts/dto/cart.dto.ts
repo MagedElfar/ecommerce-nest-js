@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { BaseDto } from "src/core/dto/base-model.dto";
-import { CartItemDto } from "src/feachers/cart-items/dto/response/cartItem.dto";
+import { CartItemDto } from "src/feachers/cart-items/dto/cartItem.dto";
 
 export class CartDto extends BaseDto {
     @ApiProperty({

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReasonDto } from './dto/create-reason.dto';
-import { IOrderCancelReason } from './order-cancel-reason.interface';
+import { IOrderCancelReason } from './interfaces/order-cancel-reason.interface';
 import { InjectModel } from '@nestjs/sequelize';
-import { OrderCancelReason } from './order-cancel-reason.entity';
+import { OrderCancelReason } from './entities/order-cancel-reason.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
 
@@ -15,7 +15,7 @@ export class OrdersCancelReasonsService {
         private readonly sequelize: Sequelize
     ) { }
 
-    async create(createReasonDto: CreateReasonDto, t?: Transaction): Promise<IOrderCancelReason> {
+    async create(createReasonDto: CreateReasonDto, t?: Transaction): Promise<OrderCancelReason> {
 
         const transaction = t || await this.sequelize.transaction()
 

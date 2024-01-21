@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ProductsSubCategoriesController } from './products-sub-categories.controller';
 import { ProductsSubCategoriesService } from './products-sub-categories.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ProductSubCategory } from './products-sub-categories.entity';
+import { ProductSubCategory } from './entities/products-sub-categories.entity';
 import { SubCategoriesModule } from '../sub-categories/sub-categories.module';
 import { ProductsModule } from '../products/products.module';
 

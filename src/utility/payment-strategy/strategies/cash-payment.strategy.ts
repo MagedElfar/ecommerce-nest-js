@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PaymentStrategy } from './../payment-strategy.interface';
-import { IOrder } from 'src/feachers/orders/order-interface';
 import { OrdersService } from 'src/feachers/orders/orders.service';
 import { OrderStatus } from 'src/core/constants';
-import { OrderScope } from 'src/feachers/orders/order.entity';
+import { OrderScope } from 'src/feachers/orders/entities/order.entity';
+import { IOrder } from 'src/feachers/orders/interfaces/order.interface';
 
 @Injectable()
 export class CashPaymentStrategy implements PaymentStrategy {
@@ -16,7 +16,7 @@ export class CashPaymentStrategy implements PaymentStrategy {
                 status: OrderStatus.CONFIRMED
             })
 
-            return await this.ordersService.findById(order.id, Object.values(OrderScope))
+            return await this.ordersService.findOneById(order.id, Object.values(OrderScope))
         } catch (error) {
             throw error
         }

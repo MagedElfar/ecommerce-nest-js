@@ -3,7 +3,7 @@ import { User } from 'src/core/decorators/user.decorator';
 import { CartsService } from './carts.service';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CartDto } from './dto/cart.dto';
-import { CartScop } from './carts.entity';
+import { CartScop } from './entities/carts.entity';
 
 @ApiTags("Carts")
 @ApiBearerAuth()

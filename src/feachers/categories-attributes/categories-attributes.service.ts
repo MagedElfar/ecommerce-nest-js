@@ -1,20 +1,16 @@
 import { CategoriesService } from './../categories/services/categories.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Transaction } from 'sequelize';
-import { Sequelize } from 'sequelize-typescript';
-import { Product } from '../products/products.entity';
-import { SubCategory } from '../sub-categories/sub-categories.entity';
-import { CategoriesAttribute } from './categories-attributes.entity';
-import { ICategoryAttribute } from './categories-attributes.interface';
-import { CreateCategoryAttributesDto } from './dto/request/create-category_attributes.dto';
+import { CategoryAttribute } from './entities/categories-attributes.entity';
+import { CreateCategoryAttributesDto } from './dto/create-category_attributes.dto';
 import { AttributeValuesService } from '../attributes-values/attributes-values.service';
+import { ICategoryAttribute } from './interfaces/category-attribute.interface';
 
 @Injectable()
 export class CategoriesAttributeService {
     constructor(
-        @InjectModel(CategoriesAttribute)
-        private readonly CategoryAttributeModelModel: typeof CategoriesAttribute,
+        @InjectModel(CategoryAttribute)
+        private readonly CategoryAttributeModelModel: typeof CategoryAttribute,
         private readonly categoriesService: CategoriesService,
         private readonly attributeValuesService: AttributeValuesService,
     ) { }
@@ -22,9 +18,9 @@ export class CategoriesAttributeService {
 
 
     async findOne(
-        data: Partial<Omit<ICategoryAttribute, "category" | "attribute">>,
+        data: ICategoryAttribute,
 
-    ): Promise<ICategoryAttribute | null> {
+    ): Promise<CategoryAttribute | null> {
 
         try {
 
@@ -45,7 +41,7 @@ export class CategoriesAttributeService {
 
     async create(
         createCategoryAttributesDto: CreateCategoryAttributesDto,
-    ): Promise<ICategoryAttribute> {
+    ): Promise<CategoryAttribute> {
 
         try {
 
@@ -73,7 +69,7 @@ export class CategoriesAttributeService {
 
 
             //create new record
-            categoryAttribute = await this.CategoryAttributeModelModel.create<CategoriesAttribute>(createCategoryAttributesDto)
+            categoryAttribute = await this.CategoryAttributeModelModel.create<CategoryAttribute>(createCategoryAttributesDto)
 
             return categoryAttribute["dataValues"];
 

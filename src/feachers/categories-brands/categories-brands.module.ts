@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CategoriesBrandsController } from './categories-brands.controller';
 import { CategoriesBrandsService } from './categories-brands.service';
-import { CategoryBrand } from './categories-brand.entity';
+import { CategoryBrand } from './entities/categories-brand.entity';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CategoriesModule } from '../categories/categories.module';
 import { BrandsModule } from '../brands/brands.module';

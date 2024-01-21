@@ -1,6 +1,6 @@
 import { AutoIncrement, BelongsTo, Column, DataType, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
-import { AttributeValues } from '../attributes-values/attributes-values.entity';
-import { ProductVariations } from '../products-variations/products-variations.entity';
+import { AttributeValue } from '../attributes-values/entities/attribute-value.entity';
+import { ProductVariations } from '../products-variations/entities/products-variations.entity';
 
 @Table({
     tableName: 'products_variations_attributes',
@@ -22,12 +22,12 @@ export class ProductVariationAttribute extends Model<ProductVariationAttribute> 
     @BelongsTo(() => ProductVariations, { onDelete: "CASCADE" })
     proVar: ProductVariations;
 
-    @ForeignKey(() => AttributeValues)
+    @ForeignKey(() => AttributeValue)
     @Column
     attrId: number;
 
-    @BelongsTo(() => AttributeValues, { onDelete: "CASCADE" })
-    attribute: AttributeValues;
+    @BelongsTo(() => AttributeValue, { onDelete: "CASCADE" })
+    attribute: AttributeValue;
 
 
 } 

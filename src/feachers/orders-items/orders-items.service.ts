@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { OrderItem } from './order-item-entity';
-import { IOrderItem } from './order-item.interface';
+import { OrderItem } from './entities/order-item-entity';
+import { IOrderItem } from './interfaces/order-item.interface';
 import { CreateOrderItemDto } from './dto/create-order-item.dto';
 
 @Injectable()

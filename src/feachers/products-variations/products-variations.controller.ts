@@ -1,15 +1,15 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
-import { CreateProductVariationDto } from './dto/request/create-product-variations.dto';
+import { CreateProductVariationDto } from './dto/create-product-variations.dto';
 import { ProductVariationsService } from './products-variations.service';
-import { UpdateProductVariationDto } from './dto/request/update-product-variations.dto';
+import { UpdateProductVariationDto } from './dto/update-product-variations.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { VariationScope } from './products-variations.entity';
-import { VariationDto } from './dto/response/variation.dto';
+import { VariationScope } from './entities/products-variations.entity';
+import { VariationDto } from './dto/variation.dto';
 import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
-import { VariationQueryDto } from './dto/request/product-variation-query.dto';
+import { VariationQueryDto } from './dto/product-variation-query.dto';
 
 @ApiTags("Product Variations")
 @Controller('products-variations')
@@ -39,9 +39,12 @@ export class ProductVariationsController {
     }
 
     @Post()
-    @Roles([UserRole.ADMIN])
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
     @ApiBearerAuth()
-    @ApiOperation({ summary: "create new product variation" })
+    @ApiOperation({
+        summary: "create new product variation",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiCreatedResponse({ type: VariationDto })
     async create(
         @Body() createProductVariationDto: CreateProductVariationDto
@@ -58,9 +61,12 @@ export class ProductVariationsController {
     }
 
     @Put(":id")
-    @Roles([UserRole.ADMIN])
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
     @ApiBearerAuth()
-    @ApiOperation({ summary: "update product variation" })
+    @ApiOperation({
+        summary: "update product variation",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "variation id" })
     @ApiOkResponse({ type: VariationDto })
     async update(
@@ -104,7 +110,10 @@ export class ProductVariationsController {
     @Delete(":id")
     @Roles([UserRole.ADMIN])
     @ApiBearerAuth()
-    @ApiOperation({ summary: "delete product variation" })
+    @ApiOperation({
+        summary: "delete product variation",
+        description: `Required Roles: ${UserRole.ADMIN}`
+    })
     @ApiParam({ name: "id", description: "variation id" })
     async delete(
         @Param("id", ParseIntPipe) id: number,

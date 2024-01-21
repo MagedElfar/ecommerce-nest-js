@@ -1,19 +1,16 @@
 import { CheckoutDto } from './dto/checkout.dto';
 import { OrdersService } from './../orders/orders.service';
-import { StripeService } from './../../utility/stripe/stripe.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { PaymentMethod } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { CartItemsService } from '../cart-items/cart-items.service';
 import { CartsService } from '../carts/carts.service';
 import { PaymentStrategyService } from 'src/utility/payment-strategy/payment-strategy.service';
-import { OrderScope } from '../orders/order.entity';
-import { CartScop } from '../carts/carts.entity';
+import { OrderScope } from '../orders/entities/order.entity';
+import { CartScop } from '../carts/entities/carts.entity';
 
 @Injectable()
 export class CheckoutService {
     constructor(
-        private readonly stripeService: StripeService,
         private readonly ordersService: OrdersService,
         private readonly cartsService: CartsService,
         private readonly cartItemService: CartItemsService,
@@ -59,7 +56,7 @@ export class CheckoutService {
     async checkoutOrder(orderId: number) {
 
         try {
-            const order = await this.ordersService.findById(orderId, [
+            const order = await this.ordersService.findOneById(orderId, [
                 OrderScope.WITH_ITEMS,
                 OrderScope.WITH_PAYMENT_METHOD
             ])

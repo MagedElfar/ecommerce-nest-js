@@ -1,12 +1,12 @@
 import { ApiProperty, PickType } from "@nestjs/swagger";
 import { OrderStatus } from "src/core/constants";
 import { BaseDto } from "src/core/dto/base-model.dto";
-import { AddressDto } from "src/feachers/addresses/dto/response/address.dto";
+import { AddressDto } from "src/feachers/addresses/dto/address.dto";
 import { OrderCancelReasonDto } from "src/feachers/orders-cancel-reasons/dto/camcel.dto";
 import { OrderItemDto } from "src/feachers/orders-items/dto/orderItem.dto";
 import { PaymentMethodDto } from "src/feachers/payments-methods/dto/paymentMethod.dto";
 import { PaymentDto } from "src/feachers/payments/dto/payment.dto";
-import { PhoneDto } from "src/feachers/phones/dto/response/phone.dto";
+import { PhoneDto } from "src/feachers/phones/dto/phone.dto";
 import { UserDto } from "src/feachers/users/dto/response/user.dto";
 
 class UserOrder extends PickType(UserDto, ["id", "name", "email"]) { }

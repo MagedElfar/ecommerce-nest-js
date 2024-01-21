@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Attribute } from './attribute.entity';
-import { CreateAttributeDto } from './dto/request/create-attribute.dto';
-import { IAttribute } from './attribute.interface';
-import { UpdateAttributeDto } from './dto/request/update-attribute.dto';
+import { Attribute } from './entities/attribute.entity';
+import { CreateAttributeDto } from './dto/create-attribute.dto';
+import { UpdateAttributeDto } from './dto/update-attribute.dto';
 
 @Injectable()
 export class AttributesService {
@@ -29,9 +28,9 @@ export class AttributesService {
     }
 
 
-    async findOneById(id: number): Promise<IAttribute | null> {
+    async findOneById(id: number, scopes: string[] = []): Promise<Attribute | null> {
         try {
-            const attribute = await this.attributeModel.findByPk(id, {})
+            const attribute = await this.attributeModel.scope(scopes).findByPk(id)
 
             if (!attribute) return null;
 
@@ -42,7 +41,7 @@ export class AttributesService {
     }
 
 
-    async create(createAttributeDto: CreateAttributeDto): Promise<IAttribute> {
+    async create(createAttributeDto: CreateAttributeDto): Promise<Attribute> {
         try {
 
             const attribute = await this.attributeModel.create<Attribute>(createAttributeDto);
@@ -55,19 +54,17 @@ export class AttributesService {
         }
     }
 
-    async update(id: number, updateAttributeDto: UpdateAttributeDto): Promise<IAttribute> {
+    async update(id: number, updateAttributeDto: UpdateAttributeDto): Promise<Attribute> {
         try {
 
-            let attribute = await this.findOneById(id);
+            const [affectedRowsCount] = await this.attributeModel.update<Attribute>(updateAttributeDto, { where: { id } })
 
-            if (!attribute) throw new NotFoundException("attribute not exist");
-
-            await this.attributeModel.update<Attribute>(updateAttributeDto, { where: { id } })
-
-            return {
-                ...attribute,
-                ...updateAttributeDto,
+            if (affectedRowsCount === 0) {
+                throw new NotFoundException('Attribute not found');
             }
+
+            return await this.findOneById(id)
+
         } catch (error) {
 
             throw error
@@ -77,11 +74,11 @@ export class AttributesService {
     async delete(id: number): Promise<void> {
         try {
 
-            let attribute = await this.findOneById(id);
 
-            if (!attribute) throw new NotFoundException();
+            const isDeleted = await this.attributeModel.destroy({ where: { id } })
 
-            await this.attributeModel.destroy({ where: { id } })
+            if (!isDeleted) throw new NotFoundException();
+
 
             return
         } catch (error) {

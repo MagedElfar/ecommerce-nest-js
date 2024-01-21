@@ -3,7 +3,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { ProductVariationsController } from './products-variations.controller';
 import { ProductVariationsService } from './products-variations.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ProductVariations } from './products-variations.entity';
+import { ProductVariations } from './entities/products-variations.entity';
 import { ProductsModule } from '../products/products.module';
 import { ProductVariationAttributesModule } from '../products-variations-attributes/products-variations-attributes.module';
 import { MediaModule } from '../media/media.module';

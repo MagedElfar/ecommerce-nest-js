@@ -1,8 +1,8 @@
 //ENUMS
 export enum UserRole {
     ADMIN = 'admin',
-    USER = 'user',
-    Vendor = "vendor"
+    MANAGER = "manager",
+    CUSTOMER = 'customer'
 }
 
 export enum OrderStatus {
@@ -26,9 +26,19 @@ export enum PaymentStatus {
 //decorator
 export const IS_PUBLIC_KEY = 'isPublic';
 
+export const Permission_service = "permissionService"
 //storage
 export const CLOUDINARY = "CLOUDINARY"
 export const USERFolder = "users"
 export const CategoryFolder = "categories"
 export const BrandsFolder = "brands"
 export const ProductsFolder = "products"
+
+export enum Action {
+    Manage = 'manage',
+    Create = 'create',
+    Read = 'read',
+    Update = 'update',
+    Delete = 'delete',
+}
+

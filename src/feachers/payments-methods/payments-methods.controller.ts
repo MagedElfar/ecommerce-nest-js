@@ -30,7 +30,10 @@ export class PaymentsMethodsController {
 
     @Post()
     @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "create payment method" })
+    @ApiOperation({
+        summary: "create payment method",
+        description: `Role Required: ${UserRole.ADMIN}`
+    })
     @ApiCreatedResponse({ type: PaymentMethodDto })
     async create(@Body() createPaymentMethodDto: CreatePaymentMethodDto) {
         try {

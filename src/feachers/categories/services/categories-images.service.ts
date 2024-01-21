@@ -1,9 +1,9 @@
 import { MediaService } from './../../media/media.service';
 import { CategoriesService } from './categories.service';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UploadImageDto } from '../dto/request/upload-image.dto';
+import { UploadImageDto } from '../dto/upload-image.dto';
 import { CategoryFolder } from 'src/core/constants';
-import { IMedia } from 'src/feachers/media/media.interface';
+import { Media } from 'src/feachers/media/entities/media.entity';
 
 @Injectable()
 export class CategoryImageService {
@@ -12,7 +12,7 @@ export class CategoryImageService {
         private readonly mediaService: MediaService
     ) { }
 
-    async upload(uploadImageDto: UploadImageDto): Promise<IMedia> {
+    async upload(uploadImageDto: UploadImageDto): Promise<Media> {
 
         try {
 

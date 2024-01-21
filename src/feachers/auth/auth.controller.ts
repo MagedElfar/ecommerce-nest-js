@@ -1,16 +1,15 @@
-import { PasswordService } from './password.service';
+import { PasswordService } from './services/password.service';
 import { Body, Controller, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { SignUpDto } from './dto/request/signup.dto';
+import { SignUpDto } from './dto/signup.dto';
 import { Request as Req } from 'express';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { LoginDto } from './dto/request/login.dto';
-import { SignupResponseDto } from './dto/response/signup.dto';
-import { LoginResponseDto } from './dto/response/login.dto';
-import { SendForgetPasswordEmailDto } from './dto/request/forget-password-email.dto';
-import { ForgetPasswordRestDto } from './dto/request/forget-password-rest.dto';
+import { LoginDto } from './dto/login.dto';
+import { AuthDto } from './dto/auth.dto';
+import { SendForgetPasswordEmailDto } from './dto/forget-password-email.dto';
+import { ForgetPasswordRestDto } from './dto/forget-password-rest.dto';
 
 @ApiTags("Authentication")
 @Controller('auth')
@@ -24,7 +23,7 @@ export class AuthController {
     @Post('signup')
     @ApiCreatedResponse({
         description: "succuss request",
-        type: SignupResponseDto,
+        type: AuthDto,
 
     })
     async signUp(@Body() signUpDto: SignUpDto) {
@@ -42,7 +41,7 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     @ApiOkResponse({
         description: "succuss request",
-        type: LoginResponseDto,
+        type: AuthDto,
     })
     async login(@Request() req: Req, @Body() loginDto: LoginDto) {
         try {

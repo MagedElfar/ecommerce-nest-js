@@ -1,14 +1,14 @@
-import { CreateCategoryDto } from '../dto/request/create-category.dto';
+import { CreateCategoryDto } from '../dto/create-category.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Category, CategoryScope } from '../categories.entity';
+import { Category } from '../entities/categories.entity';
 import * as slugify from "slugify"
-import { ICategory } from '../categories.interface';
-import { UpdateCategoryDto } from '../dto/request/update-category.dto';
-import { CategoryQueryDto } from '../dto/request/category-query.dto';
+import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { CategoryQueryDto } from '../dto/category-query.dto';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { MediaService } from 'src/feachers/media/media.service';
+import { ICategory } from '../interface/category.interface';
 
 @Injectable()
 export class CategoriesService {
@@ -54,7 +54,7 @@ export class CategoriesService {
     }
 
 
-    async findOneById(id: number, scopes: any[] = []): Promise<ICategory | null> {
+    async findOneById(id: number, scopes: any[] = []): Promise<Category | null> {
         try {
             const category = await this.categoryModel.scope(scopes).findByPk(id)
 
@@ -66,7 +66,7 @@ export class CategoriesService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICategory, "image" | "subCategories" | "parent">>, scopes: any[] = []): Promise<ICategory | null> {
+    async findOne(data: ICategory, scopes: any[] = []): Promise<Category | null> {
         try {
 
             const category = await this.categoryModel.scope(scopes).findOne({
@@ -81,7 +81,7 @@ export class CategoriesService {
         }
     }
 
-    async create(createCategoryDto: CreateCategoryDto): Promise<ICategory> {
+    async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
         try {
 
             const slug: string = slugify.default(createCategoryDto.name);
@@ -97,7 +97,7 @@ export class CategoriesService {
         }
     }
 
-    async update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<ICategory> {
+    async update(id: number, updateCategoryDto: UpdateCategoryDto): Promise<Category> {
         try {
 
             let category = await this.findOneById(id);
@@ -147,7 +147,7 @@ export class CategoriesService {
         }
     }
 
-    mappedCategoryAttributes(category: ICategory) {
+    mappedCategoryAttributes(category: Category) {
         return category.attributes.reduce((acc: any[], attr: any) => {
 
             const name = attr.attribute.name

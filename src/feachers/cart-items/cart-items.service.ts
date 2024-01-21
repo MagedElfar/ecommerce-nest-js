@@ -1,15 +1,15 @@
-import { UpdateItemDto } from './dto/request/update-item.dto';
+import { ICartItem } from './interfaces/cart-item.interface';
+import { UpdateItemDto } from './dto/update-item.dto';
 import { ConflictException, ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
-import { CartItem, CartItemScope } from './cart-item-entity';
+import { CartItem, CartItemScope } from './entities/cart-item-entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { ProductVariationsService } from '../products-variations/products-variations.service';
 import { CartsService } from '../carts/carts.service';
-import { CreateItemDto } from './dto/request/create-item-dto';
-import { ICartItem } from './cart-items-interface';
+import { CreateItemDto } from './dto/create-item-dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
-import { VariationScope } from '../products-variations/products-variations.entity';
-import { IProductVariation } from '../products-variations/products-variations.interface';
+import { VariationScope } from '../products-variations/entities/products-variations.entity';
+import { IProductVariation } from '../products-variations/interfaces/products-variations.interface';
 
 @Injectable()
 export class CartItemsService {
@@ -30,7 +30,7 @@ export class CartItemsService {
         return quantity * price
     }
 
-    async create(createItemDto: CreateItemDto): Promise<ICartItem> {
+    async create(createItemDto: CreateItemDto): Promise<CartItem> {
         try {
             const { userId, ...itemDto } = createItemDto
             let cart = await this.cartServices.findOne({ userId });
@@ -71,7 +71,7 @@ export class CartItemsService {
         }
     }
 
-    async findOneById(id: number, scopes: string[] = []): Promise<ICartItem> {
+    async findOneById(id: number, scopes: string[] = []): Promise<CartItem> {
         try {
 
             const item = await this.cartItemModel.scope(scopes).findByPk(id)
@@ -84,7 +84,7 @@ export class CartItemsService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICartItem, "cart" | "variant">>, scopes: string[] = []): Promise<ICartItem> {
+    async findOne(data: ICartItem, scopes: string[] = []): Promise<CartItem> {
         try {
 
             const item = await this.cartItemModel.scope(scopes).findOne({ where: data })
@@ -130,7 +130,6 @@ export class CartItemsService {
             if (!item) throw new NotFoundException();
 
             if (item.cart.userId !== userId) throw new ForbiddenException();
-
 
             await this.cartItemModel.destroy({ where: { id } });
 

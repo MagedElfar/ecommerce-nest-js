@@ -1,9 +1,8 @@
 import { User } from 'src/core/decorators/user.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrdersService } from './orders.service';
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { IUser } from '../users/users.interface';
-import { QueryDto } from 'src/core/dto/query.dto';
 import { OrdersQueryDto, UserOrdersQueryDto } from './dto/order-query.dto';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
@@ -11,16 +10,23 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { OrderDto } from './dto/order.dto';
 import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { Permissions } from 'src/core/decorators/permissions.decorator';
+import { OwnerShipGuard } from 'src/core/guards/owner-ship.guard';
+import { OrderScope } from './entities/order.entity';
 
 @ApiTags("Orders")
 @ApiBearerAuth()
 @Controller('orders')
+@Permissions(OrdersService)
 export class OrdersController {
     constructor(private readonly ordersService: OrdersService) { }
 
     @Post()
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "create new order" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "create new order",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiCreatedResponse({ type: OrderDto })
     async create(
         @Body() createOrderDto: CreateOrderDto,
@@ -37,8 +43,11 @@ export class OrdersController {
     }
 
     @Put(":id")
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "update order" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "update order",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "order id" })
     @ApiOkResponse({ type: OrderDto })
     async update(
@@ -56,8 +65,11 @@ export class OrdersController {
     }
 
     @Get("")
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "Find all orders" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "Find all orders",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiFindAllResponse(OrderDto)
     async getAll(
         @Query() ordersQueryDto: OrdersQueryDto,
@@ -91,16 +103,25 @@ export class OrdersController {
     }
 
     @Get(":id")
-    @ApiOperation({ summary: "Find order by id" })
+    @ApiOperation({
+        summary: "Find order by id",
+        description: `
+        Role Required:
+        ${UserRole.ADMIN} - ${UserRole.MANAGER}: get order for any user
+        ${UserRole.CUSTOMER}: get own order only
+        `
+    })
     @ApiParam({ name: "id", description: "order id" })
+    @UseGuards(OwnerShipGuard)
     async getOrder(
         @User() user: IUser,
         @Param("id", ParseIntPipe) id: number
     ) {
         try {
 
-            const order = await this.ordersService.findOrder(id, user)
+            const order = await this.ordersService.findOneById(id, Object.values(OrderScope))
 
+            if (!order) throw new NotFoundException("order not found")
             return order
         } catch (error) {
             throw error

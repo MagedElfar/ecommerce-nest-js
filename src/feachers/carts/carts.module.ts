@@ -2,7 +2,7 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CartsController } from './carts.controller';
 import { CartsService } from './carts.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Cart } from './carts.entity';
+import { Cart } from './entities/carts.entity';
 import { CartItemsModule } from '../cart-items/cart-items.module';
 
 @Module({

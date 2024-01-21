@@ -4,10 +4,9 @@ import { AppService } from './app.service';
 import { UsersModule } from './feachers/users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './feachers/auth/auth.module';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './feachers/auth/jwt-auth.guard';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthGuard } from './feachers/auth/guards/jwt-auth.guard';
 import configuration from './core/config/configuration';
-import { SequelizeModule } from '@nestjs/sequelize';
 import { LoggerModule } from './core/logger/logger.module';
 import { LoggerMiddleware } from './core/logger/logger.middleware';
 import { GlobalExceptionFilter } from './core/filters/global-exception.filter';
@@ -15,8 +14,6 @@ import { RolesGuard } from './core/guards/roles.guard';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { CloudinaryModule } from './utility/cloudinary/cloudinary.module';
 import { CategoriesModule } from './feachers/categories/categories.module';
-import { models } from './core/database/models';
-import { ProfilesModule } from './feachers/profiles/profiles.module';
 import { BrandsModule } from './feachers/brands/brands.module';
 import { ProductsModule } from './feachers/products/products.module';
 import { AttributesModule } from './feachers/attributes/attributes.module';
@@ -45,6 +42,7 @@ import { CategoriesBrandsModule } from './feachers/categories-brands/categories-
 import { PaymentStrategyModule } from './utility/payment-strategy/payment-strategy.module';
 import { DatabaseModule } from './core/database/database.module';
 import { MailModule } from './utility/mail/mail.module';
+import { InjectUserInterceptor } from './core/interceptors/inject-user.interceptor';
 
 @Module({
   imports: [
@@ -64,7 +62,6 @@ import { MailModule } from './utility/mail/mail.module';
     UsersModule,
     CategoriesModule,
     SubCategoriesModule,
-    ProfilesModule,
     BrandsModule,
     ProductsModule,
     AttributesModule,
@@ -109,6 +106,7 @@ import { MailModule } from './utility/mail/mail.module';
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+
 
     AppService
   ],

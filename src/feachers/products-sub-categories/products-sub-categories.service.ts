@@ -1,9 +1,9 @@
 import { BadRequestException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
-import { ProductSubCategory } from './products-sub-categories.entity';
+import { ProductSubCategory } from './entities/products-sub-categories.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
-import { CreateProductSubCategoryDto } from './dto/request/create-product-sub-category.dto';
-import { IProductSubCategory } from './products-sub-categories.interface';
+import { CreateProductSubCategoryDto } from './dto/create-product-sub-category.dto';
+import { IProductSubCategory } from './interfaces/products-sub-categories.interface';
 import { Sequelize } from 'sequelize-typescript';
 import { SubCategoriesService } from '../sub-categories/services/sub-categories.service';
 import { ProductsService } from '../products/services/products.service';
@@ -19,11 +19,9 @@ export class ProductsSubCategoriesService {
         private sequelize: Sequelize,
     ) { }
 
-
-
     async findOne(
         data: Partial<Omit<IProductSubCategory, "product" | "subCategory">>
-    ): Promise<IProductSubCategory | null> {
+    ): Promise<ProductSubCategory | null> {
 
         try {
 
@@ -44,7 +42,7 @@ export class ProductsSubCategoriesService {
     async create(
         createProductSubCategoryDto: CreateProductSubCategoryDto,
         t?: Transaction
-    ): Promise<IProductSubCategory> {
+    ): Promise<ProductSubCategory> {
 
         const transaction = t || await this.sequelize.transaction();
 

@@ -2,13 +2,15 @@ import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Po
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ProductsImageService } from '../services/products-images.service';
-import { UploadImageDto } from '../dto/request/upload-image.dto';
+import { UploadImageDto } from '../dto/upload-image.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
+import { UserRole } from 'src/core/constants';
+import { Roles } from 'src/core/decorators/role.decorator';
 
-@ApiTags("Product Image")
+@ApiTags("Products")
 @ApiBearerAuth()
-@Controller('products-images')
+@Controller('products/image')
 export class ProductsImageController {
     constructor(private productsImageService: ProductsImageService) { }
 
@@ -18,7 +20,11 @@ export class ProductsImageController {
             storage: memoryStorage(),
         }),
     )
-    @ApiOperation({ summary: "upload product cover image" })
+    @Roles([UserRole.ADMIN])
+    @ApiOperation({
+        summary: "upload product cover image",
+        description: `Role Required: ${UserRole.ADMIN}`
+    })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {

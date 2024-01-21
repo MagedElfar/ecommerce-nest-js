@@ -1,12 +1,13 @@
 import { PartialType, OmitType } from "@nestjs/mapped-types";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { ArrayMinSize, IsEnum, IsInt, IsNotEmpty, IsOptional, ValidateNested, isInt } from "class-validator";
+import { ArrayMinSize, IsEnum, IsInt, IsNotEmpty, IsOptional, Min, ValidateNested, isInt } from "class-validator";
 import { OrderStatus } from "src/core/constants";
-import { NotEitherProperty } from "src/core/decorators/IsNotBothPropertiesPresent.decorator";
-import { CreateAddressDto } from "src/feachers/addresses/dto/request/create-address.dto";
+import { IsAtLeastOne } from "src/core/decorators/is-at-least-one.decorator";
+import { IsNotAllowWith } from "src/core/decorators/is-not-allow-with.decorator";
+import { CreateAddressDto } from "src/feachers/addresses/dto/create-address.dto";
 import { CreateOrderItemDto } from "src/feachers/orders-items/dto/create-order-item.dto";
-import { CreatePhoneDto } from "src/feachers/phones/dto/request/create-phone.dto";
+import { CreatePhoneDto } from "src/feachers/phones/dto/create-phone.dto";
 
 export class CreateOrderDto {
 
@@ -29,8 +30,9 @@ export class CreateOrderDto {
         description: "user address id not allowed if address provided",
     })
     @IsOptional()
-    @IsNotEmpty()
+    @Min(1)
     @IsInt()
+
     addressId?: number
 
     @ApiPropertyOptional({
@@ -41,12 +43,23 @@ export class CreateOrderDto {
     @Type(() => PartialType(OmitType(CreateAddressDto, ['userId'])))
     address?: CreateAddressDto
 
+    @IsAtLeastOne({
+        properties: ["addressId", "address"],
+        message: "address or addressId at least one should exist"
+    })
+    @IsNotAllowWith({
+        properties: ["addressId", "address"],
+        message: "properties address and addressId is not allow together"
+    })
+    addressAndAddressId: any
+
     @ApiPropertyOptional({
         description: "user phone id not allowed if phone provided",
     })
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
+    @Min(1)
     phoneId?: number
 
     @ApiPropertyOptional({
@@ -57,26 +70,23 @@ export class CreateOrderDto {
     @Type(() => PartialType(OmitType(CreatePhoneDto, ['userId'])))
     phone?: CreatePhoneDto
 
+    @IsAtLeastOne({
+        properties: ["phoneId", "phone"],
+        message: "phone or phoneId at least one should exist"
+    })
+    @IsNotAllowWith({
+        properties: ["phoneId", "phone"],
+        message: "properties phone and phoneId is not allow together"
+    })
+    phoneAndPhoneId: any
+
     @ApiPropertyOptional({
         description: "payment method id",
     })
     @IsNotEmpty()
+    @Min(1)
     @IsInt()
     paymentMethodId?: number
-
-    @NotEitherProperty({
-        property1: "phone",
-        property2: "phoneId",
-        name: "phoneAndPhoneId"
-    }, { message: 'Either phone or phoneId must be present, but not both.' })
-    phoneAndPhoneId?: boolean
-
-    @NotEitherProperty({
-        property1: "address",
-        property2: "addressId",
-        name: "addressAndAddressId"
-    }, { message: 'Either address or addressId must be present, but not both.' })
-    addressAndAddressId?: boolean
 
 
     @ApiProperty({

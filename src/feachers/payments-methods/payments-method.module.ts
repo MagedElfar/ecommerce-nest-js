@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { PaymentMethod } from './payment-method.entity';
+import { PaymentMethod } from './entities/payment-method.entity';
 import { PaymentsMethodsController } from './payments-methods.controller';
 import { PaymentsMethodsService } from './payments-methods.service';
 

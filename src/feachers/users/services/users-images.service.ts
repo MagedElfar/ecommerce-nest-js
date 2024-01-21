@@ -4,7 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { USERFolder } from 'src/core/constants';
 import { Sequelize } from 'sequelize-typescript';
 import { UsersService } from './users.service';
-import { IMedia } from 'src/feachers/media/media.interface';
+import { Media } from 'src/feachers/media/entities/media.entity';
 
 
 @Injectable()
@@ -12,10 +12,9 @@ export class UsersImagesService {
     constructor(
         private readonly mediaService: MediaService,
         private readonly usersService: UsersService,
-        private sequelize: Sequelize,
     ) { }
 
-    async upload(uploadImageDto: UploadImageDto): Promise<IMedia> {
+    async upload(uploadImageDto: UploadImageDto): Promise<Media> {
 
         try {
 

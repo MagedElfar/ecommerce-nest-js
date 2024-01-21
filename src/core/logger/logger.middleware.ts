@@ -12,25 +12,24 @@ export class LoggerMiddleware implements NestMiddleware {
     const start = Date.now();
 
     // Log request information
-    res.on('close', () => {
+    res.on("close", () => {
 
-      const duration = Date.now() - start;
       const { statusCode, statusMessage } = res;
-
       if (res.statusCode >= 400) {
+
         this.loggerService.error({
           message: statusMessage,
           req,
           statusCode
         })
+      } else {
+        this.loggerService.info({
+          message: statusMessage,
+          req,
+          statusCode
+        })
+
       }
-
-      this.loggerService.info({
-        message: statusMessage,
-        req,
-        statusCode
-      })
-
     });
 
     next();

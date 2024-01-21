@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { IOrderItem } from "../orders-items/order-item.interface";
-import { ProductsService } from "../products/services/products.service";
-import { IProductVariation } from "../products-variations/products-variations.interface";
+import { IProductVariation } from "../products-variations/interfaces/products-variations.interface";
+import { OrderItem } from "../orders-items/entities/order-item-entity";
+import { IOrderItem } from "../orders-items/interfaces/order-item.interface";
 
 @Injectable()
 export class OrdersHelper {

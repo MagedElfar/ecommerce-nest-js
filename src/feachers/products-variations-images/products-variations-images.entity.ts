@@ -1,5 +1,5 @@
-import { Media } from '../media/media.entity';
-import { ProductVariations } from '../products-variations/products-variations.entity';
+import { Media } from '../media/entities/media.entity';
+import { ProductVariations } from '../products-variations/entities/products-variations.entity';
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo, PrimaryKey, AutoIncrement } from 'sequelize-typescript';
 
 @Table({ tableName: "products_variations_images" })

@@ -3,8 +3,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { PaymentMethod } from './payment-method.entity';
-import { IPaymentMethod } from './payment-method.interface';
+import { PaymentMethod } from './entities/payment-method.entity';
+import { IPaymentMethod } from './interfaces/payment-method.interface';
 
 @Injectable()
 export class PaymentsMethodsService {
@@ -35,7 +35,7 @@ export class PaymentsMethodsService {
             throw error
         }
     }
-    async findOne(data: Partial<IPaymentMethod>): Promise<IPaymentMethod> {
+    async findOne(data: IPaymentMethod): Promise<PaymentMethod> {
         try {
 
             const paymentMethod = await this.paymentMethodModel.findOne({ where: data })
@@ -46,7 +46,7 @@ export class PaymentsMethodsService {
         }
     }
 
-    async findOdeById(id: number): Promise<IPaymentMethod | null> {
+    async findOdeById(id: number): Promise<PaymentMethod | null> {
         try {
 
             const paymentMethod = await this.paymentMethodModel.findByPk(id)
@@ -60,7 +60,7 @@ export class PaymentsMethodsService {
         }
     }
 
-    async findAll(): Promise<IPaymentMethod[]> {
+    async findAll(): Promise<PaymentMethod[]> {
         try {
 
             const paymentMethods = await this.paymentMethodModel.findAll();

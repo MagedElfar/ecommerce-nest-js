@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType, PickType } from "@nestjs/swagger";
 import { BaseDto } from "src/core/dto/base-model.dto";
-import { VariationDto } from "src/feachers/products-variations/dto/response/variation.dto";
-import { ProductDto } from "src/feachers/products/dto/response/product.dto";
+import { VariationDto } from "src/feachers/products-variations/dto/variation.dto";
+import { ProductDto } from "src/feachers/products/dto/product.dto";
 
 class ProductCartDto extends PickType(ProductDto, ["id", "name", "price"]) { }
 

@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize-typescript';
-import { CategoryBrand } from './categories-brand.entity';
-import { ICategoryBrand } from './categories-brands.interface';
-import { CreateCategoryBrandDto } from './dto/request/create-category_attributes.dto';
+import { CategoryBrand } from './entities/categories-brand.entity';
+import { CreateCategoryBrandDto } from './dto/create-category_brand.dto';
 import { BrandsService } from '../brands/services/brands.service';
 import { CategoriesService } from '../categories/services/categories.service';
+import { ICategoryBrand } from './interfaces/category-brand.interface';
 
 @Injectable()
 export class CategoriesBrandsService {
@@ -19,9 +18,9 @@ export class CategoriesBrandsService {
 
 
     async findOne(
-        data: Partial<Omit<ICategoryBrand, "category" | "brand">>,
+        data: ICategoryBrand,
 
-    ): Promise<ICategoryBrand | null> {
+    ): Promise<CategoryBrand | null> {
 
         try {
 
@@ -42,7 +41,7 @@ export class CategoriesBrandsService {
 
     async create(
         createCategoryBrandDto: CreateCategoryBrandDto,
-    ): Promise<ICategoryBrand> {
+    ): Promise<CategoryBrand> {
 
         try {
 

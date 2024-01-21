@@ -5,10 +5,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
+import { Roles } from 'src/core/decorators/role.decorator';
+import { UserRole } from 'src/core/constants';
 
-@ApiTags("Sub category Image")
+@ApiTags("Sub categories")
 @ApiBearerAuth()
-@Controller('sub-categories-images')
+@Controller('sub-categories/images')
 export class SubCategoryImageController {
     constructor(private subCategoryImageService: SubCategoryImageService) { }
 
@@ -18,7 +20,11 @@ export class SubCategoryImageController {
             storage: memoryStorage(),
         }),
     )
-    @ApiOperation({ summary: "upload sub category image" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "upload sub category image",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {

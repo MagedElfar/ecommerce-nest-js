@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PaymentStrategy } from './payment-strategy.interface';
-import { IOrder } from 'src/feachers/orders/order-interface';
+import { IOrder } from 'src/feachers/orders/interfaces/order.interface';
 
 @Injectable()
 export class PaymentStrategyService {

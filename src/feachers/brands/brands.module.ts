@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Brand } from './brands.entity';
+import { Brand } from './entities/brands.entity';
 import { BrandsService } from './services/brands.service';
 import { BrandsController } from './controlers/brands.controller';
 import { BrandsImageController } from './controlers/brands-images.controller';

@@ -1,18 +1,18 @@
 import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { CategoryImageService } from '../services/categories-images.service';
-import { UploadImageDto } from '../dto/request/upload-image.dto';
+import { UploadImageDto } from '../dto/upload-image.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
-@ApiTags("Category Image")
+@ApiTags("Category")
 @ApiBearerAuth()
-@Controller('categories-images')
+@Controller('categories')
 export class CategoryImageController {
     constructor(private categoryImageService: CategoryImageService) { }
 
-    @Post()
+    @Post("images")
     @UseInterceptors(
         FileInterceptor('file', {
             storage: memoryStorage(),

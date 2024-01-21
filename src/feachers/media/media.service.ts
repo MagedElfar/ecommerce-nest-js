@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
-import { Media } from './media.entity';
+import { Media } from './entities/media.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { IMedia } from './media.interface';
 import { UploadMediaDto } from './dto/uploadMedia.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
@@ -32,7 +31,7 @@ export class MediaService {
             throw error
         }
     }
-    async create(uploadMediaDto: UploadMediaDto): Promise<IMedia> {
+    async create(uploadMediaDto: UploadMediaDto): Promise<Media> {
         let storageKey: string = "";
         let url: string = ""
         try {
@@ -52,7 +51,7 @@ export class MediaService {
         }
     }
 
-    async findById(id: number): Promise<IMedia | null> {
+    async findById(id: number): Promise<Media | null> {
         try {
             const media = await this.mediaModel.findByPk(id)
 

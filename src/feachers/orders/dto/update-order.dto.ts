@@ -1,6 +1,8 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsOptional, IsNotEmpty, IsInt, IsEnum, IsString, IsBoolean } from "class-validator";
+import { IsOptional, IsNotEmpty, IsInt, IsEnum, IsString, IsBoolean, ValidateIf, Min } from "class-validator";
 import { OrderStatus } from "src/core/constants";
+import { IsAllowWith } from "src/core/decorators/is-allow-with.decorator";
+import { IsNotAllowWith } from "src/core/decorators/is-not-allow-with.decorator";
 
 export class UpdateOrderDto {
     @ApiPropertyOptional({
@@ -9,6 +11,7 @@ export class UpdateOrderDto {
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
+    @Min(1)
     phoneId?: number
 
     @ApiPropertyOptional({
@@ -17,6 +20,7 @@ export class UpdateOrderDto {
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
+    @Min(1)
     addressId?: number
 
     @ApiPropertyOptional({
@@ -25,6 +29,7 @@ export class UpdateOrderDto {
     @IsOptional()
     @IsNotEmpty()
     @IsInt()
+    @Min(1)
     userId?: number
 
     @ApiPropertyOptional({
@@ -49,11 +54,22 @@ export class UpdateOrderDto {
     @IsBoolean()
     addToStock?: boolean = false;
 
+    @IsNotAllowWith({
+        properties: ["addToStock", "removeFromStock"],
+        message: "properties addToStock and removeFromStock is not allow together"
+    })
+    stockOperation?: any
+
     @ApiPropertyOptional({
         description: "order cancel reason",
     })
     @IsOptional()
     @IsString()
+    @IsAllowWith({
+        property: "status",
+        value: OrderStatus.CANCELLED,
+        message: "reason field allow only with order cancelled status"
+    })
     reason?: string;
 
     deliveredAt?: any

@@ -2,9 +2,9 @@ import { Body, Controller, Delete, HttpCode, HttpStatus, Param, ParseIntPipe, Po
 import { UserRole } from 'src/core/constants';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { CategoriesAttributeService } from './categories-attributes.service';
-import { CreateCategoryAttributesDto } from './dto/request/create-category_attributes.dto';
+import { CreateCategoryAttributesDto } from './dto/create-category_attributes.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CategoryAttributeDto } from './dto/response/categoryAttribute.dto';
+import { CategoryAttributeDto } from './dto/categoryAttribute.dto';
 
 @ApiTags("Categories Attribute")
 @ApiBearerAuth()
@@ -14,8 +14,11 @@ export class CategoriesAttributesController {
     constructor(private readonly categoriesAttributeService: CategoriesAttributeService) { }
 
     @Post()
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "assign attribute to category" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "assign attribute to category",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiCreatedResponse({ type: CategoryAttributeDto })
     async create(@Body() createCategoryAttributesDto: CreateCategoryAttributesDto) {
         try {
@@ -30,8 +33,12 @@ export class CategoriesAttributesController {
 
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "unassign attribute from the category" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "unassign attribute from the category",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+
+    })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
 

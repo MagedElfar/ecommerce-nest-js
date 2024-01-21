@@ -1,18 +1,15 @@
-import { BrandScope } from './../brands.entity';
+import { BrandScope } from '../entities/brands.entity';
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
 import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { BrandsService } from '../services/brands.service';
-import { CreateBrandDto } from '../dto/request/create-brands.dto';
-import { BrandQueryDto } from '../dto/request/brands-query.dto';
-import { UpdateBrandDto } from '../dto/request/update-brand.dto';
+import { CreateBrandDto } from '../dto/create-brands.dto';
+import { BrandQueryDto } from '../dto/brands-query.dto';
+import { UpdateBrandDto } from '../dto/update-brand.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
-import { FindAllBrandsResponseDto } from '../dto/response/findBrands.dto';
-import { CreateBrandResponseDto } from '../dto/response/create.dto';
-import { UpdateBrandResponseDto } from '../dto/response/update.dto';
-import { FindOneBrandResponseDto } from '../dto/response/findBrand.dto';
+import { BrandDto } from '../dto/brand.dto';
 
 @ApiTags("Brands")
 @Controller('brands')
@@ -23,7 +20,7 @@ export class BrandsController {
     @Get()
     @Public()
     @ApiOperation({ summary: "Find All brands" })
-    @ApiFindAllResponse(FindAllBrandsResponseDto)
+    @ApiFindAllResponse(BrandDto)
     async findAll(@Query() brandQueryDto: BrandQueryDto) {
         try {
             const brands = await this.brandsService.findAll(brandQueryDto, [BrandScope.WITH_IMAGE]);
@@ -34,11 +31,14 @@ export class BrandsController {
     }
 
     @Post()
-    @Roles([UserRole.ADMIN])
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
     @ApiBearerAuth()
-    @ApiOperation({ summary: "create new brand" })
+    @ApiOperation({
+        summary: "create new brand",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiCreatedResponse({
-        type: CreateBrandResponseDto
+        type: BrandDto
     })
     async create(@Body() createBrandDto: CreateBrandDto) {
         try {
@@ -51,12 +51,15 @@ export class BrandsController {
     }
 
     @Put(":id")
-    @Roles([UserRole.ADMIN])
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
     @ApiBearerAuth()
-    @ApiOperation({ summary: "update brand" })
+    @ApiOperation({
+        summary: "update brand",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "brandId" })
     @ApiOkResponse({
-        type: UpdateBrandResponseDto
+        type: BrandDto
     })
     async update(@Param("id", ParseIntPipe) id: number, @Body() updateBrandDto: UpdateBrandDto) {
         try {
@@ -73,7 +76,7 @@ export class BrandsController {
     @ApiOperation({ summary: "get brand" })
     @ApiParam({ name: "id", description: "brandId" })
     @ApiOkResponse({
-        type: FindOneBrandResponseDto
+        type: BrandDto
     })
     async findOne(@Param("id", ParseIntPipe) id: number) {
         try {
@@ -88,10 +91,13 @@ export class BrandsController {
     }
 
     @Delete(":id")
-    @Roles([UserRole.ADMIN])
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiBearerAuth()
-    @ApiOperation({ summary: "delete brand" })
+    @ApiOperation({
+        summary: "delete brand",
+        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "brandId" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

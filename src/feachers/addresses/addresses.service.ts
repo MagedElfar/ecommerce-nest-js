@@ -1,10 +1,10 @@
-import { UpdateAddressDto } from './dto/request/update-address.dto';
-import { CreateAddressDto } from './dto/request/create-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
+import { CreateAddressDto } from './dto/create-address.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Address } from './address.entity';
+import { Address } from './entities/address.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { IAddress } from './address.interface';
-import { AddressQueryDto } from './dto/request/address-query.dto';
+import { AddressQueryDto } from './dto/address-query.dto';
+import { IAddress } from './interfaces/address.interface';
 
 @Injectable()
 export class AddressesService {
@@ -13,6 +13,7 @@ export class AddressesService {
         @InjectModel(Address)
         private readonly addressModel: typeof Address
     ) { }
+
 
     async findAll(addressQueryDto: AddressQueryDto, scope: string[] = []) {
         try {
@@ -32,7 +33,7 @@ export class AddressesService {
     }
 
 
-    async create(createAddressDto: CreateAddressDto): Promise<IAddress> {
+    async create(createAddressDto: CreateAddressDto): Promise<Address> {
         try {
 
             const address = await this.addressModel.create(createAddressDto);
@@ -43,9 +44,11 @@ export class AddressesService {
         }
     }
 
-    async findOne(data: Partial<IAddress>, scope: string[] = []): Promise<IAddress | null> {
+    async findOne(data: IAddress, scope: string[] = []): Promise<Address | null> {
         try {
-            const address = await this.addressModel.scope(scope).findOne({ where: data });
+            const address = await this.addressModel.scope(scope).findOne(
+                { where: data }
+            );
 
             if (!address) return null
 
@@ -55,8 +58,9 @@ export class AddressesService {
         }
     }
 
-    async findOneById(id: number, scope: string[] = []): Promise<IAddress | null> {
+    async findOneById(id: number, scope: string[] = []): Promise<Address | null> {
         try {
+
             const address = await this.addressModel.scope(scope).findByPk(id);
 
             if (!address) return null
@@ -67,20 +71,20 @@ export class AddressesService {
         }
     }
 
-    async update(id: number, updateAddressDto: UpdateAddressDto): Promise<IAddress | null> {
+    async update(id: number, updateAddressDto: UpdateAddressDto): Promise<Address> {
         try {
 
-            const address = await this.findOne({
-                id,
-                userId: updateAddressDto.userId
-            });
+            const [affectedRowsCount] = await this.addressModel.update(
+                updateAddressDto,
+                { where: { id } },
+            );
 
-            if (!address)
-                throw new NotFoundException();
+            if (affectedRowsCount === 0) {
+                throw new NotFoundException('Address not found');
+            }
 
-            await this.addressModel.update(updateAddressDto, { where: { id } })
+            return await this.findOneById(id);
 
-            return await this.findOneById(id)
         } catch (error) {
             throw error
         }

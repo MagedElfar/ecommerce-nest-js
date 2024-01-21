@@ -1,29 +1,33 @@
+import { Permissions } from './../../core/decorators/permissions.decorator';
 import { AddressesService } from './addresses.service';
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query } from '@nestjs/common';
-import { CreateAddressDto } from './dto/request/create-address.dto';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, NotFoundException, Param, ParseIntPipe, Post, Put, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { CreateAddressDto } from './dto/create-address.dto';
 import { User } from 'src/core/decorators/user.decorator';
-import { UpdateAddressDto } from './dto/request/update-address.dto';
+import { UpdateAddressDto } from './dto/update-address.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { AddressQueryDto } from './dto/request/address-query.dto';
+import { AddressQueryDto } from './dto/address-query.dto';
 import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
-import { AddressScope } from './address.entity';
-import { CreateAddressResponseDto } from './dto/response/createAddress.dto';
-import { FindAddressesResponseDto } from './dto/response/findAddresses.dto';
-import { FindAddressResponseDto } from './dto/response/findAddress.dto';
-import { UpdateAddressResponseDto } from './dto/response/updateAddress.dto';
-
+import { Address, AddressScope } from './entities/address.entity';
+import { OwnerShipGuard } from 'src/core/guards/owner-ship.guard';
+import { InjectUserInterceptor } from 'src/core/interceptors/inject-user.interceptor';
+import { AddressDto } from './dto/address.dto';
+import { UserRole } from 'src/core/constants';
 
 
 @ApiTags("Addresses")
 @ApiBearerAuth()
 @Controller('addresses')
+@Permissions(AddressesService)
 export class AddressesController {
 
     constructor(private readonly addressesService: AddressesService) { }
 
     @Get()
-    @ApiOperation({ summary: "Find all user addresses" })
-    @ApiFindAllResponse(FindAddressesResponseDto)
+    @ApiOperation({
+        summary: "Find all user addresses",
+        description: `Required Roles : not specific role required `
+    })
+    @ApiFindAllResponse(AddressDto)
     async get(
         @Query() addressQueryDto: AddressQueryDto,
         @User("id") userId: number
@@ -32,22 +36,28 @@ export class AddressesController {
 
             addressQueryDto.userId = userId;
 
-            const addresses = await this.addressesService.findAll(addressQueryDto);
-
-            return addresses
+            return await this.addressesService.findAll(addressQueryDto);
         } catch (error) {
             throw error
         }
     }
 
     @Get(":id")
-    @ApiOperation({ summary: "Find user address by ID" })
+    @UseGuards(OwnerShipGuard)
+    @ApiOperation({
+        summary: "Find address by ID",
+        description: `
+        Role Required:
+        ${UserRole.ADMIN} - ${UserRole.MANAGER}: access to any address
+        ${UserRole.CUSTOMER}: access to own address only
+        `
+    })
     @ApiParam({ name: "id", description: "Address id" })
-    @ApiOkResponse({ type: FindAddressResponseDto })
+    @ApiOkResponse({ type: AddressDto })
     async getOne(
         @Param("id", ParseIntPipe) id: number,
         @User("id") userId: number
-    ) {
+    ): Promise<Address> {
         try {
 
             const address = await this.addressesService.findOne({
@@ -64,12 +74,22 @@ export class AddressesController {
     }
 
     @Post()
-    @ApiOperation({ summary: "Create a new address" })
-    @ApiCreatedResponse({ type: CreateAddressResponseDto })
+    @UseInterceptors(InjectUserInterceptor)
+    @ApiOperation({
+        summary: "Create a new address",
+        description: `
+        Role Required:
+        ${UserRole.ADMIN} - ${UserRole.MANAGER}: create address for any user
+        ${UserRole.CUSTOMER}: create own address
+        `
+
+    })
+    @ApiCreatedResponse({ type: AddressDto })
     async create(@Body() createAddressDto: CreateAddressDto, @User("id") userId: number) {
         try {
 
-            createAddressDto.userId = userId;
+            if (!createAddressDto.userId)
+                createAddressDto.userId = userId;
 
             const address = await this.addressesService.create(createAddressDto);
 
@@ -80,9 +100,18 @@ export class AddressesController {
     }
 
     @Put(":id")
-    @ApiOperation({ summary: "update address" })
+    @UseInterceptors(InjectUserInterceptor)
+    @UseGuards(OwnerShipGuard)
+    @ApiOperation({
+        summary: "Update address",
+        description: `
+        Role Required:
+        ${UserRole.ADMIN} - ${UserRole.MANAGER}: update any address
+        ${UserRole.CUSTOMER}: update own addresses only
+        `
+    })
     @ApiParam({ description: "address id", name: 'id' })
-    @ApiOkResponse({ type: UpdateAddressResponseDto })
+    @ApiOkResponse({ type: AddressDto })
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() updateAddressDto: UpdateAddressDto,
@@ -90,7 +119,8 @@ export class AddressesController {
     ) {
         try {
 
-            updateAddressDto.userId = userId;
+            if (!updateAddressDto.userId)
+                updateAddressDto.userId = userId;
 
             const address = await this.addressesService.update(id, updateAddressDto);
 
@@ -101,7 +131,15 @@ export class AddressesController {
     }
 
     @Delete(":id")
-    @ApiOperation({ summary: "delete address" })
+    @UseGuards(OwnerShipGuard)
+    @ApiOperation({
+        summary: "Delete address",
+        description: `
+        Role Required:
+        ${UserRole.ADMIN} - ${UserRole.MANAGER}: delete any address
+        ${UserRole.CUSTOMER}: delete own addresses only
+        `
+    })
     @ApiParam({ description: "address id", name: 'id' })
     @HttpCode(HttpStatus.NO_CONTENT)
     async delete(

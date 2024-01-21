@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { BaseDto } from "src/core/dto/base-model.dto";
-import { Brand } from "src/feachers/brands/brands.entity";
+import { Brand } from "src/feachers/brands/entities/brands.entity";
 import { MediaDto } from "src/feachers/media/dto/media.dto";
 
 export class SubCategoryDto extends BaseDto {

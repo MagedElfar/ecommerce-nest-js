@@ -1,21 +1,21 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { AttributeValues } from './attributes-values.entity';
+import { AttributeValue } from './entities/attribute-value.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { IAttributeValue } from './attributes-values.interface';
 import { Sequelize } from 'sequelize-typescript';
-import { CreateAttributeValueDto } from './dto/request/create-attribute-value.dto';
-import { UpdateAttributeValueDto } from './dto/request/update-attribute-value.dto';
+import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
+import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
+import { IAttributeValue } from './interface/attribute-value.interface';
 
 @Injectable()
 export class AttributeValuesService {
     constructor(
-        @InjectModel(AttributeValues)
-        private readonly attributeValueModel: typeof AttributeValues,
+        @InjectModel(AttributeValue)
+        private readonly attributeValueModel: typeof AttributeValue,
         private sequelize: Sequelize,
     ) { }
 
 
-    async create(createAttributeValueDto: CreateAttributeValueDto): Promise<IAttributeValue> {
+    async create(createAttributeValueDto: CreateAttributeValueDto): Promise<AttributeValue> {
         try {
             let value = await this.findOne({ ...createAttributeValueDto });
 
@@ -30,7 +30,7 @@ export class AttributeValuesService {
         }
     }
 
-    async findOne(data: Partial<Omit<IAttributeValue, "attribute">>): Promise<IAttributeValue | null> {
+    async findOne(data: IAttributeValue): Promise<AttributeValue | null> {
         try {
 
             const value = await this.attributeValueModel.findOne({ where: data });
@@ -45,7 +45,7 @@ export class AttributeValuesService {
 
     async findOneById(
         id: number,
-    ): Promise<IAttributeValue | null> {
+    ): Promise<AttributeValue | null> {
         try {
             const value = await this.attributeValueModel.findByPk(id);
 
@@ -67,23 +67,16 @@ export class AttributeValuesService {
         }
     }
 
-    async update(id: number, updateAttributeValueDto: UpdateAttributeValueDto): Promise<IAttributeValue> {
+    async update(id: number, updateAttributeValueDto: UpdateAttributeValueDto): Promise<AttributeValue> {
         try {
 
-            let value = await this.findOneById(id);
+            const [affectedRowsCount] = await this.attributeValueModel.update(updateAttributeValueDto, { where: { id } })
 
-            console.log("value = ", value)
-            console.log("id = ", id)
-
-
-            if (!value) throw new NotFoundException();
-
-            await this.attributeValueModel.update<AttributeValues>(updateAttributeValueDto, { where: { id } })
-
-            return {
-                ...value,
-                ...updateAttributeValueDto,
+            if (affectedRowsCount === 0) {
+                throw new NotFoundException('Address not found');
             }
+
+            return await this.findOneById(id)
         } catch (error) {
 
             throw error

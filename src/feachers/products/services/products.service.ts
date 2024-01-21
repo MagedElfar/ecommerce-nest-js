@@ -1,20 +1,20 @@
 import { MediaService } from 'src/feachers/media/media.service';
-import { UpdateProductDto } from '../dto/request/update-product.dto';
-import { CreateProductDto } from '../dto/request/create-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
+import { CreateProductDto } from '../dto/create-product.dto';
 import { ConflictException, HttpException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Product, ProductScop } from '../products.entity';
-import { IProduct } from '../products.interface';
+import { Product, ProductScop } from '../entities/products.entity';
+import { IProduct } from '../interfaces/product.interface';
 import * as slugify from "slugify"
 import { Sequelize } from 'sequelize-typescript';
-import { SubCategory } from '../../sub-categories/sub-categories.entity';
+import { SubCategory } from '../../sub-categories/enities/sub-categories.entity';
 import { ProductsSubCategoriesService } from '../../products-sub-categories/products-sub-categories.service';
 import { Includeable, Op, WhereOptions, where } from 'sequelize';
-import { ProductQueryDto } from '../dto/request/product-query.dto';
-import { AttributeValues } from '../../attributes-values/attributes-values.entity';
-import { ProductVariations } from '../../products-variations/products-variations.entity';
+import { ProductQueryDto } from '../dto/product-query.dto';
+import { AttributeValue } from '../../attributes-values/entities/attribute-value.entity';
+import { ProductVariations } from '../../products-variations/entities/products-variations.entity';
 import { ProductVariationsService } from '../../products-variations/products-variations.service';
-import { Media } from 'src/feachers/media/media.entity';
+import { Media } from 'src/feachers/media/entities/media.entity';
 
 @Injectable()
 export class ProductsService {
@@ -84,7 +84,7 @@ export class ProductsService {
                 where: {},
                 include: [
                     {
-                        model: AttributeValues,
+                        model: AttributeValue,
                         where: { id: { [Op.in]: filterOptions.attributes } },
                         attributes: [],
                         through: { where: { attrId: { [Op.in]: filterOptions.attributes } } }
@@ -172,9 +172,6 @@ export class ProductsService {
 
             }
 
-
-
-
             //add product sub categories if exist
             if (subCategories && subCategories.length > 0) {
                 await Promise.all(
@@ -190,12 +187,7 @@ export class ProductsService {
                 )
             }
 
-            console.log("cat ...")
-
-
             await transaction.commit();
-
-            console.log("cat ...")
 
             return await this.fullData(product["dataValues"].id)
         } catch (error) {
@@ -208,7 +200,7 @@ export class ProductsService {
         }
     }
 
-    async findOneById(id: number, scopes: string[] = []): Promise<IProduct | null> {
+    async findOneById(id: number, scopes: string[] = []): Promise<Product | null> {
         try {
 
             const product = await this.productModel.scope(scopes).findByPk(id)
@@ -221,7 +213,7 @@ export class ProductsService {
         }
     }
 
-    async findOne(data: Partial<Omit<Product, "variations" | "subCategories">>, scopes: string[] = []): Promise<IProduct | null> {
+    async findOne(data: IProduct, scopes: string[] = []): Promise<Product | null> {
         try {
 
             const product = await this.productModel.scope(scopes).findOne({ where: data })
@@ -234,7 +226,7 @@ export class ProductsService {
         }
     }
 
-    async updated(id: number, updateProductDto: UpdateProductDto): Promise<IProduct> {
+    async updated(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
         try {
             let product = await this.findOneById(id);
 
@@ -251,7 +243,7 @@ export class ProductsService {
 
             await this.productModel.update(updateProductDto, { where: { id } })
 
-            return await this.fullData(id)
+            return await this.findOneById(id)
 
         } catch (error) {
             throw error

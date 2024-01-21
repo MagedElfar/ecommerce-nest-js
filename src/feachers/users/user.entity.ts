@@ -1,9 +1,9 @@
 import { Table, Column, Model, DataType, HasOne, BelongsTo, ForeignKey, HasMany, Scopes } from 'sequelize-typescript';
 import { UserRole } from 'src/core/constants';
-import { Cart } from '../carts/carts.entity';
-import { Media } from '../media/media.entity';
-import { Address } from '../addresses/address.entity';
-import { Phone } from '../phones/phone.entity';
+import { Cart } from '../carts/entities/carts.entity';
+import { Media } from '../media/entities/media.entity';
+import { Address } from '../addresses/entities/address.entity';
+import { Phone } from '../phones/entities/phone.entity';
 
 export enum UserScop {
     WITH_Media = "with details",
@@ -49,7 +49,6 @@ export enum UserScop {
             unique: true,
             fields: ['email'],
         },
-        // Add other indexes as needed
     ],
 })
 export class User extends Model<User> {
@@ -87,7 +86,7 @@ export class User extends Model<User> {
     @Column({
         type: DataType.ENUM(...Object.values(UserRole)),
         allowNull: false,
-        defaultValue: UserRole.USER
+        defaultValue: UserRole.CUSTOMER
     })
     role: UserRole
 

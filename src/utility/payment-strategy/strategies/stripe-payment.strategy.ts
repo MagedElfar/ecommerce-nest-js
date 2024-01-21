@@ -1,8 +1,9 @@
 // stripe-payment.strategy.ts
 import { Injectable } from '@nestjs/common';
 import { PaymentStrategy } from './../payment-strategy.interface';
-import { IOrder } from 'src/feachers/orders/order-interface';
 import { StripeService } from 'src/utility/stripe/stripe.service';
+import { Order } from 'src/feachers/orders/entities/order.entity';
+import { IOrder } from 'src/feachers/orders/interfaces/order.interface';
 
 @Injectable()
 export class StripePaymentStrategy implements PaymentStrategy {

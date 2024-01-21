@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/feachers/users/users.module';
-import { LocalStrategy } from './local.strategy';
+import { LocalStrategy } from './strategies/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 import { ConfigService } from '@nestjs/config';
-import { PasswordService } from './password.service';
+import { PasswordService } from './services/password.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { RestToken } from './reset-token.entity';
+import { RestToken } from './entities/reset-token.entity';
 import { MailModule } from 'src/utility/mail/mail.module';
 
 @Module({

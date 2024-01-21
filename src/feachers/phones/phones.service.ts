@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { Phone } from './phone.entity';
+import { Phone } from './entities/phone.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreatePhoneDto } from './dto/request/create-phone.dto';
-import { IPhone } from './phone.interface';
-import { UpdatePhoneDto } from './dto/request/update-add.dto';
-import { PhoneQueryDto } from './dto/request/phone-query.dto';
+import { CreatePhoneDto } from './dto/create-phone.dto';
+import { IPhone } from './interfaces/phone.interface';
+import { UpdatePhoneDto } from './dto/update-add.dto';
+import { PhoneQueryDto } from './dto/phone-query.dto';
 
 @Injectable()
 export class PhonesService {
@@ -42,7 +42,7 @@ export class PhonesService {
         }
     }
 
-    async findOne(data: Partial<IPhone>, scopes: string[] = []): Promise<IPhone | null> {
+    async findOne(data: IPhone, scopes: string[] = []): Promise<Phone | null> {
         try {
             const phone = await this.phoneModel.scope(scopes).findOne({ where: data });
 
@@ -54,7 +54,7 @@ export class PhonesService {
         }
     }
 
-    async findOneById(id: number, scopes: string[] = []): Promise<IPhone | null> {
+    async findOneById(id: number, scopes: string[] = []): Promise<Phone | null> {
         try {
             const phone = await this.phoneModel.scope(scopes).findByPk(id);
 
@@ -66,7 +66,7 @@ export class PhonesService {
         }
     }
 
-    async update(id: number, updatePhoneDto: UpdatePhoneDto): Promise<IPhone | null> {
+    async update(id: number, updatePhoneDto: UpdatePhoneDto): Promise<Phone | null> {
         try {
 
             const phone = await this.findOneById(id);
@@ -76,10 +76,7 @@ export class PhonesService {
 
             await this.phoneModel.update(updatePhoneDto, { where: { id } })
 
-            return {
-                ...phone,
-                ...updatePhoneDto
-            }
+            return await this.findOneById(id)
         } catch (error) {
             throw error
         }

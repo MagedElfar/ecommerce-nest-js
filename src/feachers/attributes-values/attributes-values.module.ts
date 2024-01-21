@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { AttributeValuesService } from './attributes-values.service';
 import { AttributeValuesController } from './attributes-values.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AttributeValues } from './attributes-values.entity';
+import { AttributeValue } from './entities/attribute-value.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([AttributeValues])],
+  imports: [SequelizeModule.forFeature([AttributeValue])],
   providers: [AttributeValuesService],
   controllers: [AttributeValuesController],
   exports: [AttributeValuesService]

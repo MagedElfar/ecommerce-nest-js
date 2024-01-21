@@ -1,14 +1,14 @@
 import { CartItemsService } from './cart-items.service';
 import { Body, Controller, Delete, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { User } from 'src/core/decorators/user.decorator';
-import { CreateItemDto } from './dto/request/create-item-dto';
-import { UpdateItemDto } from './dto/request/update-item.dto';
+import { CreateItemDto } from './dto/create-item-dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { CartItemDto } from './dto/response/cartItem.dto';
+import { CartItemDto } from './dto/cartItem.dto';
 
-@ApiTags("Cart Items")
+@ApiTags("Carts")
 @ApiBearerAuth()
-@Controller('cart-items')
+@Controller('carts/items')
 export class CartItemsController {
 
     constructor(private readonly cartItemsService: CartItemsService) { }

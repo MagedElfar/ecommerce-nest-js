@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { Order } from './order.entity';
+import { Order } from './entities/order.entity';
 import { CartsModule } from '../carts/carts.module';
 import { OrdersHelper } from './orders.helper';
 import { PhonesModule } from '../phones/phones.module';

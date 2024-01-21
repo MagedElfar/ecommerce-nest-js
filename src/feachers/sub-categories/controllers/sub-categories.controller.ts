@@ -11,7 +11,7 @@ import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
 import { FindSubCategoriesDto } from '../dto/response/findSubCtegories.dto';
 import { CreateSubCategoryResponseDto } from '../dto/response/createCategory.dto';
 import { UpdateSubCategoryResponseDto } from '../dto/response/updateCategory.dto';
-import { SubCategoryScope } from '../sub-categories.entity';
+import { SubCategoryScope } from '../enities/sub-categories.entity';
 
 @ApiTags("Sub categories")
 @ApiBearerAuth()
@@ -34,8 +34,11 @@ export class SubCategoriesController {
     }
 
     @Post()
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "create new sub category" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "create new sub category",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiCreatedResponse({ type: CreateSubCategoryResponseDto })
     async create(@Body() createCategoryDto: CreateSubCategoryDto) {
         try {
@@ -48,8 +51,11 @@ export class SubCategoriesController {
     }
 
     @Put(":id")
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "update sub category" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "update sub category",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "sub category id" })
     @ApiOkResponse({ type: UpdateSubCategoryResponseDto })
     async update(@Param("id", ParseIntPipe) id: number, @Body() updateCategoryDto: UpdateSubCategoryDto) {
@@ -64,7 +70,9 @@ export class SubCategoriesController {
 
     @Get(":id")
     @Public()
-    @ApiOperation({ summary: "Find sub category by id" })
+    @ApiOperation({
+        summary: "Find sub category by id",
+    })
     @ApiParam({ name: "id", description: "sub category id" })
     @ApiOkResponse({ type: FindSubCategoriesDto })
     async findOne(@Param("id", ParseIntPipe) id: number) {
@@ -80,9 +88,12 @@ export class SubCategoriesController {
     }
 
     @Delete(":id")
-    @Roles([UserRole.ADMIN])
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
     @HttpCode(HttpStatus.NO_CONTENT)
-    @ApiOperation({ summary: "delete sub category" })
+    @ApiOperation({
+        summary: "delete sub category",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "sub category id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

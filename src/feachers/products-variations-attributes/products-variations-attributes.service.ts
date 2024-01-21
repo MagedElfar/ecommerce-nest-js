@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, InternalServerErrorException, NotFoundException, forwardRef } from '@nestjs/common';
 import { ProductVariationAttribute } from './products-variations-attributes.entity';
 import { InjectModel } from '@nestjs/sequelize';
-import { IProductVariationAttributes } from './products-variations-attributes.interface';
+import { IProductVariationAttributes } from './interfaces/products-variations-attributes.interface';
 import { CreateProductAttributesDto } from './dto/request/create-product_variation_attributes.dto';
 import { Transaction } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -21,28 +21,23 @@ export class ProductVariationAttributesService {
     ) { }
 
     async findOne(
-        data: Partial<Omit<IProductVariationAttributes, "proVar" | "attribute">>,
+        data: IProductVariationAttributes,
         t?: Transaction
 
-    ): Promise<IProductVariationAttributes | null> {
-
-        const transaction = t || await this.sequelize.transaction();
+    ): Promise<ProductVariationAttribute | null> {
 
         try {
 
             const productAttribute = await this.productAttributeModel.findOne({
                 where: data,
-                transaction
             });
 
             if (!productAttribute) return null;
 
-            if (!t) await transaction.commit()
 
-            return t ? productAttribute : productAttribute["dataValues"];
+            productAttribute["dataValues"];
 
         } catch (error) {
-            if (!t) await transaction.rollback()
             throw error
         }
     }
@@ -51,7 +46,7 @@ export class ProductVariationAttributesService {
     async create(
         createProductAttributesDto: CreateProductAttributesDto,
         t?: Transaction
-    ): Promise<IProductVariationAttributes> {
+    ): Promise<ProductVariationAttribute> {
 
         const transaction = t || await this.sequelize.transaction();
 

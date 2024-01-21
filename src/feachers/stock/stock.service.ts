@@ -1,9 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ProductVariationsService } from '../products-variations/products-variations.service';
 import { Sequelize } from 'sequelize-typescript';
-import { IOrderItem } from '../orders-items/order-item.interface';
 import { Transaction } from 'sequelize';
-import { IProductVariation } from '../products-variations/products-variations.interface';
+import { IProductVariation } from '../products-variations/interfaces/products-variations.interface';
+import { IOrderItem } from '../orders-items/interfaces/order-item.interface';
 
 @Injectable()
 export class StockService {

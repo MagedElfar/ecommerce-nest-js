@@ -1,9 +1,9 @@
 import { ApiProperty, OmitType, PickType } from "@nestjs/swagger";
 import { UserRole } from "src/core/constants";
 import { BaseDto } from "src/core/dto/base-model.dto";
-import { AddressDto } from "src/feachers/addresses/dto/response/address.dto";
+import { AddressDto } from "src/feachers/addresses/dto/address.dto";
 import { MediaDto } from "src/feachers/media/dto/media.dto";
-import { PhoneDto } from "src/feachers/phones/dto/response/phone.dto";
+import { PhoneDto } from "src/feachers/phones/dto/phone.dto";
 
 export class UserDto extends BaseDto {
     @ApiProperty({

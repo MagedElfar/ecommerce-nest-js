@@ -13,8 +13,11 @@ export class ProductVariationAttributesController {
     constructor(private readonly productVariationAttributesService: ProductVariationAttributesService) { }
 
     @Post()
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "assign attribute value to product variation" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "assign attribute value to product variation",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiCreatedResponse({ type: ProductAttributeDto })
     async create(@Body() createProductAttributesDto: CreateProductAttributesDto) {
         try {
@@ -29,8 +32,11 @@ export class ProductVariationAttributesController {
 
     @Delete(":id")
     @HttpCode(HttpStatus.NO_CONTENT)
-    @Roles([UserRole.ADMIN])
-    @ApiOperation({ summary: "unassign attribute value from product variation" })
+    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @ApiOperation({
+        summary: "unassign attribute value from product variation",
+        description: `Required Roles: ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+    })
     @ApiParam({ name: "id", description: "assign id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {

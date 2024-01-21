@@ -1,14 +1,14 @@
 import { MediaService } from 'src/feachers/media/media.service';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Brand, BrandScope } from '../brands.entity';
+import { Brand, BrandScope } from '../entities/brands.entity';
 import * as slugify from "slugify"
-import { IBrand } from '../brands.interface';
-import { BrandQueryDto } from '../dto/request/brands-query.dto';
+import { BrandQueryDto } from '../dto/brands-query.dto';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { CreateBrandDto } from '../dto/request/create-brands.dto';
-import { UpdateBrandDto } from '../dto/request/update-brand.dto';
+import { CreateBrandDto } from '../dto/create-brands.dto';
+import { UpdateBrandDto } from '../dto/update-brand.dto';
+import { IBrand } from '../interfaces/brand.interface';
 
 @Injectable()
 export class BrandsService {
@@ -38,7 +38,7 @@ export class BrandsService {
         }
     }
 
-    async findOneById(id: number, scopes: any[] = []): Promise<IBrand | null> {
+    async findOneById(id: number, scopes: any[] = []): Promise<Brand | null> {
         try {
             const brand = await this.brandModel.scope(scopes).findByPk(id)
 
@@ -50,7 +50,7 @@ export class BrandsService {
         }
     }
 
-    async findOne(data: Partial<Omit<IBrand, "image">>, scopes: any[] = []): Promise<IBrand | null> {
+    async findOne(data: IBrand, scopes: any[] = []): Promise<Brand | null> {
         try {
             const brand = await this.brandModel.scope(scopes).findOne({
                 where: data,
@@ -64,7 +64,7 @@ export class BrandsService {
         }
     }
 
-    async create(createBrandDto: CreateBrandDto): Promise<IBrand> {
+    async create(createBrandDto: CreateBrandDto): Promise<Brand> {
         try {
 
             const slug: string = slugify.default(createBrandDto.name);
@@ -84,7 +84,7 @@ export class BrandsService {
         }
     }
 
-    async update(id: number, updateBrandDto: UpdateBrandDto): Promise<IBrand> {
+    async update(id: number, updateBrandDto: UpdateBrandDto): Promise<Brand> {
         try {
 
             let brand = await this.findOneById(id);
@@ -122,8 +122,6 @@ export class BrandsService {
                 where: { id },
                 transaction: t
             });
-
-            if (!isDeleted) throw new NotFoundException();
 
             if (brand.imageId)
                 await this.mediaService.delete(brand.imageId, t)

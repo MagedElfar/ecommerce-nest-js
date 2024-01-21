@@ -9,7 +9,7 @@ import { MediaDto } from 'src/feachers/media/dto/media.dto';
 
 @ApiTags("User Image")
 @ApiBearerAuth()
-@Controller('users-images')
+@Controller('users/images')
 export class UsersImagesController {
 
     constructor(private usersImagesService: UsersImagesService) { }

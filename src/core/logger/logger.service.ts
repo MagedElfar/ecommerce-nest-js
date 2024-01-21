@@ -7,7 +7,6 @@ import { LoggerDto } from './dto/logger.dto';
 
 const logsDir = join(dirname(__dirname), '..', "..", 'logs');
 
-console.log(logsDir)
 
 if (!existsSync(logsDir)) {
     mkdirSync(logsDir);

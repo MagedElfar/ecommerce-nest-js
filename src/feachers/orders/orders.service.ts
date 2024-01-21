@@ -1,6 +1,6 @@
 import { OrdersHelper } from './orders.helper';
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { Order, OrderScope } from './order.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Order, OrderScope } from './entities/order.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -8,13 +8,10 @@ import { PhonesService } from '../phones/phones.service';
 import { AddressesService } from '../addresses/addresses.service';
 import { OrdersItemsService } from '../orders-items/orders-items.service';
 import { PaymentsMethodsService } from '../payments-methods/payments-methods.service';
-import { IOrder } from './order-interface';
 import { User } from '../users/user.entity';
-
-import { VariationScope } from '../products-variations/products-variations.entity';
-import { IUser } from '../users/users.interface';
-import { OrderStatus, UserRole } from 'src/core/constants';
-import { OrdersQueryDto, UserOrdersQueryDto } from './dto/order-query.dto';
+import { VariationScope } from '../products-variations/entities/products-variations.entity';
+import { OrderStatus } from 'src/core/constants';
+import { OrdersQueryDto } from './dto/order-query.dto';
 import { Op } from 'sequelize';
 import { OrdersCancelReasonsService } from '../orders-cancel-reasons/orders-cancel-reasons.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -22,6 +19,7 @@ import { Transaction } from 'sequelize';
 import { StockService } from '../stock/stock.service';
 import * as moment from 'moment';
 import { ProductVariationsService } from '../products-variations/products-variations.service';
+import { IOrder } from './interfaces/order.interface';
 
 @Injectable()
 export class OrdersService {
@@ -39,10 +37,10 @@ export class OrdersService {
         private readonly sequelize: Sequelize,
     ) { }
 
-    async create(createOrderDto: CreateOrderDto, t?: Transaction): Promise<IOrder> {
+    async create(createOrderDto: CreateOrderDto, t?: Transaction): Promise<Order> {
         const transaction = t || await this.sequelize.transaction()
         try {
-            const { userId, items: orderItems, addressAndAddressId, phoneAndPhoneId } = createOrderDto;
+            const { userId, items: orderItems, phoneAndPhoneId, addressAndAddressId } = createOrderDto;
 
             const variants = await Promise.all(orderItems.map(async item => {
                 const variant = await this.productVariationsService.findOneById(item.variantId, [
@@ -128,7 +126,7 @@ export class OrdersService {
 
             if (!t) await transaction.commit()
 
-            return await this.findById(order.id, Object.values(OrderScope))
+            return await this.findOneById(order.id, Object.values(OrderScope))
 
         } catch (error) {
             if (!t) await transaction.rollback()
@@ -167,9 +165,9 @@ export class OrdersService {
     }
 
     async findOne(
-        data: Partial<Omit<IOrder, "phone" | "address" | "items" | "paymentMethod" | "cancelReasons">>,
+        data: Omit<IOrder, "items">,
         scopes: string[] = []
-    ): Promise<IOrder | null> {
+    ): Promise<Order | null> {
         try {
             const order = await this.orderModel.scope(scopes).findOne({ where: data })
 
@@ -181,11 +179,11 @@ export class OrdersService {
         }
     }
 
-    async findById(id: number, scopes: string[] = []): Promise<IOrder | null> {
+    async findOneById(id: number, scopes: string[] = []): Promise<Order | null> {
         try {
             const order = await this.orderModel.scope(scopes).findByPk(id)
 
-            if (!order) null;
+            if (!order) return null;
 
             return order["dataValues"]
         } catch (error) {
@@ -197,36 +195,33 @@ export class OrdersService {
         const transaction = await this.sequelize.transaction()
 
         try {
-            const order = await this.findById(id, [
+
+            const { stockOperation, ...orderDto } = updateOrderDto;
+
+            const order = await this.findOneById(id, [
                 OrderScope.WITH_ITEMS
             ])
 
-            if (!order) throw new NotFoundException();
+            if (!order) throw new NotFoundException("Order not found");
 
-            if (updateOrderDto.removeFromStock) {
+
+            if (orderDto.addToStock || orderDto.removeFromStock) {
+                const stock = orderDto.addToStock ? "addToStock" : "removeFromStock";
+
                 await Promise.all(order.items.map(async item => {
                     //update product quantity
-                    await this.stockService.removeFromStock(item.variantId, item.quantity, transaction)
+                    await this.stockService["stock"](item.variantId, item.quantity, transaction)
                 }))
             }
 
-            if (updateOrderDto.addToStock) {
-                await Promise.all(order.items.map(async item => {
-                    //update product quantity
-                    await this.stockService.addToStock(item.variantId, item.quantity, transaction)
-                }))
+            if (orderDto.reason) {
+                await this.ordersCancelReasonsService.create({
+                    reason: updateOrderDto.reason,
+                    orderId: id
+                }, transaction)
             }
 
-            if (updateOrderDto.status === OrderStatus.CANCELLED) {
-                if (updateOrderDto.reason)
-                    await this.ordersCancelReasonsService.create({
-                        reason: updateOrderDto.reason,
-                        orderId: id
-                    }, transaction)
-            }
-
-            if (updateOrderDto.status === OrderStatus.COMPLETED) {
-
+            if (orderDto.status === OrderStatus.COMPLETED) {
                 console.log(moment().format("YYYY-mm-dd HH:mm:ss"))
                 updateOrderDto.deliveredAt = moment().toDate()
             }
@@ -238,25 +233,25 @@ export class OrdersService {
 
             await transaction.commit()
 
-            return await this.findById(id)
+            return await this.findOneById(id)
         } catch (error) {
             await transaction.rollback()
             throw error
         }
     }
 
-    async findOrder(id: number, user?: IUser): Promise<IOrder> {
-        try {
-            const order = await this.findById(id, Object.values(OrderScope))
+    // async findOrder(id: number, user?: IUser): Promise<Order> {
+    //     try {
+    //         const order = await this.findById(id, Object.values(OrderScope))
 
-            if (!order) throw new NotFoundException()
+    //         if (!order) throw new NotFoundException()
 
-            if (user && order.userId !== user.id && user.role !== UserRole.ADMIN) throw new ForbiddenException()
+    //         if (user && order.userId !== user.id && user.role !== UserRole.ADMIN) throw new ForbiddenException()
 
-            return order
-        } catch (error) {
-            throw error
-        }
-    }
+    //         return order
+    //     } catch (error) {
+    //         throw error
+    //     }
+    // }
 
 }

@@ -1,10 +1,10 @@
 import { UpdateCartDto } from './dto/update-cart-dto';
 import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Cart } from './carts.entity';
+import { Cart } from './entities/carts.entity';
 import { CreateCartDto } from './dto/create-cart-dto';
-import { ICart } from './carts.interface'
 import { CartItemsService } from '../cart-items/cart-items.service';
+import { ICart } from './interface/cart.interface';
 
 @Injectable()
 export class CartsService {
@@ -16,7 +16,7 @@ export class CartsService {
     ) { }
 
 
-    async create(createCartDto: CreateCartDto): Promise<ICart> {
+    async create(createCartDto: CreateCartDto): Promise<Cart> {
         try {
             const cart = await this.cartModel.create<Cart>(createCartDto)
 
@@ -26,7 +26,7 @@ export class CartsService {
         }
     }
 
-    async findOne(data: Partial<Omit<ICart, "user" | "items">>, scopes: string[] = []): Promise<ICart | null> {
+    async findOne(data: Omit<ICart, "items">, scopes: string[] = []): Promise<Cart | null> {
         try {
 
             const cart = await this.cartModel.scope(scopes).findOne({ where: data })
@@ -39,7 +39,7 @@ export class CartsService {
         }
     }
 
-    async findOneById(id: number, scopes: string[] = []): Promise<ICart> {
+    async findOneById(id: number, scopes: string[] = []): Promise<Cart> {
         try {
 
             const cart = await this.cartModel.scope(scopes).findByPk(id)
@@ -50,7 +50,7 @@ export class CartsService {
         }
     }
 
-    async update(id: number, updateCartDto: UpdateCartDto): Promise<ICart> {
+    async update(id: number, updateCartDto: UpdateCartDto): Promise<Cart> {
         try {
 
             let cart = await this.findOneById(id)
@@ -61,10 +61,7 @@ export class CartsService {
                 where: { id }
             })
 
-            return {
-                ...cart,
-                ...updateCartDto
-            }
+            return await this.findOneById(id)
         } catch (error) {
             throw error
         }

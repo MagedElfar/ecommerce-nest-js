@@ -7,7 +7,6 @@ import { ProductVariationImage } from './products-variations-images.entity';
 import { IProductVariationImage } from './products-variations-images.interface';
 import { MediaService } from '../media/media.service';
 import { UploadImageDto } from './dto/upload-image.dto';
-import { IMedia } from '../media/media.interface';
 import { AssignImageDto } from './dto/assignImage.dto';
 
 @Injectable()
