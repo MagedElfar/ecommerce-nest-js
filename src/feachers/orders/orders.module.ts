@@ -14,6 +14,7 @@ import { PaymentsMethodsModule } from '../payments-methods/payments-method.modul
 import { OrdersCancelReasonsModule } from '../orders-cancel-reasons/orders-cancel-reasons.module';
 import { StockModule } from '../stock/stock.module';
 import { ProductsModule } from '../products/products.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -27,7 +28,8 @@ import { ProductsModule } from '../products/products.module';
     CartItemsModule,
     OrdersCancelReasonsModule,
     StockModule,
-    ProductVariationsModule
+    ProductVariationsModule,
+    UsersModule
   ],
   controllers: [OrdersController],
   providers: [OrdersService, OrdersHelper],

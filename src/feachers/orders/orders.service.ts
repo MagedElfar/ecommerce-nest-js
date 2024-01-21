@@ -20,6 +20,7 @@ import { StockService } from '../stock/stock.service';
 import * as moment from 'moment';
 import { ProductVariationsService } from '../products-variations/products-variations.service';
 import { IOrder } from './interfaces/order.interface';
+import { UsersService } from '../users/services/users.service';
 
 @Injectable()
 export class OrdersService {
@@ -35,12 +36,17 @@ export class OrdersService {
         private readonly productVariationsService: ProductVariationsService,
         private readonly stockService: StockService,
         private readonly sequelize: Sequelize,
+        private readonly userServices: UsersService
     ) { }
 
     async create(createOrderDto: CreateOrderDto, t?: Transaction): Promise<Order> {
         const transaction = t || await this.sequelize.transaction()
         try {
             const { userId, items: orderItems, phoneAndPhoneId, addressAndAddressId } = createOrderDto;
+
+            const user = await this.userServices.findById(userId)
+
+            if (!user) throw new NotFoundException("User not found")
 
             const variants = await Promise.all(orderItems.map(async item => {
                 const variant = await this.productVariationsService.findOneById(item.variantId, [
