@@ -205,11 +205,11 @@ export class ProductsService {
                     subCategories.map(async cat => {
 
                         const subCat = await this.subCategoriesService.findOne({
-                            id: cat.subCategoryId,
-                            categoryId: createProductDto.categoryId
+                            categoryId: createProductDto.categoryId,
+                            id: cat.subCategoryId
                         })
 
-                        if (!subCat) throw new NotFoundException(`SubCategory with id "${cat.subCategoryId}" not found or not belong to the parent category`);
+                        if (subCat) throw new NotFoundException(`Subcategory with "${cat.subCategoryId}" not found or not belong to the parent category`);
 
                         return await this.productsSubCategoriesService.create(
                             {
@@ -220,15 +220,11 @@ export class ProductsService {
                         )
                     })
                 )
-
-                Object.assign(product, { subCategories: productSubCategories })
             }
 
             await transaction.commit();
 
-            return product
-
-            // return await this.fullData(product["dataValues"].id)
+            return await this.fullData(product["dataValues"].id)
         } catch (error) {
             console.log(error)
             await transaction.rollback()

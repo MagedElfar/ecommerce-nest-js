@@ -54,11 +54,20 @@ export class ProductsSubCategoriesService {
                 const product = await this.productsService.findOneById(productId);
 
                 if (!product) throw new NotFoundException("Product not found")
+
+                const subCategory = await this.subCategoryService.findOne({
+                    categoryId: product.categoryId,
+                    id: subCategoryId
+                });
+
+                if (!subCategory) throw new NotFoundException(`Subcategory with "${subCategoryId}" not found or not belong to the parent category`);
+            } else {
+                const subCategory = await this.subCategoryService.findOneById(subCategoryId);
+
+                if (!subCategory) throw new NotFoundException(`sub category with id = ${subCategory} not exist`)
             }
 
-            const subCategory = await this.subCategoryService.findOneById(subCategoryId);
 
-            if (!subCategory) throw new NotFoundException(`sub category with id = ${subCategory} not exist`)
 
             //check if attribute already assign to that variant
             let productSubCategory = await this.findOne(
