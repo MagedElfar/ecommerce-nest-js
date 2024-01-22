@@ -8,13 +8,19 @@ import { ProductsSubCategoriesModule } from '../products-sub-categories/products
 import { ProductVariationsModule } from '../products-variations/products-variations.module';
 import { ProductsImageService } from './services/products-images.service';
 import { MediaModule } from '../media/media.module';
+import { CategoriesModule } from '../categories/categories.module';
+import { BrandsModule } from '../brands/brands.module';
+import { SubCategoriesModule } from '../sub-categories/sub-categories.module';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([Product]),
     forwardRef(() => ProductVariationsModule),
     forwardRef(() => ProductsSubCategoriesModule),
-    MediaModule
+    MediaModule,
+    CategoriesModule,
+    BrandsModule,
+    SubCategoriesModule
   ],
   providers: [ProductsService, ProductsImageService],
   controllers: [ProductsController, ProductsImageController],

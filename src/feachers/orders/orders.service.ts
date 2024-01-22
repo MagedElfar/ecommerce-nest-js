@@ -132,6 +132,7 @@ export class OrdersService {
 
             if (!t) await transaction.commit()
 
+
             return await this.findOneById(order.id, Object.values(OrderScope))
 
         } catch (error) {

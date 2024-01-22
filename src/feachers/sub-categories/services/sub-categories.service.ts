@@ -53,7 +53,7 @@ export class SubCategoriesService {
         }
     }
 
-    async findOne(data: Partial<Omit<ISubCategory, "image" | "subCategories" | "parent">>, scopes: string[] = []): Promise<ISubCategory | null> {
+    async findOne(data: ISubCategory, scopes: string[] = []): Promise<ISubCategory | null> {
         try {
             const subCategory = await this.subCategoryModel.scope(scopes).findOne({
                 where: data,

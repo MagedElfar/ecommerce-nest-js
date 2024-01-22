@@ -15,6 +15,9 @@ import { AttributeValue } from '../../attributes-values/entities/attribute-value
 import { ProductVariations } from '../../products-variations/entities/products-variations.entity';
 import { ProductVariationsService } from '../../products-variations/products-variations.service';
 import { Media } from 'src/feachers/media/entities/media.entity';
+import { CategoriesService } from 'src/feachers/categories/services/categories.service';
+import { BrandsService } from 'src/feachers/brands/services/brands.service';
+import { SubCategoriesService } from 'src/feachers/sub-categories/services/sub-categories.service';
 
 @Injectable()
 export class ProductsService {
@@ -26,7 +29,10 @@ export class ProductsService {
         @Inject(forwardRef(() => ProductsSubCategoriesService))
         private readonly productsSubCategoriesService: ProductsSubCategoriesService,
         private sequelize: Sequelize,
-        private mediaService: MediaService
+        private mediaService: MediaService,
+        private categoriesService: CategoriesService,
+        private brandsService: BrandsService,
+        private subCategoriesService: SubCategoriesService,
     ) { }
 
     private filterCriteria(filterOptions: Partial<Omit<ProductQueryDto, "limit" | "offset">>): {
@@ -133,10 +139,29 @@ export class ProductsService {
                 ...productDto
             } = createProductDto;
 
+            const product = {}
             //1-check if product exist
             const isProduct = await this.findOne({ name: createProductDto.name })
 
-            if (isProduct) throw new ConflictException(`product with name "${createProductDto.name}" already exist`)
+            if (isProduct) throw new ConflictException("product name must be unique")
+
+            //check if category exists
+            if (createProductDto.categoryId) {
+                const category = await this.categoriesService.findOneById(createProductDto.categoryId);
+
+                if (!category) throw new NotFoundException("Category not found");
+
+                Object.assign(product, category)
+            }
+
+            //check if brand exists
+            if (createProductDto.brandId) {
+                const brand = await this.brandsService.findOneById(createProductDto.brandId);
+
+                if (!brand) throw new NotFoundException("Category not found");
+
+                Object.assign(product, brand)
+            }
 
             //2-create product slug
             const slug: string = slugify.default(createProductDto.name, {
@@ -145,7 +170,7 @@ export class ProductsService {
             })
 
             //3-create new product in database
-            const product = await this.productModel.create<Product>(
+            const newProduct = await this.productModel.create<Product>(
                 {
                     ...productDto,
                     slug,
@@ -156,11 +181,11 @@ export class ProductsService {
                 }
             )
 
+            Object.assign(product, newProduct["dataValues"])
 
             //4-create new product variations if exist
             if (ProVariations && ProVariations.length > 0) {
-
-                await Promise.all(ProVariations.map(async variant => {
+                const variations = await Promise.all(ProVariations.map(async variant => {
                     return await this.productVariationsService.create(
                         {
                             ...variant,
@@ -170,12 +195,22 @@ export class ProductsService {
                     )
                 }))
 
+                Object.assign(product, { variations })
             }
 
             //add product sub categories if exist
             if (subCategories && subCategories.length > 0) {
-                await Promise.all(
+
+                const productSubCategories = await Promise.all(
                     subCategories.map(async cat => {
+
+                        const subCat = await this.subCategoriesService.findOne({
+                            id: cat.subCategoryId,
+                            categoryId: createProductDto.categoryId
+                        })
+
+                        if (!subCat) throw new NotFoundException(`SubCategory with id "${cat.subCategoryId}" not found or not belong to the parent category`);
+
                         return await this.productsSubCategoriesService.create(
                             {
                                 ...cat,
@@ -185,11 +220,15 @@ export class ProductsService {
                         )
                     })
                 )
+
+                Object.assign(product, { subCategories: productSubCategories })
             }
 
             await transaction.commit();
 
-            return await this.fullData(product["dataValues"].id)
+            return product
+
+            // return await this.fullData(product["dataValues"].id)
         } catch (error) {
             console.log(error)
             await transaction.rollback()
@@ -324,14 +363,12 @@ export class ProductsService {
                         values: [{
                             id: attr.id,
                             value: attr.value,
-                            // categoryAttribute: attr.CategoriesAttribute
                         }],
                     })
                 } else {
                     acc[index].values.push({
                         id: attr.id,
                         value: attr.value,
-                        // categoryAttribute: attr.CategoriesAttribute
                     })
                 }
 
