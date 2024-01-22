@@ -43,7 +43,8 @@ export class ProductsService {
         const where: WhereOptions<Product> = {}
 
         const include: Includeable[] = [{
-            model: Media
+            model: Media,
+            attributes: ["id", "url"]
         }]
 
 
