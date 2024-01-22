@@ -24,9 +24,7 @@ export enum CategoryScope {
     [CategoryScope.WITH_IMAGE]: {
         include: [{
             model: Media,
-            attributes: {
-                exclude: ["createdAt", "updatedAt"]
-            }
+            attributes: ["id", "url"]
         }]
     },
     [CategoryScope.WITH_SUB_CATEGORY]: {

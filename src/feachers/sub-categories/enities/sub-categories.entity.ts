@@ -11,7 +11,8 @@ export enum SubCategoryScope {
 @Scopes(() => ({
     [SubCategoryScope.WITH_IMAGE]: {
         include: [{
-            model: Media
+            model: Media,
+            attributes: ["id", "url"]
         }]
     }
 }))

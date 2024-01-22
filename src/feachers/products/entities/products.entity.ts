@@ -21,9 +21,7 @@ export enum ProductScop {
     [ProductScop.WITH_MEDIA]: {
         include: [{
             model: Media,
-            attributes: {
-                exclude: ["createdAt", "updatedAt"]
-            }
+            attributes: ["id", "url"]
         }]
     },
 

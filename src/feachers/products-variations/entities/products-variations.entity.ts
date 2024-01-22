@@ -19,6 +19,7 @@ export enum VariationScope {
     [VariationScope.WITH_MEDIA]: {
         include: [{
             model: Media,
+            attributes: ["id", "url"],
             through: { attributes: ["id"] }
         }]
     },
@@ -36,7 +37,7 @@ export enum VariationScope {
             attributes: ["id", "price", "name"],
             include: [{
                 model: Media,
-                attributes: ["url"]
+                attributes: ["id", "url"]
             }]
         }]
     },

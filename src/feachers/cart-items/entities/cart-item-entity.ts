@@ -19,7 +19,7 @@ export enum CartItemScope {
             include: [
                 {
                     model: Media,
-                    attributes: ["url"]
+                    attributes: ["id", "url"]
                 },
                 {
                     model: Product,

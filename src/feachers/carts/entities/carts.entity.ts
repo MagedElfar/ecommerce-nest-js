@@ -18,7 +18,7 @@ export enum CartScop {
                 include: [
                     {
                         model: Media,
-                        attributes: ["url"]
+                        attributes: ["id", "url"]
                     },
                     {
                         model: Product,

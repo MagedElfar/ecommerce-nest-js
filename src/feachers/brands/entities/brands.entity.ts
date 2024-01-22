@@ -12,9 +12,7 @@ export enum BrandScope {
     [BrandScope.WITH_IMAGE]: {
         include: [{
             model: Media,
-            attributes: {
-                exclude: ["createdAt", "updatedAt"]
-            }
+            attributes: ["id", "url"]
         }]
     }
 }))
