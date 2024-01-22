@@ -139,7 +139,6 @@ export class ProductsService {
                 ...productDto
             } = createProductDto;
 
-            const product = {}
             //1-check if product exist
             const isProduct = await this.findOne({ name: createProductDto.name })
 
@@ -150,8 +149,6 @@ export class ProductsService {
                 const category = await this.categoriesService.findOneById(createProductDto.categoryId);
 
                 if (!category) throw new NotFoundException("Category not found");
-
-                Object.assign(product, category)
             }
 
             //check if brand exists
@@ -160,7 +157,6 @@ export class ProductsService {
 
                 if (!brand) throw new NotFoundException("Category not found");
 
-                Object.assign(product, brand)
             }
 
             //2-create product slug
@@ -170,7 +166,7 @@ export class ProductsService {
             })
 
             //3-create new product in database
-            const newProduct = await this.productModel.create<Product>(
+            const product = await this.productModel.create<Product>(
                 {
                     ...productDto,
                     slug,
@@ -181,7 +177,6 @@ export class ProductsService {
                 }
             )
 
-            Object.assign(product, newProduct["dataValues"])
 
             //4-create new product variations if exist
             if (ProVariations && ProVariations.length > 0) {
@@ -194,8 +189,6 @@ export class ProductsService {
                         transaction
                     )
                 }))
-
-                Object.assign(product, { variations })
             }
 
             //add product sub categories if exist
