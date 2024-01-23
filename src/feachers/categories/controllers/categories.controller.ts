@@ -8,7 +8,7 @@ import { CategoryQueryDto } from '../dto/category-query.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, OmitType } from '@nestjs/swagger';
 import { CategoryScope } from '../entities/categories.entity';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { CategoryDto } from '../dto/category.dto';
 
 @ApiTags("Category")

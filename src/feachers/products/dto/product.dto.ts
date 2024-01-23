@@ -5,7 +5,7 @@ import { CategoryDto } from "src/feachers/categories/dto/category.dto";
 import { MediaDto } from "src/feachers/media/dto/media.dto";
 import { VariationDto } from "src/feachers/products-variations/dto/variation.dto";
 import { SubCategoryDto } from "src/feachers/sub-categories/dto/response/subCategory.dto";
-import { UserDto } from "src/feachers/users/dto/response/user.dto";
+import { UserDto } from "src/feachers/users/dto/user.dto";
 
 
 class ProductCategory extends PickType(CategoryDto, ["id", "name", "slug"]) { }

@@ -4,10 +4,16 @@ import { QueryDto } from "src/core/dto/query.dto";
 
 export class UserQueryDto extends QueryDto {
     @ApiPropertyOptional({
-        description: "username",
-        example: "maged",
+        description: "search term 'search in username , first name or last name'",
     })
     @IsOptional()
     @IsString()
-    name: string = ""
+    term: string = ""
+
+    @ApiPropertyOptional({
+        description: "user email",
+    })
+    @IsOptional()
+    @IsString()
+    email: string
 }

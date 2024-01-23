@@ -5,7 +5,7 @@ import { CreatePhoneDto } from './dto/create-phone.dto';
 import { UpdatePhoneDto } from './dto/update-add.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { PhoneQueryDto } from './dto/phone-query.dto';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { Permissions } from "./../../core/decorators/permissions.decorator"
 import { PhoneDto } from './dto/phone.dto';
 import { UserRole } from 'src/core/constants';

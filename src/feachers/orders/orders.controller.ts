@@ -9,7 +9,7 @@ import { UserRole } from 'src/core/constants';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { OrderDto } from './dto/order.dto';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { Permissions } from 'src/core/decorators/permissions.decorator';
 import { OwnerShipGuard } from 'src/core/guards/owner-ship.guard';
 import { OrderScope } from './entities/order.entity';

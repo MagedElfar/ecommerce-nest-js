@@ -1,17 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CloudinaryService } from 'src/utility/cloudinary/cloudinary.service';
 import { Media } from './entities/media.entity';
-import { InjectModel } from '@nestjs/sequelize';
 import { UploadMediaDto } from './dto/uploadMedia.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Transaction } from 'sequelize';
 import { MediaQueryDto } from './dto/media.query.dto';
+import { MediaRepository } from './media.repository';
+import { MediaHelper } from './media.helper';
 
 @Injectable()
 export class MediaService {
     constructor(
-        @InjectModel(Media)
-        private readonly mediaModel: typeof Media,
+        private readonly mediaRepository: MediaRepository,
+        private readonly mediaHelper: MediaHelper,
         private readonly cloudinaryService: CloudinaryService,
         private sequelize: Sequelize,
     ) { }
@@ -19,12 +20,15 @@ export class MediaService {
     async findAll(mediaQueryDto: MediaQueryDto, scope: string[] = []) {
         try {
 
-            const { limit, page } = mediaQueryDto
+            const { limit, page, fromDate, toDate } = mediaQueryDto
 
-            const result = await this.mediaModel.scope(scope).findAndCountAll({
-                limit,
-                offset: (page - 1) * limit
-            });
+            const where = this.mediaHelper.buildDateRangeFilter(fromDate, toDate)
+
+            const result = await this.mediaRepository.findAndCountAll({
+                where,
+                scope,
+                options: { limit, offset: page }
+            })
 
             return result
         } catch (error) {
@@ -42,7 +46,7 @@ export class MediaService {
             url = cloudinary.url
 
 
-            return await this.mediaModel.create({ url, storageKey })
+            return await this.mediaRepository.create({ url, storageKey })
 
         } catch (error) {
             if (storageKey)
@@ -53,11 +57,7 @@ export class MediaService {
 
     async findById(id: number): Promise<Media | null> {
         try {
-            const media = await this.mediaModel.findByPk(id)
-
-            if (!media) return null;
-
-            return media["dataValues"]
+            return await this.mediaRepository.findById(id)
         } catch (error) {
             throw error
         }
@@ -71,10 +71,7 @@ export class MediaService {
 
             if (!media) throw new NotFoundException()
 
-            const isDelete = await this.mediaModel.destroy({
-                where: { id },
-                transaction
-            },)
+            await this.mediaRepository.delete(id, { transaction })
 
             await this.cloudinaryService.delete(media.storageKey);
 

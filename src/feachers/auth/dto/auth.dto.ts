@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from "@nestjs/swagger"
-import { UserDto } from "src/feachers/users/dto/response/user.dto"
+import { UserDto } from "src/feachers/users/dto/user.dto"
 
 export class AuthDto {
     @ApiPropertyOptional({

@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType, PickType } from "@nestjs/swagger";
 import { BaseDto } from "src/core/dto/base-model.dto";
-import { UserDto } from "src/feachers/users/dto/response/user.dto";
+import { UserDto } from "src/feachers/users/dto/user.dto";
 
 // class AddressUser extends PickType(UserDto, []) { }
 

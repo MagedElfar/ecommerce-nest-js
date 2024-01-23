@@ -13,6 +13,7 @@ export class MatchConstraint implements ValidatorConstraintInterface {
 
         const [relatedPropertyName] = args.constraints;
         const relatedValue = (args.object as any)[relatedPropertyName];
+
         return value === relatedValue;
     }
 

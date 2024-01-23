@@ -7,7 +7,7 @@ import { UpdateAttributeDto } from './dto/update-attribute.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AttributeScopes } from './entities/attribute.entity';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { AttributeDto } from './dto/attribute.dto';
 import { AttributeQueryDto } from './dto/attribute.query';
 

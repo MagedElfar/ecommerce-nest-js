@@ -1,35 +1,37 @@
-import { UserQueryDto } from '../dto/request/userQuery.dto';
+import { UserRepository } from './../user.repository';
+import { UserQueryDto } from '../dto/userQuery.dto';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from '../dto/request/createUserDto.dto';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { User, UserScop } from '../user.entity';
 import { IUser } from '../users.interface';
 import { InjectModel } from '@nestjs/sequelize';
-import { UpdateUserDto } from '../dto/request/updateUserDto.dto';
-import { Op } from 'sequelize';
-import { UpdateRoleDto } from '../dto/request/update-role.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { Op, where } from 'sequelize';
+import { UpdateRoleDto } from '../dto/update-role.dto';
 
 
 @Injectable()
 export class UsersService {
 
 
-    constructor(
-        @InjectModel(User)
-        private userModel: typeof User,
-    ) { }
+    constructor(private readonly userRepository: UserRepository) { }
 
     async findAll(userQueryDto: UserQueryDto, scope: any[] = []) {
         try {
-            const { limit, page, name } = userQueryDto;
+            const { limit, page, term, ...others } = userQueryDto;
 
-            const result = await this.userModel.scope(scope).findAndCountAll({
+            const result = await this.userRepository.findAndCountAll({
                 where: {
-                    name: { [Op.iLike]: `%${name}%` }
+                    [Op.or]: [
+                        { name: { [Op.iLike]: `%${term}%` } },
+                        { firstName: { [Op.iLike]: `%${term}%` } },
+                        { lastName: { [Op.iLike]: `%${term}%` } }
+                    ],
+                    ...others
                 },
-                limit,
-                offset: (page - 1) * limit
+                options: { limit },
+                scope
             });
-
 
             return result
         } catch (error) {
@@ -37,30 +39,22 @@ export class UsersService {
         }
     }
 
-    async findById(id: number, scope: any[] = []): Promise<IUser | null> {
+    async findById(id: number, scope: any[] = []): Promise<User | null> {
         try {
-            const user = await this.userModel.scope(scope).findByPk(
-                id
-            );
 
-            if (!user) return null
+            return await this.userRepository.findById(id, scope);
 
-            return user["dataValues"]
         } catch (error) {
             throw error
         }
     }
 
 
-    async findOne(data: Partial<Omit<IUser, "image">>, scope: any[] = []): Promise<IUser | null> {
+    async findOne(where: IUser, scope: any[] = []): Promise<User | null> {
         try {
-            const user = await this.userModel.scope(scope).findOne({
-                where: data,
-            });
 
-            if (!user) return null
+            return await this.userRepository.findOne({ where, scope })
 
-            return user["dataValues"]
         } catch (error) {
             throw error
         }
@@ -68,47 +62,40 @@ export class UsersService {
 
     async create(createUserDto: CreateUserDto): Promise<IUser> {
         try {
-            const user = await this.userModel.create<User>(createUserDto);
 
-            return user["dataValues"]
+            return await this.userRepository.create(createUserDto)
+
         } catch (error) {
-            if (error.name === 'SequelizeUniqueConstraintError') {
-                throw new BadRequestException('Email address is already in use');
-            }
+
             throw error
         }
     }
 
-    async update(id: number, updateUserDto: UpdateUserDto | Partial<Omit<IUser, "image" | "addresses" | "phones">>): Promise<Partial<IUser>> {
+    async update(id: number, updateUserDto: UpdateUserDto) {
         try {
-            let user = await this.findById(id);
 
-            if (!user) throw new NotFoundException()
+            const affectedRows = await this.userRepository.update(id, updateUserDto)
 
-            await this.userModel.update(updateUserDto, { where: { id } });
+            if (affectedRows === 0)
+                throw new NotFoundException("User not found")
 
-            const { password, ...result } = user
-
-            return await this.findById(id, [
-                UserScop.EXCLUDE_PASSWORD,
-                UserScop.WITH_Media,
-                UserScop.WITH_PHONE,
-                UserScop.WITH_ADDRESS
-            ])
+            return await this.findById(id, [UserScop.EXCLUDE_PASSWORD])
         } catch (error) {
             throw error
         }
     }
 
-    async updateRole(updateRoleDto: UpdateRoleDto): Promise<void> {
+
+
+    async delete(id: number): Promise<void> {
         try {
-            const { userId, role } = updateRoleDto;
 
-            const user = await this.findById(userId);
+            const isDeleted = await this.userRepository.delete(id)
 
-            if (!user) throw new NotFoundException();
+            if (!isDeleted)
+                throw new NotFoundException("User not found")
 
-            await this.update(userId, { role })
+            return
         } catch (error) {
             throw error
         }

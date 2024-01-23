@@ -52,9 +52,8 @@ export class AuthService {
         const { password, ...result } = newUser;
 
         // generate token
-        const token = await this.generateToken(result);
+        const token = await this.generateToken({ id: result.id });
 
-        // return the user and the token
         return { user: result, token };
     }
 

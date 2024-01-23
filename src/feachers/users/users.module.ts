@@ -6,6 +6,7 @@ import { User } from './user.entity';
 import { UsersImagesController } from './controllers/users-images.controller';
 import { UsersImagesService } from './services/users-images.service';
 import { MediaModule } from '../media/media.module';
+import { UserRepository } from './user.repository';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { MediaModule } from '../media/media.module';
     MediaModule
   ],
   controllers: [UsersController, UsersImagesController],
-  providers: [UsersService, UsersImagesService],
+  providers: [UsersService, UsersImagesService, UserRepository],
   exports: [UsersService]
 })
 export class UsersModule { }

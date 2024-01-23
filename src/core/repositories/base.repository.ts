@@ -83,7 +83,9 @@ export abstract class BaseRepository<T extends Model> {
 
     async create(entity: Partial<CreationAttributes<T>>, options?: FindOptions): Promise<T> {
         try {
-            return await this.model.create(entity as any, options);
+            const data = await this.model.create(entity as any, options);
+
+            return data["dataValues"]
         } catch (error) {
             throw error
         }

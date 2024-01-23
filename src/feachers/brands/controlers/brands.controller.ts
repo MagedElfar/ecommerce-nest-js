@@ -8,7 +8,7 @@ import { BrandQueryDto } from '../dto/brands-query.dto';
 import { UpdateBrandDto } from '../dto/update-brand.dto';
 import { Public } from 'src/core/decorators/public.decorator';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { BrandDto } from '../dto/brand.dto';
 
 @ApiTags("Brands")

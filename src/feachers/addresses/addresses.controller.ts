@@ -6,7 +6,7 @@ import { User } from 'src/core/decorators/user.decorator';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AddressQueryDto } from './dto/address-query.dto';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { Address, AddressScope } from './entities/address.entity';
 import { OwnerShipGuard } from 'src/core/guards/owner-ship.guard';
 import { InjectUserInterceptor } from 'src/core/interceptors/inject-user.interceptor';

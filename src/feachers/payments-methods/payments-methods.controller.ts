@@ -4,7 +4,7 @@ import { Roles } from 'src/core/decorators/role.decorator';
 import { UserRole } from 'src/core/constants';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
 import { ApiBearerAuth, ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ApiFindAllResponse } from 'src/core/decorators/apiFindAllResponse';
+import { ApiFindAllResponse } from 'src/core/decorators/api-find-all-response.decorator';
 import { PaymentMethodDto } from './dto/paymentMethod.dto';
 
 @ApiTags("Payment Method")

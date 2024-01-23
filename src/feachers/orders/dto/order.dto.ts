@@ -7,7 +7,7 @@ import { OrderItemDto } from "src/feachers/orders-items/dto/orderItem.dto";
 import { PaymentMethodDto } from "src/feachers/payments-methods/dto/paymentMethod.dto";
 import { PaymentDto } from "src/feachers/payments/dto/payment.dto";
 import { PhoneDto } from "src/feachers/phones/dto/phone.dto";
-import { UserDto } from "src/feachers/users/dto/response/user.dto";
+import { UserDto } from "src/feachers/users/dto/user.dto";
 
 class UserOrder extends PickType(UserDto, ["id", "name", "email"]) { }
 
