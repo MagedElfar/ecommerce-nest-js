@@ -8,6 +8,8 @@ import { IOrder } from 'src/feachers/orders/interfaces/order.interface';
 @Injectable()
 export class CashPaymentStrategy implements PaymentStrategy {
 
+
+
     constructor(private readonly ordersService: OrdersService) { }
     async pay(order: IOrder) {
 
