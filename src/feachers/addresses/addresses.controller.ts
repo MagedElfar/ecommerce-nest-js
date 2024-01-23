@@ -14,7 +14,7 @@ import { AddressDto } from './dto/address.dto';
 import { UserRole } from 'src/core/constants';
 
 
-@ApiTags("Addresses")
+@ApiTags("Address")
 @ApiBearerAuth()
 @Controller('addresses')
 @Permissions(AddressesService)
@@ -56,18 +56,14 @@ export class AddressesController {
     @ApiOkResponse({ type: AddressDto })
     async getOne(
         @Param("id", ParseIntPipe) id: number,
-        @User("id") userId: number
     ): Promise<Address> {
         try {
 
-            const address = await this.addressesService.findOne({
-                id,
-                userId
-            }, [AddressScope.WITH_USER]);
+            const address = await this.addressesService.findById(id, [AddressScope.WITH_USER]);
 
-            if (!address) throw new NotFoundException()
-
+            if (!address) throw new NotFoundException("Address not found")
             return address
+
         } catch (error) {
             throw error
         }
@@ -91,16 +87,14 @@ export class AddressesController {
             if (!createAddressDto.userId)
                 createAddressDto.userId = userId;
 
-            const address = await this.addressesService.create(createAddressDto);
+            return await this.addressesService.create(createAddressDto);
 
-            return address
         } catch (error) {
             throw error
         }
     }
 
     @Put(":id")
-    @UseInterceptors(InjectUserInterceptor)
     @UseGuards(OwnerShipGuard)
     @ApiOperation({
         summary: "Update address",
@@ -119,12 +113,8 @@ export class AddressesController {
     ) {
         try {
 
-            if (!updateAddressDto.userId)
-                updateAddressDto.userId = userId;
+            return await this.addressesService.update(id, updateAddressDto);
 
-            const address = await this.addressesService.update(id, updateAddressDto);
-
-            return address
         } catch (error) {
             throw error
         }
@@ -141,14 +131,14 @@ export class AddressesController {
         `
     })
     @ApiParam({ description: "address id", name: 'id' })
-    @HttpCode(HttpStatus.NO_CONTENT)
     async delete(
         @Param("id", ParseIntPipe) id: number,
         @User("id") userId: number
     ) {
         try {
             await this.addressesService.delete(id, userId);
-            return
+
+            return { message: "Address is deleted successfully" }
         } catch (error) {
             throw error
         }

@@ -1,4 +1,10 @@
-import { Model, FindOptions, ModelStatic, CreationAttributes } from 'sequelize';
+import { Model, FindOptions, ModelStatic, CreationAttributes, WhereOptions } from 'sequelize';
+
+interface IReadRecord<T> {
+    scope?: string[],
+    where?: WhereOptions<T>,
+    options?: FindOptions
+}
 
 export abstract class BaseRepository<T extends Model> {
     private readonly model: ModelStatic<T>;
@@ -7,23 +13,69 @@ export abstract class BaseRepository<T extends Model> {
         this.model = model;
     }
 
-    async findAll(scope: string[] = [], options?: FindOptions): Promise<T[]> {
+    async findAndCountAll({ where, scope = [], options }: IReadRecord<T>): Promise<any> {
         try {
 
-            const { limit, offset } = options
-            return await this.model.scope(scope).findAll({
+            const { limit, offset, ...rest } = options
+
+            console.log(rest)
+
+            return await this.model.scope(scope).findAndCountAll({
+                where,
                 limit,
                 offset: (offset - 1) * limit,
-                ...options
+                ...rest
             });
         } catch (error) {
             throw error
         }
     }
 
-    async findById(id: number, scope: string[] = [], options?: FindOptions): Promise<T | null> {
+    async findAll({ where, scope = [], options }: IReadRecord<T>): Promise<T[]> {
         try {
-            return await this.model.scope(scope).findByPk(id, options);
+
+            const { limit, offset, ...rest } = options
+            return await this.model.scope(scope).findAll({
+                where,
+                limit,
+                offset: (offset - 1) * limit,
+                ...rest
+            });
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async countAll({ where }: IReadRecord<T>): Promise<number> {
+        try {
+            return await this.model.count({ where });
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findById(id: number, scope = []): Promise<T | null> {
+        try {
+            const data = await this.model.scope(scope).findByPk(id);
+
+            if (!data) return null
+
+            return data["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOne({ where, scope = [], options }: IReadRecord<T>): Promise<T | null> {
+        try {
+            const data = await this.model.scope(scope).findOne({
+                where,
+                ...options
+            });
+
+            if (!data) return null
+
+            return data["dataValues"]
         } catch (error) {
             throw error
         }
@@ -37,11 +89,13 @@ export abstract class BaseRepository<T extends Model> {
         }
     }
 
-    async update(id: number, entity: Partial<T>, options?: FindOptions): Promise<T | null> {
+    async update(id: number, entity: Partial<T>, options?: FindOptions): Promise<number> {
 
         try {
-            await this.model.update(entity, { where: { id }, ...options });
-            return this.findById(id, []);
+
+            const [affectedRowsCount] = await this.model.update(entity, { where: { id }, ...options });
+
+            return affectedRowsCount
         } catch (error) {
             throw error
         }
@@ -49,7 +103,11 @@ export abstract class BaseRepository<T extends Model> {
     }
 
     async delete(id: number, options?: FindOptions): Promise<number> {
-        const result = await this.model.destroy({ where: { id }, ...options });
-        return result;
+        try {
+            const result = await this.model.destroy({ where: { id }, ...options });
+            return result;
+        } catch (error) {
+            error
+        }
     }
 }

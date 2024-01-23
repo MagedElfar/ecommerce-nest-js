@@ -52,7 +52,7 @@ export class CategoriesAttributeService {
             if (!category)
                 throw new NotFoundException("category not exist")
 
-            const value = await this.attributeValuesService.findOneById(attributeId)
+            const value = await this.attributeValuesService.findById(attributeId)
 
             if (!value)
                 throw new NotFoundException("attribute value not exist")

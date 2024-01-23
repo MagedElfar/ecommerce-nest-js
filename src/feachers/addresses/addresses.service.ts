@@ -1,30 +1,27 @@
+import { AddressRepository } from './address.repository';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Address } from './entities/address.entity';
-import { InjectModel } from '@nestjs/sequelize';
 import { AddressQueryDto } from './dto/address-query.dto';
 import { IAddress } from './interfaces/address.interface';
 
 @Injectable()
 export class AddressesService {
 
-    constructor(
-        @InjectModel(Address)
-        private readonly addressModel: typeof Address
-    ) { }
-
+    constructor(private readonly addressRepository: AddressRepository) { }
 
     async findAll(addressQueryDto: AddressQueryDto, scope: string[] = []) {
         try {
 
-            const { limit, page } = addressQueryDto
+            const { limit, page, userId } = addressQueryDto
 
-            const result = await this.addressModel.scope(scope).findAndCountAll({
-                where: { userId: addressQueryDto.userId },
-                limit,
-                offset: (page - 1) * limit
-            });
+            const result = await this.addressRepository.findAndCountAll({
+                where: { userId },
+                options: { limit, offset: page },
+                scope
+            })
+
 
             return result
         } catch (error) {
@@ -36,36 +33,29 @@ export class AddressesService {
     async create(createAddressDto: CreateAddressDto): Promise<Address> {
         try {
 
-            const address = await this.addressModel.create(createAddressDto);
+            const address = await this.addressRepository.create(createAddressDto);
 
-            return address["dataValues"]
+            return address
         } catch (error) {
             throw error
         }
     }
 
-    async findOne(data: IAddress, scope: string[] = []): Promise<Address | null> {
+    async findOne(where: IAddress, scope: string[] = []): Promise<Address | null> {
         try {
-            const address = await this.addressModel.scope(scope).findOne(
-                { where: data }
-            );
 
-            if (!address) return null
+            return await this.addressRepository.findOne({ where, scope });
 
-            return address["dataValues"]
         } catch (error) {
             throw error
         }
     }
 
-    async findOneById(id: number, scope: string[] = []): Promise<Address | null> {
+    async findById(id: number, scope: string[] = []): Promise<Address | null> {
         try {
 
-            const address = await this.addressModel.scope(scope).findByPk(id);
+            return await this.addressRepository.findById(id, scope)
 
-            if (!address) return null
-
-            return address["dataValues"]
         } catch (error) {
             throw error
         }
@@ -74,16 +64,12 @@ export class AddressesService {
     async update(id: number, updateAddressDto: UpdateAddressDto): Promise<Address> {
         try {
 
-            const [affectedRowsCount] = await this.addressModel.update(
-                updateAddressDto,
-                { where: { id } },
-            );
+            const affectedRowsCount = await this.addressRepository.update(id, updateAddressDto);
 
-            if (affectedRowsCount === 0) {
+            if (affectedRowsCount === 0)
                 throw new NotFoundException('Address not found');
-            }
 
-            return await this.findOneById(id);
+            return await this.findById(id);
 
         } catch (error) {
             throw error
@@ -92,12 +78,12 @@ export class AddressesService {
 
     async delete(id: number, userId: number): Promise<void> {
         try {
-            const address = await this.findOne({ id, userId });
 
-            if (!address)
+            const isDeleted = await this.addressRepository.delete(id)
+
+            if (!isDeleted)
                 throw new NotFoundException();
 
-            await this.addressModel.destroy({ where: { id } })
             return;
         } catch (error) {
             throw error

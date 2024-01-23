@@ -27,10 +27,10 @@ export class OwnerShipGuard implements CanActivate {
 
         this.service = await this.moduleRef.create(service);
 
-        const resource = await this.service.findOneById(resourceId)
+        const resource = await this.service.findById(resourceId)
 
         if (userId !== resource?.userId) {
-            throw new ForbiddenException('You do not have the necessary permissions.');
+            throw new ForbiddenException('Access Denied');
         }
 
         return true;

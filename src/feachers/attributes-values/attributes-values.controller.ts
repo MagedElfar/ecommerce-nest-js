@@ -7,7 +7,7 @@ import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
 import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
 import { AttributeValueDto } from './dto/attribute-value.dto';
 
-@ApiTags("Attributes Values")
+@ApiTags("Attribute Value")
 @ApiBearerAuth()
 @Controller('attributes-values')
 export class AttributeValuesController {
@@ -24,9 +24,8 @@ export class AttributeValuesController {
     async create(@Body() createAttributeValueDto: CreateAttributeValueDto) {
         try {
 
-            const value = await this.attributeValuesService.create(createAttributeValueDto);
+            return await this.attributeValuesService.create(createAttributeValueDto);
 
-            return value
         } catch (error) {
             throw error
         }
@@ -46,26 +45,25 @@ export class AttributeValuesController {
     ) {
         try {
 
-            const value = await this.attributeValuesService.update(id, updateAttributeValueDto);
+            return await this.attributeValuesService.update(id, updateAttributeValueDto);
 
-            return value
         } catch (error) {
             throw error
         }
     }
 
     @Delete(":id")
-    @Roles([UserRole.ADMIN, UserRole.MANAGER])
+    @Roles([UserRole.ADMIN])
     @ApiOperation({
         summary: "delete attribute value",
-        description: `Role Required:  ${UserRole.ADMIN} - ${UserRole.MANAGER}`
+        description: `Role Required:  ${UserRole.ADMIN}`
     })
     @ApiParam({ name: "id", description: "attribute value id" })
     async delete(@Param("id", ParseIntPipe) id: number) {
         try {
             const value = await this.attributeValuesService.delete(id);
 
-            return value
+            return { message: "Attribute value is deleted successfully" }
         } catch (error) {
             throw error
         }

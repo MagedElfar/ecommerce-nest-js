@@ -63,7 +63,7 @@ export class ProductVariationAttributesService {
             }
 
             //check if attribute exist
-            const attribute = await this.attributeValuesService.findOneById(
+            const attribute = await this.attributeValuesService.findById(
                 attrId,
             );
 

@@ -1,7 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { AttributeValueRepository } from './attribute-value.repository';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { AttributeValue } from './entities/attribute-value.entity';
-import { InjectModel } from '@nestjs/sequelize';
-import { Sequelize } from 'sequelize-typescript';
 import { CreateAttributeValueDto } from './dto/create-attribute-value.dto';
 import { UpdateAttributeValueDto } from './dto/update-attribute-value.dto';
 import { IAttributeValue } from './interface/attribute-value.interface';
@@ -9,49 +8,37 @@ import { IAttributeValue } from './interface/attribute-value.interface';
 @Injectable()
 export class AttributeValuesService {
     constructor(
-        @InjectModel(AttributeValue)
-        private readonly attributeValueModel: typeof AttributeValue,
-        private sequelize: Sequelize,
+        private readonly attributeValueRepository: AttributeValueRepository,
     ) { }
 
 
     async create(createAttributeValueDto: CreateAttributeValueDto): Promise<AttributeValue> {
         try {
-            let value = await this.findOne({ ...createAttributeValueDto });
 
-            if (value) throw new BadRequestException("this attribute already has this value")
+            const { attributeId, value } = createAttributeValueDto;
 
-            value = await this.attributeValueModel.create(createAttributeValueDto);
+            const attrValue = await this.findOne({ attributeId, value });
 
-            return value["dataValues"]
+            if (attrValue) throw new ConflictException("this attribute already has this value")
+
+            return await this.attributeValueRepository.create(createAttributeValueDto);
+
         } catch (error) {
-
             throw error;
         }
     }
 
-    async findOne(data: IAttributeValue): Promise<AttributeValue | null> {
+    async findOne(where: IAttributeValue, scope: string[] = []): Promise<AttributeValue | null> {
         try {
-
-            const value = await this.attributeValueModel.findOne({ where: data });
-
-            if (!value) return null;
-
-            return value["dataValues"]
+            return await this.attributeValueRepository.findOne({ where, scope });
         } catch (error) {
             throw error
         }
     }
 
-    async findOneById(
-        id: number,
-    ): Promise<AttributeValue | null> {
+    async findById(id: number, scope: string[] = []): Promise<AttributeValue | null> {
         try {
-            const value = await this.attributeValueModel.findByPk(id);
-
-            if (!value) return null;
-
-            return value["dataValues"]
+            return await this.attributeValueRepository.findById(id, scope);
         } catch (error) {
             throw error
         }
@@ -61,7 +48,11 @@ export class AttributeValuesService {
         id: number,
     ): Promise<void> {
         try {
-            const isDeleted = await this.attributeValueModel.destroy({ where: { id } })
+            const isDeleted = await this.attributeValueRepository.delete(id);
+
+            if (!isDeleted) throw new NotFoundException("Attribute value not found")
+
+            return;
         } catch (error) {
             throw error
         }
@@ -70,13 +61,13 @@ export class AttributeValuesService {
     async update(id: number, updateAttributeValueDto: UpdateAttributeValueDto): Promise<AttributeValue> {
         try {
 
-            const [affectedRowsCount] = await this.attributeValueModel.update(updateAttributeValueDto, { where: { id } })
+            const affectedRowsCount = await this.attributeValueRepository.update(id, updateAttributeValueDto)
 
             if (affectedRowsCount === 0) {
                 throw new NotFoundException('Address not found');
             }
 
-            return await this.findOneById(id)
+            return await this.findById(id)
         } catch (error) {
 
             throw error

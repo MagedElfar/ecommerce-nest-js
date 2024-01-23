@@ -1,26 +1,36 @@
+import { AttributeRepository } from './attributes.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { Attribute } from './entities/attribute.entity';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
+import { Op } from 'sequelize';
+import { AttributeQueryDto } from './dto/attribute.query';
+import { IAttribute } from './interfaces/attribute.interface';
 
 @Injectable()
 export class AttributesService {
-    constructor(
-        @InjectModel(Attribute)
-        private readonly attributeModel: typeof Attribute,
-    ) { }
+    constructor(private readonly attributeRepository: AttributeRepository) { }
 
-    async findAll(scopes: string[] = []): Promise<any> {
+    async findAll(attributeQueryDto: AttributeQueryDto, scope: string[] = []): Promise<any> {
         try {
 
-            const rows = await this.attributeModel.scope(scopes).findAll({
-                group: ['Attribute.id', 'values.id'],
+            const { limit, page, term } = attributeQueryDto;
+
+            const rows = await this.attributeRepository.findAll({
+                scope,
+                where: { name: { [Op.iLike]: `%${term}%` } },
+                options: {
+                    group: ['Attribute.id'],
+                    offset: page,
+                    limit
+                }
             });
 
-            const count = await this.attributeModel.count();
+            const count = await this.attributeRepository.countAll({
+                where: { name: { [Op.iLike]: `%${term}%` } },
+            })
 
-            return { rows, count };
+            return { count, rows }
 
         } catch (error) {
             throw error;
@@ -28,13 +38,21 @@ export class AttributesService {
     }
 
 
-    async findOneById(id: number, scopes: string[] = []): Promise<Attribute | null> {
+    async findById(id: number, scope: string[] = []): Promise<Attribute> {
         try {
-            const attribute = await this.attributeModel.scope(scopes).findByPk(id)
 
-            if (!attribute) return null;
+            return await this.attributeRepository.findById(id, scope)
 
-            return attribute["dataValues"]
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async findOne(where: IAttribute, scope: string[] = []): Promise<Attribute> {
+        try {
+
+            return await this.attributeRepository.findOne({ where })
+
         } catch (error) {
             throw error
         }
@@ -44,9 +62,7 @@ export class AttributesService {
     async create(createAttributeDto: CreateAttributeDto): Promise<Attribute> {
         try {
 
-            const attribute = await this.attributeModel.create<Attribute>(createAttributeDto);
-
-            return attribute["dataValues"];
+            return await this.attributeRepository.create(createAttributeDto);
 
         } catch (error) {
 
@@ -57,13 +73,13 @@ export class AttributesService {
     async update(id: number, updateAttributeDto: UpdateAttributeDto): Promise<Attribute> {
         try {
 
-            const [affectedRowsCount] = await this.attributeModel.update<Attribute>(updateAttributeDto, { where: { id } })
+            const affectedRowsCount = await this.attributeRepository.update(id, updateAttributeDto)
 
-            if (affectedRowsCount === 0) {
+            if (affectedRowsCount === 0)
                 throw new NotFoundException('Attribute not found');
-            }
 
-            return await this.findOneById(id)
+
+            return await this.findById(id)
 
         } catch (error) {
 
@@ -75,12 +91,11 @@ export class AttributesService {
         try {
 
 
-            const isDeleted = await this.attributeModel.destroy({ where: { id } })
+            const isDeleted = await this.attributeRepository.delete(id)
 
-            if (!isDeleted) throw new NotFoundException();
+            if (!isDeleted) throw new NotFoundException('Attribute not found');
 
-
-            return
+            return;
         } catch (error) {
 
             throw error

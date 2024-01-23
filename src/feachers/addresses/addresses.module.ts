@@ -3,12 +3,12 @@ import { AddressesController } from './addresses.controller';
 import { AddressesService } from './addresses.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Address } from './entities/address.entity';
-import { InjectUserInterceptor } from 'src/core/interceptors/inject-user.interceptor';
+import { AddressRepository } from './address.repository';
 
 @Module({
   imports: [SequelizeModule.forFeature([Address])],
   controllers: [AddressesController],
-  providers: [AddressesService],
+  providers: [AddressesService, AddressRepository],
   exports: [AddressesService]
 })
 export class AddressesModule { }
